@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
+import heroLeader from "@/assets/hero-leader.jpg";
 
 export const Hero = () => {
   const scrollToContact = () => {
@@ -15,7 +16,9 @@ export const Hero = () => {
       </div>
 
       <div className="container relative z-10 mx-auto px-4 py-24 md:py-32 lg:py-40">
-        <div className="max-w-4xl mx-auto text-center space-y-8">
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-7xl mx-auto">
+          {/* Content */}
+          <div className="text-center lg:text-left space-y-8 order-2 lg:order-1">
           <div className="inline-block px-4 py-2 bg-accent/10 backdrop-blur-sm rounded-full border border-accent/20 mb-4">
             <span className="text-accent font-semibold">Para líderes que quieren serlo de verdad</span>
           </div>
@@ -52,6 +55,19 @@ export const Hero = () => {
             Sin riesgo. Solo pagas por resultados reales.
           </p>
         </div>
+
+        {/* Image */}
+        <div className="order-1 lg:order-2">
+          <div className="relative rounded-3xl overflow-hidden shadow-strong">
+            <img 
+              src={heroLeader} 
+              alt="Líder de negocios exitoso y confiado"
+              className="w-full h-auto object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/40 to-transparent"></div>
+          </div>
+        </div>
+      </div>
       </div>
 
       {/* Bottom wave */}

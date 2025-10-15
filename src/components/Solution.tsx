@@ -1,4 +1,5 @@
 import { CheckCircle2 } from "lucide-react";
+import solutionPartnership from "@/assets/solution-partnership.jpg";
 
 const benefits = [
   "Identificamos las fugas de dinero que no ves",
@@ -35,8 +36,17 @@ export const Solution = () => {
           </p>
         </div>
 
-        <div className="max-w-5xl mx-auto">
-          <div className="grid md:grid-cols-2 gap-8 mb-12">
+        <div className="max-w-6xl mx-auto">
+          {/* Partnership Image */}
+          <div className="mb-12 rounded-3xl overflow-hidden shadow-strong max-w-4xl mx-auto">
+            <img 
+              src={solutionPartnership} 
+              alt="Socios de negocios cerrando acuerdo exitoso"
+              className="w-full h-64 md:h-96 object-cover"
+            />
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-8 mb-12 max-w-5xl mx-auto">
             {benefits.map((benefit, index) => (
               <div key={index} className="flex items-start gap-3">
                 <CheckCircle2 className="w-6 h-6 text-accent flex-shrink-0 mt-1" />

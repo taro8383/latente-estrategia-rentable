@@ -1,9 +1,19 @@
 import { Shield, TrendingUp, Handshake } from "lucide-react";
+import successCelebration from "@/assets/success-celebration.jpg";
 
 export const Pricing = () => {
   return (
     <section className="py-24 md:py-32 hero-gradient text-primary-foreground">
       <div className="container mx-auto px-4">
+        {/* Success Image */}
+        <div className="max-w-5xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-strong border-4 border-accent/30">
+          <img 
+            src={successCelebration} 
+            alt="Equipo celebrando éxito empresarial"
+            className="w-full h-64 md:h-80 object-cover"
+          />
+        </div>
+
         <div className="max-w-4xl mx-auto text-center mb-16">
           <h2 className="mb-6 text-primary-foreground">
             El modelo que cambia <span className="text-accent">todo el juego</span>

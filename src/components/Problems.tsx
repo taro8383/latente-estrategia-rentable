@@ -1,4 +1,5 @@
 import { AlertCircle, Clock, TrendingDown, Users, Brain, Target, DollarSign, Zap, Lock, Flame } from "lucide-react";
+import problemsStress from "@/assets/problems-stress.jpg";
 
 const problems = [
   {
@@ -57,6 +58,15 @@ export const Problems = () => {
   return (
     <section className="py-24 md:py-32 bg-background">
       <div className="container mx-auto px-4">
+        {/* Image Banner */}
+        <div className="max-w-5xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-strong">
+          <img 
+            src={problemsStress} 
+            alt="Empresario estresado trabajando hasta tarde"
+            className="w-full h-64 md:h-96 object-cover"
+          />
+        </div>
+
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="mb-6">
             Si esto te suena familiar,
