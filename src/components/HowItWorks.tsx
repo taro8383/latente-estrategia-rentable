@@ -29,7 +29,7 @@ const steps = [
 
 export const HowItWorks = () => {
   return (
-    <section className="py-24 md:py-32 bg-background">
+    <section id="como-funciona" className="py-24 md:py-32 bg-background">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center mb-16">
           <h2 className="mb-6">

@@ -16,7 +16,7 @@ const benefits = [
 
 export const Solution = () => {
   return (
-    <section className="py-24 md:py-32 subtle-gradient">
+    <section id="solucion" className="py-24 md:py-32 subtle-gradient">
       <div className="container mx-auto px-4">
         <div className="max-w-4xl mx-auto text-center mb-16">
           <div className="inline-block px-4 py-2 bg-accent/10 rounded-full border border-accent/20 mb-6">
@@ -55,24 +55,24 @@ export const Solution = () => {
             ))}
           </div>
 
-          <div className="bg-primary text-primary-foreground rounded-3xl p-8 md:p-12 shadow-strong">
+          <div className="solution-bg text-primary-foreground rounded-3xl p-8 md:p-12 shadow-strong">
             <div className="max-w-3xl mx-auto text-center space-y-6">
-              <h3 className="text-3xl md:text-4xl">
+              <h3 className="text-3xl md:text-4xl text-white">
                 Tú te enfocas en dirigir.
                 <br />
                 <span className="text-accent">Nosotros en multiplicar tu rentabilidad.</span>
               </h3>
               
-              <p className="text-xl text-primary-foreground/90">
+              <p className="text-xl text-white/90">
                 Analizamos tu negocio completo. Encontramos oportunidades que no sabías que existían.
                 Implementamos mejoras que generan resultados medibles.
               </p>
 
               <div className="pt-4">
-                <p className="text-2xl font-bold">
+                <p className="text-2xl font-bold text-white">
                   Y solo cobramos del incremento que generamos.
                 </p>
-                <p className="text-lg text-primary-foreground/80 mt-2">
+                <p className="text-lg text-white/80 mt-2">
                   Si no hay resultados, no hay pago. Así de simple.
                 </p>
               </div>

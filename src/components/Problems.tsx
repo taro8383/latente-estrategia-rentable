@@ -56,7 +56,7 @@ const problems = [
 
 export const Problems = () => {
   return (
-    <section className="py-24 md:py-32 bg-background">
+    <section id="problemas" className="py-24 md:py-32 bg-background">
       <div className="container mx-auto px-4">
         {/* Image Banner */}
         <div className="max-w-5xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-strong">
