@@ -27,35 +27,86 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+      pages: write
+      id-token: write
 
     steps:
+    - name: Debug - Show workflow inputs
+      run: |
+        echo "🔍 DEBUG: Workflow Inputs"
+        echo "Short Code: ${{ github.event.inputs.shortCode }}"
+        echo "Long URL: ${{ github.event.inputs.longUrl }}"
+        echo "Expiration Hours: ${{ github.event.inputs.expirationHours }}"
+        echo "Metadata: ${{ github.event.inputs.metadata }}"
+        echo "Repository: ${{ github.repository }}"
+        echo "Ref: ${{ github.ref }}"
+        echo "Actor: ${{ github.actor }}"
+
     - name: Checkout repository
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
+        fetch-depth: 0
 
     - name: Setup Node.js
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: '18'
 
+    - name: Debug - Show repository structure
+      run: |
+        echo "🔍 DEBUG: Repository Structure"
+        pwd
+        ls -la
+        echo "🔍 DEBUG: Public directory"
+        ls -la public/ || echo "Public directory not found"
+        echo "🔍 DEBUG: Check for url-mappings.json"
+        if [ -f "public/url-mappings.json" ]; then
+          echo "url-mappings.json exists"
+          head -20 public/url-mappings.json
+        else
+          echo "url-mappings.json NOT found"
+        fi
+
     - name: Store URL mapping
       run: |
+        echo "🔍 DEBUG: Starting URL mapping storage"
+
         # Parse inputs
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
         LONG_URL="${{ github.event.inputs.longUrl }}"
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
         METADATA="${{ github.event.inputs.metadata }}"
 
+        echo "🔍 DEBUG: Parsed inputs"
+        echo "SHORT_CODE: $SHORT_CODE"
+        echo "LONG_URL: $LONG_URL"
+        echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
+        echo "METADATA: $METADATA"
+
+        # Validate inputs
+        if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
+          echo "❌ ERROR: Missing required inputs"
+          exit 1
+        fi
+
         # Calculate expiration
         EXPIRES_AT=$(node -e "console.log(Date.now() + (${EXPIRATION_HOURS} * 60 * 60 * 1000))")
+        echo "🔍 DEBUG: Expiration timestamp: $EXPIRES_AT"
+        echo "🔍 DEBUG: Expiration date: $(node -e "console.log(new Date(${EXPIRES_AT}).toISOString())")"
 
         # Read current mappings
         MAPPINGS_FILE="public/url-mappings.json"
+        echo "🔍 DEBUG: Checking mappings file: $MAPPINGS_FILE"
+
         if [ -f "$MAPPINGS_FILE" ]; then
+          echo "🔍 DEBUG: Reading existing mappings"
           MAPPINGS=$(cat "$MAPPINGS_FILE")
+          echo "🔍 DEBUG: Current mappings size: $(echo "$MAPPINGS" | wc -c)"
         else
+          echo "🔍 DEBUG: Creating new mappings file"
           MAPPINGS='{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}'
+          mkdir -p public
         fi
 
         # Add new mapping
@@ -70,57 +121,122 @@ jobs:
         EOF
         )
 
+        echo "🔍 DEBUG: New mapping created"
+        echo "$NEW_MAPPING"
+
         # Update mappings JSON using Node.js
         node <<EOF
-        const mappings = JSON.parse(\`${MAPPINGS}\`);
-        const newMapping = JSON.parse(\`${NEW_MAPPING}\`);
+        try {
+          console.log('🔍 DEBUG: Starting Node.js processing');
 
-        mappings.mappings[${SHORT_CODE}] = newMapping;
-        mappings.lastUpdated = Date.now();
+          const mappings = JSON.parse(\`${MAPPINGS}\`);
+          const newMapping = JSON.parse(\`${NEW_MAPPING}\`);
 
-        // Update statistics
-        const now = Date.now();
-        let activeCount = 0;
-        let expiredCount = 0;
+          console.log('🔍 DEBUG: Current mappings count:', Object.keys(mappings.mappings).length);
 
-        Object.values(mappings.mappings).forEach(mapping => {
-          if (now > mapping.expiresAt) {
-            expiredCount++;
-          } else {
-            activeCount++;
+          // Check for duplicate
+          if (mappings.mappings[${SHORT_CODE}]) {
+            console.log('⚠️ WARNING: Overwriting existing mapping for:', '${SHORT_CODE}');
           }
-        });
 
-        mappings.statistics = {
-          totalMappings: Object.keys(mappings.mappings).length,
-          activeMappings: activeCount,
-          expiredMappings: expiredCount
-        };
+          mappings.mappings[${SHORT_CODE}] = newMapping;
+          mappings.lastUpdated = Date.now();
 
-        // Write updated mappings
-        require('fs').writeFileSync('${MAPPINGS_FILE}', JSON.stringify(mappings, null, 2));
+          // Update statistics
+          const now = Date.now();
+          let activeCount = 0;
+          let expiredCount = 0;
 
-        console.log('✅ URL mapping stored successfully');
-        console.log('Short code:', '${SHORT_CODE}');
-        console.log('Long URL:', '${LONG_URL}');
-        console.log('Expires at:', new Date(${EXPIRES_AT}).toISOString());
+          Object.values(mappings.mappings).forEach(mapping => {
+            if (now > mapping.expiresAt) {
+              expiredCount++;
+            } else {
+              activeCount++;
+            }
+          });
+
+          mappings.statistics = {
+            totalMappings: Object.keys(mappings.mappings).length,
+            activeMappings: activeCount,
+            expiredMappings: expiredCount
+          };
+
+          // Write updated mappings
+          const fs = require('fs');
+          fs.writeFileSync('${MAPPINGS_FILE}', JSON.stringify(mappings, null, 2));
+
+          console.log('✅ URL mapping stored successfully');
+          console.log('🔢 Short code:', '${SHORT_CODE}');
+          console.log('🔗 Long URL:', '${LONG_URL}');
+          console.log('⏰ Expires at:', new Date(${EXPIRES_AT}).toISOString());
+          console.log('📊 Total mappings:', Object.keys(mappings.mappings).length);
+          console.log('📈 Active mappings:', activeCount);
+
+        } catch (error) {
+          console.error('❌ ERROR in Node.js processing:', error);
+          process.exit(1);
+        }
 EOF
+
+        if [ $? -ne 0 ]; then
+          echo "❌ ERROR: Node.js processing failed"
+          exit 1
+        fi
+
+        echo "🔍 DEBUG: Node.js processing completed"
+
+    - name: Debug - Verify mapping was stored
+      run: |
+        echo "🔍 DEBUG: Verifying mapping was stored"
+        if [ -f "public/url-mappings.json" ]; then
+          echo "✅ url-mappings.json exists"
+          echo "🔍 DEBUG: File size: $(wc -c < public/url-mappings.json)"
+          echo "🔍 DEBUG: Content preview:"
+          head -30 public/url-mappings.json
+          echo "🔍 DEBUG: Looking for short code: ${{ github.event.inputs.shortCode }}"
+          if grep -q "${{ github.event.inputs.shortCode }}" public/url-mappings.json; then
+            echo "✅ Short code found in mappings"
+          else
+            echo "❌ Short code NOT found in mappings"
+            exit 1
+          fi
+        else
+          echo "❌ url-mappings.json was NOT created"
+          exit 1
+        fi
 
     - name: Commit and push changes
       run: |
+        echo "🔍 DEBUG: Starting commit and push"
         git config --local user.email "action@github.com"
         git config --local user.name "GitHub Action"
+
         git add public/url-mappings.json
+        git status
+
         if git diff --staged --quiet; then
-          echo "No changes to commit"
+          echo "🔍 DEBUG: No changes to commit"
         else
+          echo "🔍 DEBUG: Committing changes"
           git commit -m "Add URL mapping: ${{ github.event.inputs.shortCode }}"
+          echo "🔍 DEBUG: Pushing to repository"
           git push
         fi
 
     - name: Deploy to GitHub Pages
       if: success()
-      uses: peaceiris/actions-gh-pages@v3
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./public
+
+    - name: Debug - Final status
+      if: always()
+      run: |
+        echo "🔍 DEBUG: Final workflow status"
+        echo "Job status: ${{ job.status }}"
+        echo "Step outcomes:"
+        echo "  - Checkout: ${{ steps.checkout.outcome }}"
+        echo "  - Store mapping: ${{ steps.*.outcome }}"
+        echo "  - Commit and push: ${{ steps.*.outcome }}"
+        echo "  - Deploy: ${{ steps.*.outcome }}"
