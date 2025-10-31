@@ -93,13 +93,13 @@ jobs:
         echo "DEBUG: Sanitized LONG_URL: $LONG_URL"
 
     - name: Checkout repository
-      uses: actions/checkout@08c69032742357312072f7acc3be2882682fc0cc # v5.0.0
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
     - name: Setup Node.js
-      uses: actions/setup-node@2028fbc5c25fe9cf00d9f06a71cc4710d4507903 # v6.0.0
+      uses: actions/setup-node@v4
       with:
         node-version: '20'
         cache: 'npm'
@@ -269,7 +269,7 @@ jobs:
 
     - name: Deploy to GitHub Pages
       if: success()
-      uses: peaceiris/actions-gh-pages@4f9cc6602d3f66b9c108549d475ec49e8ef4d45e # v4.0.0
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./public
