@@ -98,18 +98,7 @@ jobs:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-
-    - name: Verify Node.js installation
-      run: |
-        echo "Node version: $(node --version)"
-        echo "NPM version: $(npm --version)"
-        which node
-
+    
     - name: Debug - Show repository structure
       run: |
         echo "DEBUG: Repository Structure"
@@ -166,22 +155,38 @@ jobs:
           mkdir -p public
         fi
 
-        # Create JSON mapping using simple bash (no Node.js dependency)
-        if [ ! -f "public/url-mappings.json" ]; then
-          echo '{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}' > public/url-mappings.json
-        fi
+        # Simple bash-based JSON creation
+        echo "DEBUG: Starting simple JSON creation"
 
-        # Use bash to create simple JSON entry (minimal, no complex parsing needed)
+        # Create public directory if it doesn't exist
+        mkdir -p public
+
+        # Create or update mappings file with simple echo
         TIMESTAMP=$(date +%s)000
-        JSON_ENTRY="{\"shortCode\":\"$SHORT_CODE\",\"longUrl\":\"$LONG_URL\",\"createdAt\":$TIMESTAMP,\"expiresAt\":$EXPIRES_AT,\"metadata\":$METADATA}"
+        echo "DEBUG: Timestamp: $TIMESTAMP"
+        echo "DEBUG: SHORT_CODE: $SHORT_CODE"
+        echo "DEBUG: LONG_URL: $LONG_URL"
 
-        # Simple JSON insertion using bash (not perfect but works for our use case)
-        sed -i "s/\"mappings\": {/\"mappings\": {\"$SHORT_CODE\":$JSON_ENTRY,/" public/url-mappings.json
+        # Create basic JSON structure
+        cat > public/url-mappings.json << EOF
+{
+  "mappings": {
+    "$SHORT_CODE": {
+      "shortCode": "$SHORT_CODE",
+      "longUrl": "$LONG_URL",
+      "createdAt": $TIMESTAMP,
+      "expiresAt": $EXPIRES_AT,
+      "metadata": $METADATA
+    }
+  },
+  "lastUpdated": $TIMESTAMP,
+  "version": "1.0"
+}
+EOF
 
-        echo "DEBUG: JSON updated with bash"
-        echo "Short code: $SHORT_CODE"
-        echo "Long URL: $LONG_URL"
-        echo "Timestamp: $TIMESTAMP"
+        echo "DEBUG: JSON file created successfully"
+        echo "DEBUG: File contents:"
+        cat public/url-mappings.json
 
     - name: Debug - Verify mapping was stored
       run: |
