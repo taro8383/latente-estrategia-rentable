@@ -160,27 +160,28 @@ jobs:
           mkdir -p public
         fi
 
-        # Create JSON mapping directly with jq to avoid Node.js issues
+        # Create JSON mapping using simple bash/Node.js approach
         if [ ! -f "public/url-mappings.json" ]; then
           echo '{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}' > public/url-mappings.json
         fi
 
-        # Use jq to update JSON safely
-        jq --arg short "$SHORT_CODE" \
-           --arg long "$LONG_URL" \
-           --argjson expires $(echo $EXPIRES_AT | jq '.') \
-           --argjson metadata $(echo "$METADATA" | jq '.') \
-           '.mappings[$short] = {
-             "shortCode": $short,
-             "longUrl": $long,
-             "createdAt": now,
-             "expiresAt": $expires,
-             "metadata": $metadata
-           } | .lastUpdated = now' \
-           public/url-mappings.json > public/url-mappings.json.tmp && \
-        mv public/url-mappings.json.tmp public/url-mappings.json
+        # Use Node.js one-liner to update JSON (more reliable than complex script)
+        node -e "
+          const fs = require('fs');
+          const data = JSON.parse(fs.readFileSync('public/url-mappings.json', 'utf8'));
+          data.mappings['$SHORT_CODE'] = {
+            shortCode: '$SHORT_CODE',
+            longUrl: '$LONG_URL',
+            createdAt: Date.now(),
+            expiresAt: $EXPIRES_AT,
+            metadata: $METADATA
+          };
+          data.lastUpdated = Date.now();
+          fs.writeFileSync('public/url-mappings.json', JSON.stringify(data, null, 2));
+          console.log('JSON updated successfully');
+        "
 
-        echo "DEBUG: JSON updated with jq"
+        echo "DEBUG: JSON updated with Node.js one-liner"
         echo "Short code: $SHORT_CODE"
         echo "Long URL: $LONG_URL"
 
