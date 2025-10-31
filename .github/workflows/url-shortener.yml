@@ -167,22 +167,10 @@ jobs:
         echo "DEBUG: SHORT_CODE: $SHORT_CODE"
         echo "DEBUG: LONG_URL: $LONG_URL"
 
-        # Create basic JSON structure
-        cat > public/url-mappings.json << EOF
-{
-  "mappings": {
-    "$SHORT_CODE": {
-      "shortCode": "$SHORT_CODE",
-      "longUrl": "$LONG_URL",
-      "createdAt": $TIMESTAMP,
-      "expiresAt": $EXPIRES_AT,
-      "metadata": $METADATA
-    }
-  },
-  "lastUpdated": $TIMESTAMP,
-  "version": "1.0"
-}
-EOF
+        # Create basic JSON structure using printf (avoids YAML issues)
+        printf '{\n  "mappings": {\n    "%s": {\n      "shortCode": "%s",\n      "longUrl": "%s",\n      "createdAt": %s,\n      "expiresAt": %s,\n      "metadata": %s\n    }\n  },\n  "lastUpdated": %s,\n  "version": "1.0"\n}' \
+          "$SHORT_CODE" "$SHORT_CODE" "$LONG_URL" "$TIMESTAMP" "$EXPIRES_AT" "$METADATA" "$TIMESTAMP" \
+          > public/url-mappings.json
 
         echo "DEBUG: JSON file created successfully"
         echo "DEBUG: File contents:"
