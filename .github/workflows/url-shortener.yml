@@ -117,6 +117,8 @@ jobs:
     - name: Store URL mapping
       run: |
         echo "DEBUG: Starting URL mapping storage"
+        echo "DEBUG: All environment variables:"
+        env | grep -E "^(SHORT_CODE|LONG_URL|EXPIRATION_HOURS|METADATA)="
 
         # Use validated and sanitized environment variables
         SHORT_CODE="${{ env.SHORT_CODE }}"
@@ -125,10 +127,10 @@ jobs:
         METADATA="${{ env.METADATA }}"
 
         echo "DEBUG: Parsed inputs"
-        echo "SHORT_CODE: $SHORT_CODE"
-        echo "LONG_URL: $LONG_URL"
-        echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
-        echo "METADATA: $METADATA"
+        echo "SHORT_CODE: '$SHORT_CODE'"
+        echo "LONG_URL: '$LONG_URL'"
+        echo "EXPIRATION_HOURS: '$EXPIRATION_HOURS'"
+        echo "METADATA: '$METADATA'"
 
         # Validate inputs
         if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
@@ -136,43 +138,50 @@ jobs:
           exit 1
         fi
 
-        # Calculate expiration
-        EXPIRES_AT=$(node -e "console.log(Date.now() + (${EXPIRATION_HOURS} * 60 * 60 * 1000))")
-        echo "DEBUG: Expiration timestamp: $EXPIRES_AT"
-        echo "DEBUG: Expiration date: $(node -e "console.log(new Date(${EXPIRES_AT}).toISOString())")"
+        echo "DEBUG: Input validation passed"
 
-        # Read current mappings
-        MAPPINGS_FILE="public/url-mappings.json"
-        echo "DEBUG: Checking mappings file: $MAPPINGS_FILE"
+        # Calculate expiration using bash only (no bc, no Node.js)
+        CURRENT_TIME=$(date +%s)
+        EXPIRATION_SECONDS=$((${EXPIRATION_HOURS} * 3600))
+        EXPIRES_AT=$((${CURRENT_TIME} + ${EXPIRATION_SECONDS}))
+        EXPIRES_AT_MS="${EXPIRES_AT}000"
+        echo "DEBUG: Current time: $CURRENT_TIME"
+        echo "DEBUG: Expiration seconds: $EXPIRATION_SECONDS"
+        echo "DEBUG: Expiration timestamp: $EXPIRES_AT_MS"
+        echo "DEBUG: Current timestamp: ${CURRENT_TIME}000"
 
-        if [ -f "$MAPPINGS_FILE" ]; then
-          echo "DEBUG: Reading existing mappings"
-          MAPPINGS=$(cat "$MAPPINGS_FILE")
-          echo "DEBUG: Current mappings size: $(echo "$MAPPINGS" | wc -c)"
-        else
-          echo "DEBUG: Creating new mappings file"
-          MAPPINGS='{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}'
-          mkdir -p public
-        fi
-
-        # Simple bash-based JSON creation
-        echo "DEBUG: Starting simple JSON creation"
-
-        # Create public directory if it doesn't exist
+        # Create public directory
+        echo "DEBUG: Creating public directory"
         mkdir -p public
+        echo "DEBUG: Directory creation successful"
 
-        # Create or update mappings file with simple echo
+        # Create timestamp using bash
         TIMESTAMP=$(date +%s)000
         echo "DEBUG: Timestamp: $TIMESTAMP"
-        echo "DEBUG: SHORT_CODE: $SHORT_CODE"
-        echo "DEBUG: LONG_URL: $LONG_URL"
 
-        # Create basic JSON structure using printf (avoids YAML issues)
-        printf '{\n  "mappings": {\n    "%s": {\n      "shortCode": "%s",\n      "longUrl": "%s",\n      "createdAt": %s,\n      "expiresAt": %s,\n      "metadata": %s\n    }\n  },\n  "lastUpdated": %s,\n  "version": "1.0"\n}' \
-          "$SHORT_CODE" "$SHORT_CODE" "$LONG_URL" "$TIMESTAMP" "$EXPIRES_AT" "$METADATA" "$TIMESTAMP" \
-          > public/url-mappings.json
+        echo "DEBUG: About to create JSON file"
 
-        echo "DEBUG: JSON file created successfully"
+        # Test basic commands first
+        echo "DEBUG: Testing basic commands"
+        echo "test" > /tmp/test.txt
+        if [ $? -eq 0 ]; then
+          echo "DEBUG: Basic file creation works"
+        else
+          echo "ERROR: Basic file creation failed"
+          exit 1
+        fi
+
+        # Create JSON using simple echo
+        echo "DEBUG: Creating JSON with echo"
+        echo '{"mappings":{"'"$SHORT_CODE"'":{"shortCode":"'"$SHORT_CODE"'","longUrl":"'"$LONG_URL"'","createdAt":'"$TIMESTAMP"',"expiresAt":'"$EXPIRES_AT_MS"',"metadata":'"$METADATA"'"}},"lastUpdated":'"$TIMESTAMP"',"version":"1.0"}' > public/url-mappings.json
+
+        if [ $? -eq 0 ]; then
+          echo "DEBUG: JSON file created successfully"
+        else
+          echo "ERROR: JSON file creation failed"
+          exit 1
+        fi
+
         echo "DEBUG: File contents:"
         cat public/url-mappings.json
 
