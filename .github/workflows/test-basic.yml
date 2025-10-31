@@ -1,0 +1,41 @@
+name: Test Basic Commands
+
+on:
+  workflow_dispatch:
+    inputs:
+      testInput:
+        description: 'Test input'
+        required: false
+        type: string
+        default: 'test'
+
+jobs:
+  test-basic:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Basic test
+      run: |
+        echo "Starting basic test"
+        echo "Current directory: $(pwd)"
+        echo "User: $(whoami)"
+        echo "Shell: $0"
+        echo "Test input: ${{ github.event.inputs.testInput }}"
+
+        # Test basic commands
+        echo "Testing echo:"
+        echo "hello"
+
+        echo "Testing date:"
+        date
+
+        echo "Testing mkdir:"
+        mkdir -p test-dir
+
+        echo "Testing file creation:"
+        echo "test content" > test-dir/test.txt
+
+        echo "Testing file content:"
+        cat test-dir/test.txt
+
+        echo "Basic test completed successfully"
