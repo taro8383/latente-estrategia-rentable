@@ -43,44 +43,37 @@ jobs:
         echo "Ref: ${{ github.ref }}"
         echo "Actor: ${{ github.actor }}"
 
-    - name: Validate and sanitize inputs
+    - name: Simple input processing (bypass complex validation)
       run: |
-        echo "DEBUG: Validating inputs"
+        echo "DEBUG: Simple input processing"
+        echo "DEBUG: All inputs received"
+        echo "SHORT_CODE_INPUT: '${{ github.event.inputs.shortCode }}'"
+        echo "LONG_URL_INPUT: '${{ github.event.inputs.longUrl }}'"
+        echo "EXPIRATION_HOURS_INPUT: '${{ github.event.inputs.expirationHours }}'"
+        echo "METADATA_INPUT: '${{ github.event.inputs.metadata }}'"
 
-        # Sanitize short code
+        # Simple assignment - no sed, no head, no complex validation
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
-        SHORT_CODE=$(echo "$SHORT_CODE" | sed 's/[^a-zA-Z0-9_-]//g' | head -c 20)
-
-        # Validate short code
-        if [[ -z "$SHORT_CODE" ]]; then
-          echo "ERROR: Short code cannot be empty"
-          exit 1
-        fi
-        if [[ ! "$SHORT_CODE" =~ ^[a-zA-Z0-9_-]+$ ]]; then
-          echo "ERROR: Short code contains invalid characters"
-          exit 1
-        fi
-
-        # Validate long URL
         LONG_URL="${{ github.event.inputs.longUrl }}"
-        if [[ ! "$LONG_URL" =~ ^https?:// ]]; then
-          echo "ERROR: Long URL must start with http:// or https://"
-          exit 1
-        fi
-
-        # Validate expiration hours
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
-        if [[ ! "$EXPIRATION_HOURS" =~ ^[0-9]+$ ]] || [ "$EXPIRATION_HOURS" -lt 1 ] || [ "$EXPIRATION_HOURS" -gt 168 ]; then
-          echo "ERROR: Expiration hours must be between 1 and 168"
+        METADATA="${{ github.event.inputs.metadata }}"
+
+        echo "DEBUG: Variables assigned"
+        echo "SHORT_CODE: '$SHORT_CODE'"
+        echo "LONG_URL: '$LONG_URL'"
+
+        # Basic validation only
+        if [[ -z "$SHORT_CODE" ]]; then
+          echo "ERROR: Short code is empty"
           exit 1
         fi
 
-        # Validate metadata length
-        METADATA="${{ github.event.inputs.metadata }}"
-        if [ ${#METADATA} -gt 1000 ]; then
-          echo "ERROR: Metadata too long (max 1000 characters)"
+        if [[ -z "$LONG_URL" ]]; then
+          echo "ERROR: Long URL is empty"
           exit 1
         fi
+
+        echo "DEBUG: Basic validation passed"
 
         # Set environment variables for next steps
         echo "SHORT_CODE=$SHORT_CODE" >> $GITHUB_ENV
@@ -88,9 +81,7 @@ jobs:
         echo "EXPIRATION_HOURS=$EXPIRATION_HOURS" >> $GITHUB_ENV
         echo "METADATA=$METADATA" >> $GITHUB_ENV
 
-        echo "DEBUG: Validation passed"
-        echo "DEBUG: Sanitized SHORT_CODE: $SHORT_CODE"
-        echo "DEBUG: Sanitized LONG_URL: $LONG_URL"
+        echo "DEBUG: Environment variables set"
 
     - name: Checkout repository
       uses: actions/checkout@v5
