@@ -160,73 +160,29 @@ jobs:
           mkdir -p public
         fi
 
-        # Create simple Node script
-        cat > process_mappings.js << 'EOF'
-        const fs = require('fs');
-        const mappings = JSON.parse(process.env.MAPPINGS);
-        const shortCode = process.env.SHORT_CODE;
-        const longUrl = process.env.LONG_URL;
-        const expiresAt = parseInt(process.env.EXPIRES_AT);
-        const metadata = JSON.parse(process.env.METADATA);
-
-        console.log('DEBUG: Starting Node.js processing');
-        console.log('DEBUG: Current mappings count:', Object.keys(mappings.mappings).length);
-
-        // Add new mapping
-        mappings.mappings[shortCode] = {
-          shortCode: shortCode,
-          longUrl: longUrl,
-          createdAt: Date.now(),
-          expiresAt: expiresAt,
-          metadata: metadata
-        };
-        mappings.lastUpdated = Date.now();
-
-        // Update statistics
-        const now = Date.now();
-        let activeCount = 0;
-        let expiredCount = 0;
-
-        Object.values(mappings.mappings).forEach(mapping => {
-          if (now > mapping.expiresAt) {
-            expiredCount++;
-          } else {
-            activeCount++;
-          }
-        });
-
-        mappings.statistics = {
-          totalMappings: Object.keys(mappings.mappings).length,
-          activeMappings: activeCount,
-          expiredMappings: expiredCount
-        };
-
-        // Write updated mappings
-        fs.writeFileSync('public/url-mappings.json', JSON.stringify(mappings, null, 2));
-
-        console.log('URL mapping stored successfully');
-        console.log('Short code:', shortCode);
-        console.log('Long URL:', longUrl);
-        console.log('Expires at:', new Date(expiresAt).toISOString());
-        console.log('Total mappings:', Object.keys(mappings.mappings).length);
-        console.log('Active mappings:', activeCount);
-        EOF
-
-        # Run Node script
-        export MAPPINGS="$MAPPINGS"
-        export SHORT_CODE="$SHORT_CODE"
-        export LONG_URL="$LONG_URL"
-        export EXPIRES_AT="$EXPIRES_AT"
-        export METADATA="$METADATA"
-
-        node process_mappings.js
-
-        if [ $? -ne 0 ]; then
-          echo "ERROR: Node.js processing failed"
-          exit 1
+        # Create JSON mapping directly with jq to avoid Node.js issues
+        if [ ! -f "public/url-mappings.json" ]; then
+          echo '{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}' > public/url-mappings.json
         fi
 
-        echo "DEBUG: Node.js processing completed"
+        # Use jq to update JSON safely
+        jq --arg short "$SHORT_CODE" \
+           --arg long "$LONG_URL" \
+           --argjson expires $(echo $EXPIRES_AT | jq '.') \
+           --argjson metadata $(echo "$METADATA" | jq '.') \
+           '.mappings[$short] = {
+             "shortCode": $short,
+             "longUrl": $long,
+             "createdAt": now,
+             "expiresAt": $expires,
+             "metadata": $metadata
+           } | .lastUpdated = now' \
+           public/url-mappings.json > public/url-mappings.json.tmp && \
+        mv public/url-mappings.json.tmp public/url-mappings.json
+
+        echo "DEBUG: JSON updated with jq"
+        echo "Short code: $SHORT_CODE"
+        echo "Long URL: $LONG_URL"
 
     - name: Debug - Verify mapping was stored
       run: |
