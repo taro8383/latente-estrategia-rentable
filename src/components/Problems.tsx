@@ -9,7 +9,7 @@ import { usePersonalization } from "@/context/PersonalizationProvider";
 const allProblems = [
   {
     icon: Clock,
-    title: "Padecés el 'Síndrome del Fundador Prisionero'",
+    title: "Padecés el 'Síndrome del Fundador Prisionero'", // This will be wrapped in PersonalizedText where it's rendered
     before: "Tu expertise operativa te convirtió en el mejor bombero, pero te mantiene como rehén de tu propia empresa. Sin un sistema de delegación estratégica (no operativa), cada nuevo éxito solo significa más incendios que apagar - te estás ahogando en tu propio crecimiento.",
     after: "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos revisás el diseño de tu próxima colección en un café de [ubicacion].",
     result: "Ahora eres el estratega, no el bombero."
@@ -65,7 +65,7 @@ const allProblems = [
   },
   {
     icon: Flame,
-    title: "No estás quemado - estás estratégicamente hambriento",
+    title: "No estás quemado - estás estratégicamente hambriento", // This will be wrapped in PersonalizedText where it's rendered
     before: "Sabés que hay un rey en vos esperando salir, pero carecés del mapa de ruta y la munición específica para tomar el trono. La frustración no viene de falta de ambición, sino de falta de acceso a las palancas de dominio que los número uno guardan celosamente.",
     after: "Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '[frase descriptiva]', tu nombre es el primero—y el único—que suena.",
     result: "Ese rey sos vos."
