@@ -94,9 +94,9 @@ export class VariableReplacer {
       male: "El próximo rey será decidido",
       female: "La próxima reina será decidida"
     },
-    "Recompensa al que se declara rey, y está listo para tomar ese lugar": {
-      male: "Recompensa al que se declara rey, y está listo para tomar ese lugar",
-      female: "Recompensa a quien se declara líder absoluta, y está lista para tomar ese lugar"
+    "Recompensa a el que se declara rey, y está listo para tomar ese lugar": {
+      male: "Recompensa a el que se declara rey, y está listo para tomar ese lugar",
+      female: "Recompensa a la que se declara reina, y está lista para tomar ese lugar"
     },
     "convertirte en el #1 absoluto": {
       male: "convertirte en el #1 absoluto",
