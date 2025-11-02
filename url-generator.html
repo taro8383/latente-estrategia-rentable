@@ -1024,15 +1024,12 @@
                         owner = hostname.replace('.github.io', '');
                         repo = pathSegments.length > 0 ? pathSegments[0] : owner;
                     } else {
-                        owner = localStorage.getItem('github_owner') || 'taro8383';
-                        repo = localStorage.getItem('github_repo') || 'latente-estrategia-rentable';
+                        owner = localStorage.getItem('github_owner') || 'your-username';
+                        repo = localStorage.getItem('github_repo') || 'your-repo';
 
-                        if (owner === 'taro8383' && repo === 'latente-estrategia-rentable') {
-                            // Use defaults for this project
-                            console.log('Using default repository:', owner + '/' + repo);
-                        } else {
-                            owner = prompt('Enter GitHub username (default: taro8383):') || owner;
-                            repo = prompt('Enter repository name (default: latente-estrategia-rentable):') || repo;
+                        if (owner === 'your-username' || repo === 'your-repo') {
+                            owner = prompt('Enter GitHub username:') || owner;
+                            repo = prompt('Enter repository name:') || repo;
                             localStorage.setItem('github_owner', owner);
                             localStorage.setItem('github_repo', repo);
                         }
@@ -1085,27 +1082,8 @@
                 } catch (error) {
                     console.error('�?Failed to trigger GitHub Action:', error);
 
-                    // Provide detailed error information
-                    let errorMessage = `Failed to store URL mapping: ${error.message}`;
-
-                    if (error.message.includes('Not Found')) {
-                        errorMessage += '\n\nPossible causes:\n';
-                        errorMessage += '1. Repository does not exist or is not accessible\n';
-                        errorMessage += '2. Workflow file "url-shortener-final.yml" not found in repository\n';
-                        errorMessage += '3. GitHub token lacks "repo" or "workflow" permissions\n';
-                        errorMessage += `4. Incorrect repository: ${owner}/${repo}`;
-                    }
-
-                    if (error.message.includes('Unauthorized')) {
-                        errorMessage += '\n\nGitHub token is invalid or lacks proper permissions.';
-                    }
-
-                    if (error.message.includes('403')) {
-                        errorMessage += '\n\nGitHub token lacks "workflow" scope permission.';
-                    }
-
                     // CRITICAL: No localStorage fallback - this is server-side only for cross-device compatibility
-                    throw new Error(errorMessage + '.\n\nThe URL was NOT created and will NOT work across devices. Please check your GitHub token and repository settings.');
+                    throw new Error(`Failed to store URL mapping: ${error.message}. The URL was NOT created and will NOT work across devices. Please check your GitHub token and repository settings.`);
                 }
             }
 
