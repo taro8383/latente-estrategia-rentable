@@ -104,9 +104,46 @@ export class URLShortener {
     }
 
     /**
-     * Retrieve long URL by short code
+     * Retrieve long URL by short code from server-side storage
+     * This now fetches from GitHub-hosted JSON file only
      */
-    static getLongUrl(shortCode: string): string | null {
+    static async getLongUrl(shortCode: string): Promise<string | null> {
+        try {
+            // Try to get mapping from GitHub-hosted JSON file
+            let mappingsUrl;
+            if (window.location.hostname.includes('github.io')) {
+                const pathname = window.location.pathname;
+                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
+                mappingsUrl = `https://${window.location.hostname}/${repoName}/url-mappings.json`;
+            } else {
+                // Local development or other hosting
+                mappingsUrl = `${window.location.origin}/url-mappings.json`;
+            }
+
+            const response = await fetch(mappingsUrl);
+            if (response.ok) {
+                const mappingsData = await response.json();
+                if (mappingsData.mappings && mappingsData.mappings[shortCode]) {
+                    const mapping = mappingsData.mappings[shortCode];
+                    // Check if mapping has expired
+                    if (Date.now() <= mapping.expiresAt) {
+                        return mapping.longUrl;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch mapping from server:', error);
+        }
+
+        return null; // Not found or expired
+    }
+
+    /**
+     * Legacy method for backward compatibility - tries localStorage first, then server
+     * @deprecated Use async getLongUrl instead
+     */
+    static getLongUrlSync(shortCode: string): string | null {
         const mappings = this.getMappings();
         const mapping = mappings[shortCode];
 

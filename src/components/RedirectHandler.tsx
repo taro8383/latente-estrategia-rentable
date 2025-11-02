@@ -30,14 +30,14 @@ export const RedirectHandler: React.FC = () => {
             });
         }, 1000);
 
-        const performRedirect = () => {
+        const performRedirect = async () => {
             try {
                 // Add persistent debug logging that survives redirect
                 const debugLog = [];
                 debugLog.push(`🔍 REDIRECT DEBUG: Starting redirect for shortCode: ${shortCode}`);
                 debugLog.push(`🔍 REDIRECT DEBUG: Current URL: ${window.location.href}`);
                 debugLog.push(`🔍 REDIRECT DEBUG: Current hash: ${window.location.hash}`);
-                
+
                 // Store debug info in sessionStorage to survive redirect
                 try {
                     sessionStorage.setItem('redirect_debug_log', JSON.stringify(debugLog));
@@ -46,19 +46,19 @@ export const RedirectHandler: React.FC = () => {
                 } catch (e) {
                     console.error('🔍 REDIRECT DEBUG: Failed to store debug log in sessionStorage:', e);
                 }
-                
+
                 // DEBUG: Check localStorage state before lookup
                 console.log('🔍 REDIRECT DEBUG: localStorage state before lookup:', {
                     url_mappings: localStorage.getItem('url_mappings'),
                     allKeys: Object.keys(localStorage),
                     shortCode: shortCode
                 });
-                
-                // Primary lookup using utility
+
+                // Primary lookup using utility (now async)
                 console.log('🔍 REDIRECT DEBUG: Starting URL lookup for shortCode:', shortCode);
                 console.log('🔍 REDIRECT DEBUG: localStorage available before lookup:', typeof localStorage !== 'undefined');
-                
-                let longUrl = URLShortener.getLongUrl(shortCode);
+
+                let longUrl = await URLShortener.getLongUrl(shortCode);
                 debugLog.push(`🔍 REDIRECT DEBUG: Lookup longUrl for shortCode: ${shortCode} => ${longUrl}`);
                 console.log('🔍 REDIRECT DEBUG: Lookup longUrl for shortCode:', shortCode, '=>', longUrl);
                 console.log('🔍 REDIRECT DEBUG: longUrl type:', typeof longUrl);
