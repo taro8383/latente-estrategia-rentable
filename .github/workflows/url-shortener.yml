@@ -95,7 +95,7 @@ jobs:
         fi
 
         # Create Node script with robust metadata handling
-        cat > process_mappings.js << 'EOF'
+        cat > process_mappings.cjs << 'EOF'
         const fs = require('fs');
 
         console.log('DEBUG: Starting Node.js processing');
@@ -183,7 +183,7 @@ jobs:
         export EXPIRES_AT="$EXPIRES_AT"
         export METADATA="$METADATA"
 
-        node process_mappings.js
+        node process_mappings.cjs
 
         if [ $? -ne 0 ]; then
           echo "ERROR: Node.js processing failed"
