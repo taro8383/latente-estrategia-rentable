@@ -19,7 +19,7 @@ const DialogOverlay = React.forwardRef<
   <DialogPrimitive.Overlay
     ref={ref}
     className={cn(
-      "fixed inset-0 z-50 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
+      "fixed inset-0 z-30 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0",
       className,
     )}
     {...props}
@@ -30,25 +30,66 @@ DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
 const DialogContent = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Content>
->(({ className, children, ...props }, ref) => (
-  <DialogPortal>
-    <DialogOverlay />
-    <DialogPrimitive.Content
-      ref={ref}
-      className={cn(
-        "fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border bg-background p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%] sm:rounded-lg",
-        className,
-      )}
-      {...props}
-    >
-      {children}
-      <DialogPrimitive.Close className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none">
-        <X className="h-4 w-4" />
-        <span className="sr-only">Close</span>
-      </DialogPrimitive.Close>
-    </DialogPrimitive.Content>
-  </DialogPortal>
-));
+>(({ className, children, ...props }, ref) => {
+  // Keep the dialog vertically centered relative to the *visible* viewport.
+  // Some mobile browsers report a different visual viewport height when UI chrome is visible.
+  React.useEffect(() => {
+    const setDialogTop = () => {
+      const vv = (window as any).visualViewport;
+      // visualViewport gives offsetTop + height of the usable viewport.
+      const centerPx = vv ? Math.round(vv.offsetTop + vv.height / 2) : Math.round(window.pageYOffset + window.innerHeight / 2);
+      document.documentElement.style.setProperty("--dialog-top", `${centerPx}px`);
+    };
+
+    setDialogTop();
+
+    const vv = (window as any).visualViewport;
+    const resizeTarget: any = vv || window;
+    const handler = () => setDialogTop();
+
+    if (vv) {
+      vv.addEventListener("resize", handler);
+      vv.addEventListener("scroll", handler);
+    } else {
+      window.addEventListener("resize", handler);
+      window.addEventListener("scroll", handler);
+    }
+    window.addEventListener("orientationchange", handler);
+
+    return () => {
+      if (vv) {
+        vv.removeEventListener("resize", handler);
+        vv.removeEventListener("scroll", handler);
+      } else {
+        window.removeEventListener("resize", handler);
+        window.removeEventListener("scroll", handler);
+      }
+      window.removeEventListener("orientationchange", handler);
+    };
+  }, []);
+
+  return (
+    <DialogPortal>
+      <DialogOverlay />
+      <DialogPrimitive.Content
+        ref={ref}
+        // Use CSS variable --dialog-top (set by JS) with fallback 50vh.
+        style={{ top: "var(--dialog-top, 50vh)" }}
+        className={cn(
+          "fixed left-4 right-4 sm:left-1/2 sm:right-auto z-50 sm:transform sm:-translate-y-1/2 sm:-translate-x-1/2 box-border max-w-[calc(100vw-2rem)] sm:max-w-lg md:max-w-xl lg:max-w-2xl xl:max-w-4xl grid gap-4 border bg-background p-4 sm:p-6 shadow-lg duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 rounded-lg max-h-[80vh] overflow-y-auto",
+          className,
+        )}
+        {...props}
+      >
+        {children}
+        <DialogPrimitive.Close className="absolute right-3 top-3 sm:right-4 sm:top-4 rounded-md opacity-70 ring-offset-background transition-opacity data-[state=open]:bg-accent data-[state=open]:text-muted-foreground hover:opacity-100 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:pointer-events-none p-1 sm:p-0">
+          <X className="h-5 w-5 sm:h-4 sm:w-4" />
+          <span className="sr-only">Close</span>
+        </DialogPrimitive.Close>
+      </DialogPrimitive.Content>
+    </DialogPortal>
+  );
+});
 DialogContent.displayName = DialogPrimitive.Content.displayName;
 
 const DialogHeader = ({ className, ...props }: React.HTMLAttributes<HTMLDivElement>) => (

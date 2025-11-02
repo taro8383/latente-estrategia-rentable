@@ -15,6 +15,7 @@ interface StoredMappings {
 }
 
 export class URLShortener {
+    private static readonly STORAGE_KEY = 'url_mappings';
     private static readonly DEFAULT_LENGTH = 6;
     private static readonly ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
 
@@ -30,107 +31,181 @@ export class URLShortener {
     }
 
     /**
-     * Retrieve long URL by short code from server-side storage
-     * This now fetches from GitHub-hosted JSON file only
+     * Get all stored mappings from localStorage
      */
-    static async getLongUrl(shortCode: string): Promise<string | null> {
+    private static getMappings(): StoredMappings {
         try {
-            // Try to get mapping from GitHub-hosted JSON file
-            let mappingsUrl;
-            if (window.location.hostname.includes('github.io')) {
-                const pathname = window.location.pathname;
-                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-                const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
-                mappingsUrl = `https://${window.location.hostname}/${repoName}/url-mappings.json`;
-            } else {
-                // Local development or other hosting
-                mappingsUrl = `${window.location.origin}/url-mappings.json`;
-            }
-
-            const response = await fetch(mappingsUrl);
-            if (response.ok) {
-                const mappingsData = await response.json();
-                if (mappingsData.mappings && mappingsData.mappings[shortCode]) {
-                    const mapping = mappingsData.mappings[shortCode];
-                    // Check if mapping has expired
-                    if (Date.now() <= mapping.expiresAt) {
-                        return mapping.longUrl;
-                    }
-                }
-            }
+            const stored = localStorage.getItem(this.STORAGE_KEY);
+            console.log('🔍 URL SHORTENER DEBUG: Raw localStorage data:', stored);
+            console.log('🔍 URL SHORTENER DEBUG: Storage key:', this.STORAGE_KEY);
+            console.log('🔍 URL SHORTENER DEBUG: localStorage available:', typeof localStorage !== 'undefined');
+            
+            const parsed = stored ? JSON.parse(stored) : {};
+            console.log('🔍 URL SHORTENER DEBUG: Parsed mappings:', parsed);
+            return parsed;
         } catch (error) {
-            console.error('Failed to fetch mapping from server:', error);
+            console.error('Failed to parse URL mappings:', error);
+            return {};
+        }
+    }
+
+    /**
+     * Save mappings to localStorage
+     */
+    private static saveMappings(mappings: StoredMappings): void {
+        try {
+            localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+        } catch (error) {
+            console.error('Failed to save URL mappings:', error);
+            // Handle quota exceeded error
+            this.cleanupExpired();
+            try {
+                localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+            } catch (retryError) {
+                console.error('Failed to save mappings even after cleanup:', retryError);
+            }
+        }
+    }
+
+    /**
+     * Clean up expired mappings
+     */
+    static cleanupExpired(): void {
+        const mappings = this.getMappings();
+        const now = Date.now();
+        let hasChanges = false;
+
+        Object.keys(mappings).forEach(shortCode => {
+            if (now > mappings[shortCode].expiresAt) {
+                delete mappings[shortCode];
+                hasChanges = true;
+            }
+        });
+
+        if (hasChanges) {
+            this.saveMappings(mappings);
+        }
+    }
+
+    /**
+     * Store a mapping between short code and long URL
+     */
+    static storeMapping(shortCode: string, longUrl: string, expirationHours: number = 72): void {
+        const mapping: URLMapping = {
+            shortCode,
+            longUrl,
+            createdAt: Date.now(),
+            expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+        };
+
+        const mappings = this.getMappings();
+        mappings[shortCode] = mapping;
+        this.saveMappings(mappings);
+    }
+
+    /**
+     * Retrieve long URL by short code
+     */
+    static getLongUrl(shortCode: string): string | null {
+        const mappings = this.getMappings();
+        const mapping = mappings[shortCode];
+
+        if (!mapping) {
+            return null;
         }
 
-        return null; // Not found or expired
+        // Check if mapping has expired
+        if (Date.now() > mapping.expiresAt) {
+            delete mappings[shortCode];
+            this.saveMappings(mappings);
+            return null;
+        }
+
+        return mapping.longUrl;
     }
 
     /**
      * Generate a short URL for a given long URL
-     * NOTE: This method is deprecated for cross-device compatibility
-     * Use the URL generator HTML tool which stores data server-side via GitHub Actions
      */
     static generateShortUrl(longUrl: string, expirationHours: number = 72): string {
-        // DEPRECATED: This method stores data locally and breaks cross-device functionality
-        // Use the URL generator tool instead for server-side storage
-        throw new Error('generateShortUrl is deprecated for cross-device compatibility. Use the URL generator HTML tool which stores data server-side via GitHub Actions.');
+        // Clean up expired mappings first
+        this.cleanupExpired();
+
+        // Generate unique short code
+        let shortCode: string;
+        const mappings = this.getMappings();
+        
+        do {
+            shortCode = this.generateShortCode();
+        } while (mappings[shortCode]); // Ensure uniqueness
+
+        // Store the mapping
+        this.storeMapping(shortCode, longUrl, expirationHours);
+
+        // Generate the short URL
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+        return `${baseUrl}#/r/${shortCode}`;
     }
 
     /**
-     * Get statistics about URL mappings
+     * Get statistics about stored mappings
      */
-    static async getStats(): Promise<{ count: number; serverOnly: boolean }> {
-        try {
-            let mappingsUrl;
-            if (window.location.hostname.includes('github.io')) {
-                const pathname = window.location.pathname;
-                const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
-                const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
-                mappingsUrl = `https://${window.location.hostname}/${repoName}/url-mappings.json`;
-            } else {
-                mappingsUrl = `${window.location.origin}/url-mappings.json`;
+    static getStats(): { count: number; expiredCount: number; totalSize: number } {
+        const mappings = this.getMappings();
+        const now = Date.now();
+        let expiredCount = 0;
+        let totalSize = 0;
+
+        Object.values(mappings).forEach(mapping => {
+            if (now > mapping.expiresAt) {
+                expiredCount++;
             }
+            totalSize += mapping.longUrl.length;
+        });
 
-            const response = await fetch(mappingsUrl);
-            if (response.ok) {
-                const mappingsData = await response.json();
-                const now = Date.now();
-                let activeCount = 0;
-
-                if (mappingsData.mappings) {
-                    Object.values(mappingsData.mappings).forEach((mapping: any) => {
-                        if (now <= mapping.expiresAt) {
-                            activeCount++;
-                        }
-                    });
-                }
-
-                return {
-                    count: activeCount,
-                    serverOnly: true
-                };
-            }
-        } catch (error) {
-            console.error('Failed to fetch server stats:', error);
-        }
-
-        return { count: 0, serverOnly: true };
+        return {
+            count: Object.keys(mappings).length,
+            expiredCount,
+            totalSize
+        };
     }
 
     /**
-     * Clear all mappings - no-op for server-side storage
+     * Remove a specific mapping
+     */
+    static removeMapping(shortCode: string): boolean {
+        const mappings = this.getMappings();
+        if (mappings[shortCode]) {
+            delete mappings[shortCode];
+            this.saveMappings(mappings);
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Clear all mappings
      */
     static clearAll(): void {
-        // No-op for server-side storage
-        console.warn('clearAll is no-op for server-side storage. Use GitHub repository management to clear mappings.');
+        try {
+            localStorage.removeItem(this.STORAGE_KEY);
+        } catch (error) {
+            console.error('Failed to clear URL mappings:', error);
+        }
     }
 
     /**
-     * Initialize - no cleanup needed for server-side storage
+     * Initialize cleanup on page load
      */
     static initialize(): void {
-        // No cleanup needed for server-side storage
-        console.info('URLShortener initialized in server-side mode for cross-device compatibility.');
+        // Clean up expired mappings on initialization
+        this.cleanupExpired();
+        
+        // Set up periodic cleanup every hour
+        setInterval(() => {
+            this.cleanupExpired();
+        }, 60 * 60 * 1000);
     }
 }
 

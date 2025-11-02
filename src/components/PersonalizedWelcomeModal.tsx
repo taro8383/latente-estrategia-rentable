@@ -4,7 +4,6 @@ import { ArrowRight } from "lucide-react";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { EnhancedUrgencyTimer } from "@/components/EnhancedUrgencyTimer";
 import { usePersonalization } from "@/context/PersonalizationProvider";
-import { useState, useEffect, useRef } from "react";
 
 interface PersonalizedWelcomeModalProps {
   isOpen: boolean;
@@ -12,47 +11,7 @@ interface PersonalizedWelcomeModalProps {
 }
 
 export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcomeModalProps) => {
-  const { data, replacer } = usePersonalization();
-  const [modalMaxHeight, setModalMaxHeight] = useState<string>('50vh');
-  const logoContainerRef = useRef<HTMLDivElement>(null);
-
-  // Calculate dynamic modal height based on content
-  useEffect(() => {
-    if (!isOpen) return;
-
-    const calculateHeight = () => {
-      const viewportHeight = window.innerHeight;
-      const headerHeight = 80; // Approximate header height
-      const footerHeight = 120; // Approximate footer/action area height
-      const padding = 40; // Total padding
-      const urgencyTimerHeight = 80; // Approximate urgency timer height
-      const trustIndicatorsHeight = 60; // Approximate trust indicators height
-
-      // Reserve space for other elements
-      const reservedSpace = headerHeight + footerHeight + padding + urgencyTimerHeight + trustIndicatorsHeight;
-
-      // Calculate available height for logo and content
-      const availableHeight = viewportHeight - reservedSpace;
-
-      // Ensure minimum height for small screens and maximum for larger screens
-      const calculatedMaxHeight = Math.max(Math.min(availableHeight, viewportHeight * 0.8), 300);
-
-      // Convert to vh for responsive behavior
-      const maxHeightInVh = (calculatedMaxHeight / viewportHeight) * 100;
-
-      setModalMaxHeight(`${maxHeightInVh}vh`);
-    };
-
-    calculateHeight();
-
-    // Recalculate on resize
-    const handleResize = () => {
-      calculateHeight();
-    };
-
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [isOpen]);
+  const { data } = usePersonalization();
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -68,7 +27,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
         ">
           <DialogHeader className="relative z-10 p-3 sm:p-4 md:p-6 pb-2 sm:pb-4">
             <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-white leading-tight text-center">
-              {replacer ? replacer.replace('Bienvenido, [reader name]') : 'Bienvenido, Invitado'}
+              Bienvenido, <span className="text-accent">{data?.readerInfo?.name || 'Invitado'}</span>
             </DialogTitle>
           </DialogHeader>
   
@@ -76,23 +35,20 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           <div className="absolute inset-0 hero-gradient opacity-95 modal-backdrop-blur"></div>
           
           {/* Content container */}
-          <div
-            className="relative z-10 p-3 sm:p-4 md:p-6 text-center space-y-3 sm:space-y-4 overflow-y-auto"
-            style={{ maxHeight: modalMaxHeight }}
-          >
+          <div className="relative z-10 p-3 sm:p-4 md:p-6 text-center space-y-3 sm:space-y-4 max-h-[40vh] sm:max-h-[50vh] overflow-y-auto">
             {/* Welcome message */}
             <div className="space-y-2 sm:space-y-3">
             <p className="text-white/90 text-sm sm:text-base leading-relaxed">
-              Tu oportunidad exclusiva de <span className="text-accent font-semibold">{replacer ? replacer.replace('convertirte en el #1 absoluto') : 'convertirte en el #1 absoluto'}</span> está lista.
+              Tu oportunidad exclusiva de convertirte en el <span className="text-accent font-semibold">#1 absoluto</span> está lista.
             </p>
           </div>
 
           {/* Company Logo */}
-          <div className="flex justify-center py-2 sm:py-3" ref={logoContainerRef}>
+          <div className="flex justify-center py-2 sm:py-3">
             <CompanyLogo
               logoData={data?.companyLogo}
               brandName={data?.brandInfo?.name}
-              className="max-h-24 sm:max-h-32 md:max-h-40 w-auto object-contain transition-all duration-300"
+              className="max-h-8 sm:max-h-10 md:max-h-12 w-auto object-contain"
             />
           </div>
 

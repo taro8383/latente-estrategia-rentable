@@ -4,12 +4,8 @@ export class VariableReplacer {
   private data: PersonalizationData;
   private defaults: Record<string, string>;
 
-  // Gender mapping constants for the 20 specific replacements
+  // Gender mapping constants for the 19 specific replacements
   private static readonly GENDER_MAPPINGS: Record<string, Record<Gender, string>> = {
-    "Bienvenido": {
-      male: "Bienvenido",
-      female: "Bienvenida"
-    },
     "estimado empresario": {
       male: "estimado empresario",
       female: "estimada empresaria"
@@ -70,17 +66,9 @@ export class VariableReplacer {
       male: "eres campeón",
       female: "sos campeona"
     },
-    "¿Eres campeón?": {
-      male: "¿Eres campeón?",
-      female: "¿Eres campeona?"
-    },
     "ser el próximo rey": {
       male: "ser el próximo rey",
       female: "ser la próxima reina"
-    },
-    "podes ser el próximo rey": {
-      male: "podes ser el próximo rey",
-      female: "podes ser la próxima reina"
     },
     "si eres seleccionado": {
       male: "si eres seleccionado",
@@ -93,46 +81,6 @@ export class VariableReplacer {
     "El próximo rey será decidido": {
       male: "El próximo rey será decidido",
       female: "La próxima reina será decidida"
-    },
-    "Recompensa al que se declara rey, y está listo para tomar ese lugar": {
-      male: "Recompensa al que se declara rey, y está listo para tomar ese lugar",
-      female: "Recompensa a quien se declara líder absoluta, y está lista para tomar ese lugar"
-    },
-    "convertirte en el #1 absoluto": {
-      male: "convertirte en el #1 absoluto",
-      female: "convertirte en la #1 absoluta"
-    },
-    "Entonces… ¿Por qué seguís atrapado en el": {
-      male: "Entonces… ¿Por qué seguís atrapado en el",
-      female: "Entonces… ¿Por qué seguís atrapada en el"
-    },
-    "Sin este manual, estás condenado a jugar siempre a alcanzarlos.": {
-      male: "Sin este manual, estás condenado a jugar siempre a alcanzarlos.",
-      female: "Sin este manual, estás condenada a jugar siempre a alcanzarlos."
-    },
-    "Estás atrapado en la 'Trampa del Esfuerzo Lineal'": {
-      male: "Estás atrapado en la 'Trampa del Esfuerzo Lineal'",
-      female: "Estás atrapada en la 'Trampa del Esfuerzo Lineal'"
-    },
-    "¿Podrías construir esto solo?": {
-      male: "¿Podrías construir esto solo?",
-      female: "¿Podrías construir esto sola?"
-    },
-    "Quiero ser el #1 en mi mercado": {
-      male: "Quiero ser el #1 en mi mercado",
-      female: "Quiero ser la #1 en mi mercado"
-    },
-    "ser el #1 absoluto": {
-      male: "ser el #1 absoluto",
-      female: "ser la #1 absoluta"
-    },
-    "Quiero ser socio estratégico de Latente": {
-      male: "Quiero ser socio estratégico de Latente",
-      female: "Quiero ser socia estratégica de Latente"
-    },
-    "Y si estás listo para dejar de competir y empezar a dominar…": {
-      male: "Y si estás listo para dejar de competir y empezar a dominar…",
-      female: "Y si estás lista para dejar de competir y empezar a dominar…"
     }
   };
 
@@ -168,21 +116,15 @@ export class VariableReplacer {
       'industry keyword 1': 'productos premium',
       'industry keyword 2': 'artesanía de calidad',
       'industry keyword 3': 'diseño exclusivo',
-      'industry keywords': 'productos premium',
-      // Gender-specific placeholder mappings
-      'gender_estratega_bombero': 'Ahora eres el estratega, no el bombero',
-      'gender_moneda_cambio_perdedores': 'son la moneda de cambio de los perdedores',
-      'gender_rey_vuelto': "'¡El rey ha vuelto!'",
-      'gender_no_estas_quemado': 'No estás quemado - estás estratégicamente hambriento',
-      'gender_rey_sos_vos': 'Ese rey sos vos'
+      'industry keywords': 'productos premium'
     };
   }
 
   private applyGenderReplacements(text: string): string {
     const gender = (this.data.genderInfo?.gender) || 'male';
-
+    
     let result = text;
-
+    
     // Apply gender-specific replacements
     Object.entries(VariableReplacer.GENDER_MAPPINGS).forEach(([maleText, genderMap]) => {
       const replacement = genderMap[gender];
@@ -190,7 +132,7 @@ export class VariableReplacer {
         result = result.replace(new RegExp(this.escapeRegExp(maleText), 'g'), replacement);
       }
     });
-
+    
     return result;
   }
 

@@ -17,8 +17,8 @@ export const Header = () => {
   ];
 
   const scrollToSection = (href: string) => {
-    // Use getElementById for section "1" since CSS IDs cannot start with numbers
-    const element = href === '#1' ? document.getElementById('1') : document.querySelector(href);
+    // Map '#1' anchor to actual element id 'section-1' (IDs cannot start with numbers)
+    const element = href === '#1' ? document.getElementById('section-1') : document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }

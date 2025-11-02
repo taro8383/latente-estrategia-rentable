@@ -118,68 +118,68 @@ export const Offers = () => {
   return (
     <section id="ofertas" className="py-24 md:py-32 bg-background">
       <div className="container mx-auto px-4">
-        <div className="max-w-4xl mx-auto text-center mb-16">
-          <div className="inline-block px-4 py-2 bg-accent/10 rounded-full border border-accent/20 mb-6">
+        <div className="max-w-4xl mx-auto text-center mb-16 mobile-center">
+          <div className="inline-block px-4 py-2 bg-accent/10 rounded-full border border-accent/20 mb-6 mobile-center-block">
             <span className="text-accent font-semibold">Elige tu nivel</span>
           </div>
           
-          <h2 className="mb-6">
+          <h2 className="mb-6 mobile-center-text">
             Nuestra <span className="text-accent">oferta irresistible</span>
           </h2>
-          <p className="text-xl text-muted-foreground">
+          <p className="text-xl text-muted-foreground mobile-center-text">
             Tres formas de empezar. Todas diseñadas para que tú ganes.
           </p>
         </div>
 
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8 mb-12">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-3 gap-8 mb-12 mobile-stack mobile-center">
           {tiers.map((tier) => {
             const Icon = tier.icon;
             return (
               <div
                 key={tier.id}
-                className={`relative rounded-3xl p-8 transition-smooth ${
+                className={`relative rounded-3xl p-8 transition-smooth mobile-center-block ${
                   tier.highlighted
                     ? 'solution-bg text-primary-foreground shadow-strong scale-105 border-2 border-accent'
                     : 'bg-card border border-border shadow-medium hover:shadow-strong'
                 }`}
               >
                 {tier.highlighted && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 accent-gradient text-white text-sm font-bold rounded-full shadow-medium">
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1 accent-gradient text-white text-sm font-bold rounded-full shadow-medium mobile-center-block">
                     MÁS POPULAR
                   </div>
                 )}
 
-                <div className="flex flex-col h-full">
+                <div className="flex flex-col h-full mobile-center">
                   {/* Header */}
-                  <div className="text-center mb-6">
-                    <div className={`inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4 ${
-                      tier.highlighted 
-                        ? 'bg-accent/20' 
+                  <div className="text-center mb-6 mobile-center">
+                    <div className={`inline-flex w-16 h-16 rounded-2xl items-center justify-center mb-4 mobile-center-block ${
+                      tier.highlighted
+                        ? 'bg-accent/20'
                         : 'bg-accent/10'
                     }`}>
                       <Icon className={`w-8 h-8 ${tier.highlighted ? 'text-accent' : 'text-accent'}`} />
                     </div>
                     
-                    <h3 className={`text-2xl font-bold mb-2 ${
+                    <h3 className={`text-2xl font-bold mb-2 mobile-center-text ${
                      tier.highlighted ? 'text-white' : 'text-foreground'
                    }`}>
                       {tier.name}
                     </h3>
                     
-                    <div className="mb-4">
-                      <p className={`text-4xl font-bold mb-1 ${
+                    <div className="mb-4 mobile-center">
+                      <p className={`text-4xl font-bold mb-1 mobile-center-text ${
                         tier.highlighted ? 'text-accent' : 'text-accent'
                       }`}>
                         {tier.price}
                       </p>
-                      <p className={`text-sm ${
+                      <p className={`text-sm mobile-center-text ${
                         tier.highlighted ? 'text-white/80' : 'text-muted-foreground'
                       }`}>
                         {tier.priceDetail}
                       </p>
                     </div>
 
-                    <p className={`text-sm leading-relaxed ${
+                    <p className={`text-sm leading-relaxed mobile-center-text ${
                       tier.highlighted ? 'text-white/90' : 'text-muted-foreground'
                     }`}>
                       {tier.description}
@@ -187,20 +187,20 @@ export const Offers = () => {
                   </div>
 
                   {/* Benefits */}
-                  <div className="flex-1 space-y-4 mb-6">
+                  <div className="flex-1 space-y-4 mb-6 mobile-center">
                     {tier.benefits.map((benefit, idx) => (
-                      <div key={idx} className="flex items-start gap-3">
-                        <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 ${
+                      <div key={idx} className="flex items-start gap-3 mobile-stack mobile-center">
+                        <CheckCircle2 className={`w-5 h-5 flex-shrink-0 mt-0.5 mobile-center-block ${
                           tier.highlighted ? 'text-accent' : 'text-accent'
                         }`} />
-                        <div>
-                          <p className={`font-semibold text-sm ${
+                        <div className="mobile-center-text">
+                          <p className={`font-semibold text-sm mobile-center-text ${
                             tier.highlighted ? 'text-white' : 'text-foreground'
                           }`}>
                             {benefit.title}
                           </p>
                           {benefit.description && (
-                            <p className={`text-xs mt-1 ${
+                            <p className={`text-xs mt-1 mobile-center-text ${
                               tier.highlighted ? 'text-white/80' : 'text-muted-foreground'
                             }`}>
                               {benefit.description}
@@ -215,11 +215,11 @@ export const Offers = () => {
                   <Button
                     onClick={scrollToContact}
                     size="lg"
-                    className={`w-full ${
+                    className={`w-full mobile-center-block ${
                       tier.highlighted
                         ? 'accent-gradient text-white hover:scale-105 shadow-medium'
                         : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
-                    } transition-bounce`}
+                    } transition-bounce mobile-button-md`}
                   >
                     {tier.cta}
                   </Button>
@@ -229,8 +229,8 @@ export const Offers = () => {
           })}
         </div>
 
-        <div className="max-w-3xl mx-auto text-center p-8 rounded-2xl bg-card border border-border shadow-soft">
-          <p className="text-lg text-muted-foreground">
+        <div className="max-w-3xl mx-auto text-center p-8 rounded-2xl bg-card border border-border shadow-soft mobile-center">
+          <p className="text-lg text-muted-foreground mobile-center-text">
             <strong className="text-foreground">¿No estás seguro cuál elegir?</strong>
             <br />
             Comienza con el diagnóstico gratuito. Te diremos exactamente qué nivel tiene más sentido para tu situación.

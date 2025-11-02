@@ -24,6 +24,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   // update internal state so that component renders the provided inline logo.
   useEffect(() => {
     if (logoData) {
+      // Debug: log presence and a short preview of the incoming data URI
+      try {
+        console.log('CompanyLogo: received logoData, startsWith data:', (logoData as string).startsWith('data:'), 'length:', logoData.length);
+      } catch (e) {
+        console.log('CompanyLogo: received logoData (unable to inspect)', e);
+      }
       setLogoSrc(logoData);
       setHasError(false);
       setIsLoading(false);
@@ -129,8 +135,10 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   }, []);
 
   const handleImageError = () => {
+    console.warn('CompanyLogo: handleImageError called, current logoSrc length:', logoSrc ? (logoSrc.length) : 'null');
     if (!hasError) {
       setHasError(true);
+      console.warn('Company logo failed to load, using fallback');
 
       // Try text-based fallback
       if (brandName) {
@@ -141,6 +149,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   };
 
   const handleImageLoad = () => {
+    console.log('CompanyLogo: image loaded successfully, srcPreview=', logoSrc ? ((logoSrc as string).substring(0, 80) + ((logoSrc as string).length > 80 ? '...' : '')) : 'null');
     setIsLoading(false);
     setHasError(false);
   };
@@ -167,38 +176,32 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
           onLoad={handleImageLoad}
           onError={handleImageError}
           style={{
-            maxWidth: '280px',
-            maxHeight: '160px',
+            maxWidth: '200px',
+            maxHeight: '100px',
             width: 'auto',
             height: 'auto',
             objectFit: 'contain',
             borderRadius: '8px',
             border: '1px solid #374151',
-            backgroundColor: '#1f2937',
-            transition: 'all 0.3s ease'
+            backgroundColor: '#1f2937'
           }}
         />
       )}
       
       {!isLoading && !logoSrc && brandName && (
         <div className="company-logo-text-fallback">
-          <div
-            className="flex items-center justify-center w-24 h-12 sm:w-32 sm:h-16 md:w-40 md:h-20 bg-gray-800 rounded-lg border border-gray-600 transition-all duration-300"
+          <div 
+            className="flex items-center justify-center w-32 h-16 bg-gray-800 rounded-lg border border-gray-600"
             style={{
               backgroundColor: '#1a1a1a',
               color: '#ffffff',
               fontFamily: 'Inter, sans-serif',
               fontWeight: 'bold',
-              fontSize: '12px',
-              maxWidth: '280px',
-              width: 'auto',
-              height: 'auto',
-              minHeight: '60px',
-              padding: '8px 16px'
+              fontSize: '14px'
             }}
           >
-            <span className="text-center px-2 leading-tight">
-              {brandName.length > 20 ? brandName.substring(0, 20) + '...' : brandName}
+            <span className="text-center px-2">
+              {brandName.length > 15 ? brandName.substring(0, 15) + '...' : brandName}
             </span>
           </div>
         </div>
