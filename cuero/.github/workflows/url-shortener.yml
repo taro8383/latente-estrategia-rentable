@@ -38,7 +38,7 @@ jobs:
         echo "Short Code: ${{ github.event.inputs.shortCode }}"
         echo "Long URL: ${{ github.event.inputs.longUrl }}"
         echo "Expiration Hours: ${{ github.event.inputs.expirationHours }}"
-        echo "Metadata: ${{ github.event.inputs.metadata }}"
+        echo "Metadata: '${{ github.event.inputs.metadata }}'"
         echo "Repository: ${{ github.repository }}"
         echo "Ref: ${{ github.ref }}"
         echo "Actor: ${{ github.actor }}"
@@ -86,7 +86,7 @@ jobs:
         echo "SHORT_CODE=$SHORT_CODE" >> $GITHUB_ENV
         echo "LONG_URL=$LONG_URL" >> $GITHUB_ENV
         echo "EXPIRATION_HOURS=$EXPIRATION_HOURS" >> $GITHUB_ENV
-        echo "METADATA=$METADATA" >> $GITHUB_ENV
+        echo "METADATA='$METADATA'" >> $GITHUB_ENV
 
         echo "DEBUG: Validation passed"
         echo "DEBUG: Sanitized SHORT_CODE: $SHORT_CODE"
