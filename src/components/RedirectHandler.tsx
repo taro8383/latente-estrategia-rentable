@@ -10,6 +10,13 @@ export const RedirectHandler: React.FC = () => {
   const [countdown, setCountdown] = useState(3);
   const [error, setError] = useState<string | null>(null);
 
+  // Debug URL parsing immediately
+  console.log('🔍 REDIRECT DEBUG: Component mounted');
+  console.log('🔍 REDIRECT DEBUG: window.location.href:', window.location.href);
+  console.log('🔍 REDIRECT DEBUG: window.location.hash:', window.location.hash);
+  console.log('🔍 REDIRECT DEBUG: useParams result:', shortCode);
+  console.log('🔍 REDIRECT DEBUG: Expected shortCode from URL:', window.location.hash.split('/')[2]);
+
   useEffect(() => {
     // Check if shortCode is available
     if (!shortCode) {
