@@ -38,7 +38,7 @@ jobs:
         echo "Short Code: ${{ github.event.inputs.shortCode }}"
         echo "Long URL: ${{ github.event.inputs.longUrl }}"
         echo "Expiration Hours: ${{ github.event.inputs.expirationHours }}"
-        echo "Metadata: '${{ github.event.inputs.metadata }}'"
+        echo "Metadata: ${{ github.event.inputs.metadata }}"
         echo "Repository: ${{ github.repository }}"
         echo "Ref: ${{ github.ref }}"
         echo "Actor: ${{ github.actor }}"
@@ -76,37 +76,29 @@ jobs:
         fi
 
         # Validate metadata length
-        RAW_METADATA='${{ github.event.inputs.metadata }}'
-        if [ ${#RAW_METADATA} -gt 1000 ]; then
+        METADATA='${{ github.event.inputs.metadata }}'
+        if [ ${#METADATA} -gt 1000 ]; then
           echo "ERROR: Metadata too long (max 1000 characters)"
           exit 1
         fi
-
-        # Base64 encode metadata to avoid shell interpretation issues
-        METADATA_ENCODED=$(echo -n "$RAW_METADATA" | base64 -w 0)
 
         # Set environment variables for next steps
         echo "SHORT_CODE=$SHORT_CODE" >> $GITHUB_ENV
         echo "LONG_URL=$LONG_URL" >> $GITHUB_ENV
         echo "EXPIRATION_HOURS=$EXPIRATION_HOURS" >> $GITHUB_ENV
-        echo "METADATA_ENCODED=$METADATA_ENCODED" >> $GITHUB_ENV
+        echo "METADATA=$METADATA" >> $GITHUB_ENV
 
         echo "DEBUG: Validation passed"
         echo "DEBUG: Sanitized SHORT_CODE: $SHORT_CODE"
         echo "DEBUG: Sanitized LONG_URL: $LONG_URL"
 
     - name: Checkout repository
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      uses: actions/checkout@v5
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
-    - name: Setup Node.js
-      uses: actions/setup-node@1e60f620b9541d16f28e01576558c4f2f0d7ce1f # v4.1.0
-      with:
-        node-version: '20'
-        cache: 'npm'
-
+    
     - name: Debug - Show repository structure
       run: |
         echo "DEBUG: Repository Structure"
@@ -130,15 +122,13 @@ jobs:
         SHORT_CODE="${{ env.SHORT_CODE }}"
         LONG_URL="${{ env.LONG_URL }}"
         EXPIRATION_HOURS="${{ env.EXPIRATION_HOURS }}"
-
-        # Decode base64 metadata
-        METADATA=$(echo "${{ env.METADATA_ENCODED }}" | base64 -d)
+        METADATA="${{ env.METADATA }}"
 
         echo "DEBUG: Parsed inputs"
         echo "SHORT_CODE: $SHORT_CODE"
         echo "LONG_URL: $LONG_URL"
         echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
-        echo "METADATA: '$METADATA'"
+        echo "METADATA: $METADATA"
 
         # Validate inputs
         if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
@@ -165,88 +155,38 @@ jobs:
           mkdir -p public
         fi
 
-        # Create simple Node script using echo to avoid heredoc issues
-        echo 'const fs = require("fs");' > process_mappings.js
-        echo 'const mappings = JSON.parse(process.env.MAPPINGS);' >> process_mappings.js
-        echo 'const shortCode = process.env.SHORT_CODE;' >> process_mappings.js
-        echo 'const longUrl = process.env.LONG_URL;' >> process_mappings.js
-        echo 'const expiresAt = parseInt(process.env.EXPIRES_AT);' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo 'let metadata;' >> process_mappings.js
-        echo 'try {' >> process_mappings.js
-        echo '  metadata = JSON.parse(process.env.METADATA || "{}");' >> process_mappings.js
-        echo '} catch (error) {' >> process_mappings.js
-        echo '  console.log("DEBUG: JSON parse failed, trying JavaScript evaluation");' >> process_mappings.js
-        echo '  console.log("DEBUG: Metadata input:", process.env.METADATA);' >> process_mappings.js
-        echo '  try {' >> process_mappings.js
-        echo '    // Use Function constructor for safer evaluation' >> process_mappings.js
-        echo '    const jsObject = new Function("return " + process.env.METADATA)();' >> process_mappings.js
-        echo '    metadata = jsObject;' >> process_mappings.js
-        echo '    console.log("DEBUG: Successfully evaluated metadata as JavaScript object");' >> process_mappings.js
-        echo '  } catch (fallbackError) {' >> process_mappings.js
-        echo '    console.log("WARNING: Could not parse metadata, using empty object");' >> process_mappings.js
-        echo '    console.log("DEBUG: Original METADATA value:", process.env.METADATA);' >> process_mappings.js
-        echo '    metadata = {};' >> process_mappings.js
-        echo '  }' >> process_mappings.js
-        echo '}' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo 'console.log("DEBUG: Starting Node.js processing");' >> process_mappings.js
-        echo 'console.log("DEBUG: Current mappings count:", Object.keys(mappings.mappings).length);' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo '// Add new mapping' >> process_mappings.js
-        echo 'mappings.mappings[shortCode] = {' >> process_mappings.js
-        echo '  shortCode: shortCode,' >> process_mappings.js
-        echo '  longUrl: longUrl,' >> process_mappings.js
-        echo '  createdAt: Date.now(),' >> process_mappings.js
-        echo '  expiresAt: expiresAt,' >> process_mappings.js
-        echo '  metadata: metadata' >> process_mappings.js
-        echo '};' >> process_mappings.js
-        echo 'mappings.lastUpdated = Date.now();' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo '// Update statistics' >> process_mappings.js
-        echo 'const now = Date.now();' >> process_mappings.js
-        echo 'let activeCount = 0;' >> process_mappings.js
-        echo 'let expiredCount = 0;' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo 'Object.values(mappings.mappings).forEach(mapping => {' >> process_mappings.js
-        echo '  if (now > mapping.expiresAt) {' >> process_mappings.js
-        echo '    expiredCount++;' >> process_mappings.js
-        echo '  } else {' >> process_mappings.js
-        echo '    activeCount++;' >> process_mappings.js
-        echo '  }' >> process_mappings.js
-        echo '});' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo 'mappings.statistics = {' >> process_mappings.js
-        echo '  totalMappings: Object.keys(mappings.mappings).length,' >> process_mappings.js
-        echo '  activeMappings: activeCount,' >> process_mappings.js
-        echo '  expiredMappings: expiredCount' >> process_mappings.js
-        echo '};' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo '// Write updated mappings' >> process_mappings.js
-        echo 'fs.writeFileSync("public/url-mappings.json", JSON.stringify(mappings, null, 2));' >> process_mappings.js
-        echo '' >> process_mappings.js
-        echo 'console.log("URL mapping stored successfully");' >> process_mappings.js
-        echo 'console.log("Short code:", shortCode);' >> process_mappings.js
-        echo 'console.log("Long URL:", longUrl);' >> process_mappings.js
-        echo 'console.log("Expires at:", new Date(expiresAt).toISOString());' >> process_mappings.js
-        echo 'console.log("Total mappings:", Object.keys(mappings.mappings).length);' >> process_mappings.js
-        echo 'console.log("Active mappings:", activeCount);' >> process_mappings.js
+        # Simple bash-based JSON creation
+        echo "DEBUG: Starting simple JSON creation"
 
-        # Run Node script
-        export MAPPINGS="$MAPPINGS"
-        export SHORT_CODE="$SHORT_CODE"
-        export LONG_URL="$LONG_URL"
-        export EXPIRES_AT="$EXPIRES_AT"
-        export METADATA='$METADATA'
+        # Create public directory if it doesn't exist
+        mkdir -p public
 
-        node process_mappings.js
+        # Create or update mappings file with simple echo
+        TIMESTAMP=$(date +%s)000
+        echo "DEBUG: Timestamp: $TIMESTAMP"
+        echo "DEBUG: SHORT_CODE: $SHORT_CODE"
+        echo "DEBUG: LONG_URL: $LONG_URL"
 
-        if [ $? -ne 0 ]; then
-          echo "ERROR: Node.js processing failed"
-          exit 1
-        fi
+        # Create basic JSON structure
+        cat > public/url-mappings.json << EOF
+{
+  "mappings": {
+    "$SHORT_CODE": {
+      "shortCode": "$SHORT_CODE",
+      "longUrl": "$LONG_URL",
+      "createdAt": $TIMESTAMP,
+      "expiresAt": $EXPIRES_AT,
+      "metadata": $METADATA
+    }
+  },
+  "lastUpdated": $TIMESTAMP,
+  "version": "1.0"
+}
+EOF
 
-        echo "DEBUG: Node.js processing completed"
+        echo "DEBUG: JSON file created successfully"
+        echo "DEBUG: File contents:"
+        cat public/url-mappings.json
 
     - name: Debug - Verify mapping was stored
       run: |
@@ -289,7 +229,7 @@ jobs:
 
     - name: Deploy to GitHub Pages
       if: success()
-      uses: peaceiris/actions-gh-pages@4f9cc6600d4bf148f4c5980e0e7e8722d642f18a # v4.0.0
+      uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./public
