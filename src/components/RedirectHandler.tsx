@@ -20,15 +20,22 @@ export const RedirectHandler: React.FC<RedirectHandlerProps> = ({ shortCode }) =
         // Use the async getLongUrl method to fetch from GitHub Pages
         const longUrl = await URLShortener.getLongUrl(shortCode);
 
+        console.log('🔍 REDIRECT DEBUG: ShortCode:', shortCode);
+        console.log('🔍 REDIRECT DEBUG: LongUrl result:', longUrl);
+        console.log('🔍 REDIRECT DEBUG: Current URL:', window.location.href);
+        console.log('🔍 REDIRECT DEBUG: Current origin:', window.location.origin);
+
         if (longUrl) {
-          console.log('🔍 REDIRECT DEBUG: Found longUrl:', longUrl);
+          console.log('🔍 REDIRECT DEBUG: About to redirect to:', longUrl);
           setRedirectStatus('Redirigiendo...');
 
           // Simple direct redirect to avoid URL malformation
           setTimeout(() => {
+            console.log('🔍 REDIRECT DEBUG: Executing window.location.replace with:', longUrl);
             window.location.replace(longUrl);
           }, 1000);
         } else {
+          console.log('🔍 REDIRECT DEBUG: No longUrl found, setting error');
           setError('Enlace no encontrado o expirado');
           setIsRedirecting(false);
         }

@@ -117,8 +117,8 @@ export class URLShortener {
                 const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
                 mappingsUrl = `https://${window.location.hostname}/${repoName}/url-mappings.json`;
             } else {
-                // Local development or other hosting
-                mappingsUrl = `${window.location.origin}/url-mappings.json`;
+                // Local development or other hosting (custom domain)
+                mappingsUrl = `${window.location.origin}/url-mappings.json?t=${Date.now()}`;
             }
 
             const response = await fetch(mappingsUrl);
