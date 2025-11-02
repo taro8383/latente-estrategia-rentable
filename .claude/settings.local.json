@@ -21,7 +21,8 @@
       "Bash(./test-final-fix.sh:*)",
       "Bash(find:*)",
       "Bash(git reset:*)",
-      "Bash(git pull:*)"
+      "Bash(git pull:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []
