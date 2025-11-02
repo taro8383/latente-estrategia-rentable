@@ -82,10 +82,10 @@ export const Hero = () => {
               pero vos con tu instinto, <strong>lo sentiste incluso antes de abrir el email que te envié</strong>.
             </PersonalizedText>
 
-            <PersonalizedText as="p" className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto mb-4 text-center mobile-center-text">
+            <div className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto mb-4 text-center mobile-center-text">
               El mercado no recompensa la calidad. <br className="hidden sm:block" />
-              Recompensa a el que <strong>se declara rey</strong>, y está listo para tomar ese lugar.
-            </PersonalizedText>
+              Recompensa <PersonalizedText>a el que <strong>se declara rey</strong></PersonalizedText>, y está listo para tomar ese lugar.
+            </div>
 
             <div className="bg-accent/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-accent/20 mb-6 mobile-center-block">
               <HeroQuote />
