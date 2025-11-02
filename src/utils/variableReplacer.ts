@@ -98,6 +98,10 @@ export class VariableReplacer {
       male: "a el que se declara rey",
       female: "a la que se declara reina"
     },
+    "a el que <strong>se declara rey</strong>": {
+      male: "a el que <strong>se declara rey</strong>",
+      female: "a la que <strong>se declara reina</strong>"
+    },
     "convertirte en el #1 absoluto": {
       male: "convertirte en el #1 absoluto",
       female: "convertirte en la #1 absoluta"
@@ -105,6 +109,14 @@ export class VariableReplacer {
     "el #1 absoluto": {
       male: "el #1 absoluto",
       female: "la #1 absoluta"
+    },
+    "el <span class=\"text-accent font-semibold\">#1 absoluto</span>": {
+      male: "el <span class=\"text-accent font-semibold\">#1 absoluto</span>",
+      female: "la <span class=\"text-accent font-semibold\">#1 absoluta</span>"
+    },
+    "el <span class=\"text-accent\">#1 absoluto</span>": {
+      male: "el <span class=\"text-accent\">#1 absoluto</span>",
+      female: "la <span class=\"text-accent\">#1 absoluta</span>"
     },
     "Entonces… ¿Por qué seguís atrapado en el": {
       male: "Entonces… ¿Por qué seguís atrapado en el",
