@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Redirect Flow</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        button { padding: 10px 15px; margin: 5px; cursor: pointer; }
+        .log { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>Test de Flujo de Redirección</h1>
+
+    <div class="test-section">
+        <h2>Estado Actual</h2>
+        <div id="current-url">URL: <span></span></div>
+        <div id="storage-state">Storage: <span></span></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Generar URL de Prueba</h2>
+        <button onclick="generateTestURL()">Generar URL Corta</button>
+        <div id="generated-url"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Simular Flujo de Redirección</h2>
+        <button onclick="testRedirectFlow()">Iniciar Flujo Completo</button>
+        <button onclick="simulateStep1()">Paso 1: Extraer datos</button>
+        <button onclick="simulateStep2()">Paso 2: Almacenar datos</button>
+        <button onclick="simulateStep3()">Paso 3: Cambiar hash</button>
+        <button onclick="simulateStep4()">Paso 4: Renderizar página</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h2>Logs</h2>
+        <button onclick="clearLogs()">Limpiar Logs</button>
+        <div id="logs" class="log"></div>
+    </div>
+
+    <script>
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logDiv = document.getElementById('logs');
+            const logEntry = document.createElement('div');
+            logEntry.className = type;
+            logEntry.textContent = `[${timestamp}] ${message}`;
+            logDiv.appendChild(logEntry);
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function updateCurrentState() {
+            // Update current URL
+            document.querySelector('#current-url span').textContent = window.location.href;
+
+            // Update storage state
+            const storage = {};
+            try {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    if (key && key.includes('personalization')) {
+                        storage[key] = localStorage.getItem(key);
+                    }
+                }
+            } catch (e) {
+                log('Error reading localStorage: ' + e.message, 'error');
+            }
+
+            const storageText = Object.keys(storage).length > 0
+                ? `${Object.keys(storage).length} items de personalización`
+                : 'Sin datos de personalización';
+            document.querySelector('#storage-state span').textContent = storageText;
+        }
+
+        function generateTestURL() {
+            const testData = {
+                nombre: 'Usuario Test',
+                email: 'test@example.com',
+                telefono: '+1234567890',
+                empresa: 'Empresa Test',
+                genero: 'masculino',
+                uniqueCode: 'TEST' + Date.now().toString(36).toUpperCase()
+            };
+
+            const encoded = btoa(JSON.stringify(testData));
+            const shortCode = 'TEST' + Math.random().toString(36).substring(2, 8).toUpperCase();
+
+            // Store in mappings.json format for testing
+            const mappings = {
+                mappings: {},
+                lastUpdated: Date.now(),
+                version: "1.0",
+                statistics: { totalMappings: 0, activeMappings: 0, expiredMappings: 0 }
+            };
+            mappings.mappings[shortCode] = {
+                shortCode: shortCode,
+                longUrl: `#/invite/${testData.uniqueCode}?data=${encoded}`,
+                createdAt: Date.now(),
+                expiresAt: Date.now() + (72 * 60 * 60 * 1000), // 72 hours
+                metadata: { test: true }
+            };
+            mappings.statistics.totalMappings = 1;
+            mappings.statistics.activeMappings = 1;
+
+            // Store for testing
+            localStorage.setItem('test_mappings', JSON.stringify(mappings));
+
+            const testURL = `#/r/${shortCode}`;
+            document.getElementById('generated-url').innerHTML = `
+                <div class="success">URL generada: <a href="${testURL}" target="_blank">${testURL}</a></div>
+                <div class="info">Datos: ${JSON.stringify(testData, null, 2)}</div>
+            `;
+
+            log(`URL de prueba generada: ${testURL}`, 'success');
+        }
+
+        function simulateStep1() {
+            log('=== PASO 1: Extrayendo datos de URL corta ===', 'info');
+
+            // Get current hash
+            const hash = window.location.hash.substring(1);
+            const match = hash.match(/^\/r\/([A-Z0-9]+)$/i);
+
+            if (!match) {
+                log('Error: Formato de URL inválido. Debe ser #/r/XXXX', 'error');
+                return false;
+            }
+
+            const shortCode = match[1];
+            log(`Short code detectado: ${shortCode}`, 'info');
+
+            // Get test mappings
+            const mappings = JSON.parse(localStorage.getItem('test_mappings') || '{}');
+            const mapping = mappings.mappings[shortCode];
+
+            if (!mapping) {
+                log(`Error: No se encontró mapping para ${shortCode}`, 'error');
+                return false;
+            }
+
+            log(`Mapping encontrado: ${mapping.longUrl}`, 'success');
+            log(`Expira: ${new Date(mapping.expiresAt).toLocaleString()}`, 'info');
+
+            // Parse the long URL
+            const urlObj = new URL(mapping.longUrl, window.location.origin);
+            const invitePath = urlObj.hash.substring(1); // Remove #
+            const dataParam = urlObj.searchParams.get('data');
+
+            if (!dataParam) {
+                log('Error: No se encontró parámetro data', 'error');
+                return false;
+            }
+
+            try {
+                const personalizationData = JSON.parse(atob(dataParam));
+                log(`Datos decodificados: ${JSON.stringify(personalizationData, null, 2)}`, 'success');
+
+                // Store for next step
+                sessionStorage.setItem('test_step1_data', JSON.stringify({
+                    invitePath,
+                    personalizationData
+                }));
+
+                return true;
+            } catch (e) {
+                log(`Error decodificando datos: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        function simulateStep2() {
+            log('=== PASO 2: Almacenando datos en localStorage ===', 'info');
+
+            const step1Data = JSON.parse(sessionStorage.getItem('test_step1_data') || '{}');
+            if (!step1Data.personalizationData) {
+                log('Error: Datos del paso 1 no encontrados. Ejecutar paso 1 primero.', 'error');
+                return false;
+            }
+
+            try {
+                // Store personalization data
+                localStorage.setItem('incoming_personalization_payload', JSON.stringify(step1Data.personalizationData));
+                localStorage.setItem('personalization_active', 'true');
+
+                log('Datos almacenados en localStorage:', 'success');
+                log('- incoming_personalization_payload: OK', 'info');
+                log('- personalization_active: true', 'info');
+
+                // Verify storage
+                const stored = localStorage.getItem('incoming_personalization_payload');
+                const parsed = JSON.parse(stored);
+                log(`Verificación: ${parsed.nombre} (${parsed.email})`, 'success');
+
+                return true;
+            } catch (e) {
+                log(`Error almacenando datos: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        function simulateStep3() {
+            log('=== PASO 3: Cambiando hash a ruta de invitación ===', 'info');
+
+            const step1Data = JSON.parse(sessionStorage.getItem('test_step1_data') || '{}');
+            if (!step1Data.invitePath) {
+                log('Error: Ruta de invitación no encontrada. Ejecutar pasos 1-2 primero.', 'error');
+                return false;
+            }
+
+            const newHash = '#' + step1Data.invitePath;
+            log(`Cambiando hash a: ${newHash}`, 'info');
+
+            // Simulate the hash change
+            window.location.hash = newHash;
+
+            // Verify the change
+            setTimeout(() => {
+                log(`Hash actual: ${window.location.hash}`, 'info');
+                log('Hash cambiado exitosamente', 'success');
+                updateCurrentState();
+            }, 100);
+
+            return true;
+        }
+
+        function simulateStep4() {
+            log('=== PASO 4: Verificando renderizado de página ===', 'info');
+
+            // Check if we're on the right route
+            const currentHash = window.location.hash;
+            const isInviteRoute = currentHash.includes('/invite/');
+
+            if (!isInviteRoute) {
+                log(`Error: No estamos en ruta /invite/. Hash actual: ${currentHash}`, 'error');
+                return false;
+            }
+
+            log('Ruta correcta detectada: /invite/', 'success');
+
+            // Check personalization data is available
+            const personalizationData = localStorage.getItem('incoming_personalization_payload');
+            if (!personalizationData) {
+                log('Error: Datos de personalización no encontrados en localStorage', 'error');
+                return false;
+            }
+
+            try {
+                const data = JSON.parse(personalizationData);
+                log(`Datos de personalización disponibles: ${data.nombre}`, 'success');
+
+                // Simulate successful page render
+                log('✅ FLUJO COMPLETADO EXITOSAMENTE', 'success');
+                log('   1. ✅ URL corta procesada', 'info');
+                log('   2. ✅ Datos extraídos y almacenados', 'info');
+                log('   3. ✅ Hash cambiado a ruta /invite/', 'info');
+                log('   4. ✅ Página personalizada lista para renderizar', 'info');
+
+                return true;
+            } catch (e) {
+                log(`Error verificando datos: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        function testRedirectFlow() {
+            log('=== INICIANDO FLUJO COMPLETO DE REDIRECCIÓN ===', 'info');
+
+            const results = document.getElementById('test-results');
+            results.innerHTML = '<div class="info">Ejecutando flujo completo...</div>';
+
+            setTimeout(() => {
+                const step1Result = simulateStep1();
+                if (!step1Result) {
+                    results.innerHTML = '<div class="error">❌ Falló en Paso 1</div>';
+                    return;
+                }
+
+                setTimeout(() => {
+                    const step2Result = simulateStep2();
+                    if (!step2Result) {
+                        results.innerHTML = '<div class="error">❌ Falló en Paso 2</div>';
+                        return;
+                    }
+
+                    setTimeout(() => {
+                        const step3Result = simulateStep3();
+                        if (!step3Result) {
+                            results.innerHTML = '<div class="error">❌ Falló en Paso 3</div>';
+                            return;
+                        }
+
+                        setTimeout(() => {
+                            const step4Result = simulateStep4();
+                            if (step4Result) {
+                                results.innerHTML = '<div class="success">✅ Flujo completado exitosamente</div>';
+                                log('🎉 REDIRECCIÓN COMPLETADA - La página principal debería mostrarse ahora', 'success');
+                            } else {
+                                results.innerHTML = '<div class="error">❌ Falló en Paso 4</div>';
+                            }
+                            updateCurrentState();
+                        }, 500);
+                    }, 500);
+                }, 500);
+            }, 100);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs').innerHTML = '';
+            log('Logs limpiados');
+        }
+
+        // Initialize
+        updateCurrentState();
+        log('Página de prueba cargada. Listo para probar el flujo de redirección.', 'info');
+
+        // Auto-update state every 2 seconds
+        setInterval(updateCurrentState, 2000);
+    </script>
+</body>
+</html>

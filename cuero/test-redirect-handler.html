@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Redirect Handler</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            padding: 30px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        .debug-section {
+            background: rgba(79, 70, 229, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            margin: 10px 0;
+            border: 1px solid #4f46e5;
+        }
+        button { 
+            background: linear-gradient(45deg, #ff6b35, #f72b1b); 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            margin: 10px 5px;
+        }
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+        .url-display {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #444;
+            margin: 10px 0;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Test Redirect Handler</h1>
+        
+        <div class="debug-section">
+            <h3>Current URL Analysis</h3>
+            <div id="currentUrl"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>localStorage State</h3>
+            <div id="localStorageState"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>URL Mappings</h3>
+            <div id="urlMappings"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>Test Actions</h3>
+            <button onclick="testShortUrlGeneration()">Test Short URL Generation</button>
+            <button onclick="testRedirectHandler()">Test Redirect Handler</button>
+            <button onclick="clearAllData()">Clear All Data</button>
+            <button onclick="simulateRedirect()">Simulate Redirect</button>
+        </div>
+        
+        <div class="debug-section">
+            <h3>Generated URLs</h3>
+            <div id="generatedUrls"></div>
+        </div>
+    </div>
+
+    <script>
+        // URL Shortener Utility (simplified version)
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static saveMappings(mappings) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                } catch (error) {
+                    console.error('Failed to save URL mappings:', error);
+                }
+            }
+
+            static storeMapping(shortCode, longUrl, expirationHours = 72) {
+                const mapping = {
+                    shortCode,
+                    longUrl,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                };
+
+                const mappings = this.getMappings();
+                mappings[shortCode] = mapping;
+                this.saveMappings(mappings);
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+
+                if (!mapping) {
+                    return null;
+                }
+
+                if (Date.now() > mapping.expiresAt) {
+                    delete mappings[shortCode];
+                    this.saveMappings(mappings);
+                    return null;
+                }
+
+                return mapping.longUrl;
+            }
+
+            static generateShortUrl(longUrl, expirationHours = 72) {
+                let shortCode;
+                const mappings = this.getMappings();
+                
+                do {
+                    shortCode = this.generateShortCode();
+                } while (mappings[shortCode]);
+
+                this.storeMapping(shortCode, longUrl, expirationHours);
+
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                return `${baseUrl}#/r/${shortCode}`;
+            }
+        }
+
+        // UTF-8 safe base64 encoder
+        function base64EncodeUnicode(str) {
+            return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                return String.fromCharCode('0x' + p1);
+            }));
+        }
+
+        // Test data
+        const testPersonalizationData = {
+            readerInfo: {
+                name: "Juan Test",
+                company: "Empresa Test",
+                position: "CEO",
+                location: "Buenos Aires"
+            },
+            brandInfo: {
+                name: "Marca Test",
+                industry: "Cuero Premium"
+            },
+            customMessages: {
+                historia: "Esta es una historia de prueba para depurar el redirect handler"
+            }
+        };
+
+        function updateDebugInfo() {
+            document.getElementById('currentUrl').innerHTML = `
+                <div class="url-display">${window.location.href}</div>
+                <div><strong>Hash:</strong> ${window.location.hash}</div>
+                <div><strong>Search:</strong> ${window.location.search}</div>
+            `;
+
+            const localStorageState = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key) {
+                    localStorageState[key] = localStorage.getItem(key);
+                }
+            }
+            document.getElementById('localStorageState').innerHTML = `
+                <pre>${JSON.stringify(localStorageState, null, 2)}</pre>
+            `;
+
+            const mappings = URLShortener.getMappings();
+            document.getElementById('urlMappings').innerHTML = `
+                <pre>${JSON.stringify(mappings, null, 2)}</pre>
+            `;
+        }
+
+        function testShortUrlGeneration() {
+            console.log('🧪 Testing short URL generation...');
+            
+            const jsonData = JSON.stringify(testPersonalizationData);
+            const encodedData = base64EncodeUnicode(jsonData);
+            
+            const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+            const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+            const uniqueCode = 'test' + Date.now();
+            
+            const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
+            const shortUrl = URLShortener.generateShortUrl(longUrl, 72);
+            
+            console.log('🧪 Generated longUrl:', longUrl);
+            console.log('🧪 Generated shortUrl:', shortUrl);
+            console.log('🧪 Encoded data length:', encodedData.length);
+            
+            document.getElementById('generatedUrls').innerHTML = `
+                <div class="url-display"><strong>Long URL:</strong><br>${longUrl}</div>
+                <div class="url-display"><strong>Short URL:</strong><br>${shortUrl}</div>
+                <div class="url-display"><strong>Encoded Data Preview:</strong><br>${encodedData.substring(0, 100)}...</div>
+                <button onclick="window.open('${shortUrl}', '_blank')">Test Short URL</button>
+            `;
+            
+            updateDebugInfo();
+        }
+
+        function testRedirectHandler() {
+            console.log('🧪 Testing redirect handler logic...');
+            
+            // Simulate what RedirectHandler does
+            const hash = window.location.hash;
+            console.log('🧪 Current hash:', hash);
+            
+            if (hash.includes('/r/')) {
+                const shortCode = hash.split('/r/')[1]?.split('?')[0];
+                console.log('🧪 Extracted shortCode:', shortCode);
+                
+                if (shortCode) {
+                    const longUrl = URLShortener.getLongUrl(shortCode);
+                    console.log('🧪 Found longUrl:', longUrl);
+                    
+                    if (longUrl) {
+                        console.log('🧪 Simulating redirect to:', longUrl);
+                        
+                        // Extract data part like RedirectHandler does
+                        const hashIndex = longUrl.indexOf('#');
+                        if (hashIndex !== -1) {
+                            const hashPart = longUrl.substring(hashIndex + 1);
+                            console.log('🧪 Hash part:', hashPart);
+                            
+                            const qIndex = hashPart.indexOf('?');
+                            if (qIndex !== -1) {
+                                const pathOnly = hashPart.substring(0, qIndex);
+                                const queryString = hashPart.substring(qIndex + 1);
+                                console.log('🧪 Path only:', pathOnly);
+                                console.log('🧪 Query string:', queryString);
+                                
+                                const params = new URLSearchParams(queryString);
+                                const encodedData = params.get('data');
+                                console.log('🧪 Extracted encodedData:', encodedData ? `(len=${encodedData.length})` : null);
+                                
+                                if (encodedData) {
+                                    console.log('🧪 Storing in localStorage...');
+                                    localStorage.setItem('incoming_personalization_payload', encodedData);
+                                    localStorage.setItem('incoming_personalization_payload_ts', String(Date.now()));
+                                    
+                                    console.log('🧪 Stored. Verifying...');
+                                    const verifyStored = localStorage.getItem('incoming_personalization_payload');
+                                    console.log('🧪 Verification - stored matches:', verifyStored === encodedData);
+                                    
+                                    console.log('🧪 Navigating to:', pathOnly);
+                                    window.location.hash = pathOnly;
+                                    setTimeout(() => {
+                                        console.log('🧪 Reloading page...');
+                                        window.location.reload();
+                                    }, 200);
+                                } else {
+                                    console.log('🧪 No encoded data found in query string');
+                                }
+                            } else {
+                                console.log('🧪 No query string found in hash part');
+                            }
+                        } else {
+                            console.log('🧪 No hash found in long URL');
+                        }
+                    } else {
+                        console.log('🧪 No long URL found for short code');
+                    }
+                } else {
+                    console.log('🧪 No short code found in hash');
+                }
+            } else {
+                console.log('🧪 Hash does not contain /r/ pattern');
+            }
+        }
+
+        function clearAllData() {
+            console.log('🧪 Clearing all test data...');
+            localStorage.removeItem('incoming_personalization_payload');
+            localStorage.removeItem('incoming_personalization_payload_ts');
+            localStorage.removeItem('url_mappings');
+            updateDebugInfo();
+        }
+
+        function simulateRedirect() {
+            console.log('🧪 Simulating redirect flow...');
+            
+            // Generate test URLs first
+            testShortUrlGeneration();
+            
+            // Wait a bit then simulate redirect
+            setTimeout(() => {
+                const mappings = URLShortener.getMappings();
+                const shortCodes = Object.keys(mappings);
+                
+                if (shortCodes.length > 0) {
+                    const testShortCode = shortCodes[shortCodes.length - 1];
+                    console.log('🧪 Simulating visit to short code:', testShortCode);
+                    window.location.hash = `#/r/${testShortCode}`;
+                    setTimeout(() => {
+                        window.location.reload();
+                    }, 100);
+                } else {
+                    console.log('🧪 No short codes to test');
+                }
+            }, 1000);
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDebugInfo();
+            console.log('🧪 Test page loaded');
+            console.log('🧪 Current localStorage keys:', Object.keys(localStorage));
+        });
+
+        // Update debug info when hash changes
+        window.addEventListener('hashchange', function() {
+            console.log('🧪 Hash changed to:', window.location.hash);
+            setTimeout(updateDebugInfo, 100);
+        });
+    </script>
+</body>
+</html>

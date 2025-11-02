@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test URL Shortener</title>
+</head>
+<body>
+    <h1>Testing URL Shortener</h1>
+    <div id="results"></div>
+
+    <script>
+        async function testURLShortener() {
+            const results = document.getElementById('results');
+            results.innerHTML = '<p>Testing...</p>';
+
+            try {
+                // Test fetching the mappings file
+                const mappingsUrl = 'https://latente.net/url-mappings.json';
+                results.innerHTML += `<p>Fetching from: ${mappingsUrl}</p>`;
+
+                const response = await fetch(mappingsUrl);
+                results.innerHTML += `<p>Response status: ${response.status}</p>`;
+
+                if (response.ok) {
+                    const data = await response.json();
+                    results.innerHTML += `<p>Found ${Object.keys(data.mappings || {}).length} mappings</p>`;
+
+                    const shortCode = '1fRPHZ';
+                    if (data.mappings && data.mappings[shortCode]) {
+                        const mapping = data.mappings[shortCode];
+                        results.innerHTML += `<p>Found mapping for ${shortCode}: ${mapping.longUrl}</p>`;
+                        results.innerHTML += `<p>Expires: ${new Date(mapping.expiresAt).toLocaleString()}</p>`;
+                    } else {
+                        results.innerHTML += `<p>No mapping found for ${shortCode}</p>`;
+                    }
+                } else {
+                    results.innerHTML += `<p>Failed to fetch: ${response.statusText}</p>`;
+                }
+            } catch (error) {
+                results.innerHTML += `<p>Error: ${error.message}</p>`;
+            }
+        }
+
+        testURLShortener();
+    </script>
+</body>
+</html>

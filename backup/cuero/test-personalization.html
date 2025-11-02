@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test de Personalización - Latente</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            padding: 30px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 { 
+            color: #ffffff; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .test-section { 
+            margin-bottom: 30px; 
+            padding: 20px; 
+            background: rgba(79, 70, 229, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid #4f46e5;
+        }
+        .test-url { 
+            background: #1a1a1a; 
+            padding: 15px; 
+            border-radius: 4px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px; 
+            border: 1px solid #444; 
+            margin: 10px 0; 
+            word-break: break-all;
+        }
+        .test-button { 
+            background: #4f46e5; 
+            color: white; 
+            border: none; 
+            padding: 8px 16px; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        .test-button:hover { 
+            background: #3d4452;
+        }
+        .instructions { 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 8px; 
+            border: 1px solid #444; 
+            padding: 20px; 
+            margin-top: 20px;
+        }
+        .instructions h3 { 
+            color: #4f46e5; 
+            margin-bottom: 15px;
+        }
+        .instructions p { 
+            margin-bottom: 10px; 
+            line-height: 1.5;
+        }
+        .code { 
+            background: #2d2d2d; 
+            padding: 10px; 
+            border-radius: 4px; 
+            font-family: 'Courier New', monospace; 
+            font-size: 12px; 
+            color: #e2e8f0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test de Sistema de Personalización</h1>
+        
+        <div class="test-section">
+            <h3>URL de Prueba con Personalización</h3>
+            <div class="test-url">
+                https://your-domain.com/invite/test123?data=eyJicmFuZEluZm8iOnsibWUuIHRlc3VybmFtZSI6IkNvYWNoIiwiY29tcHJ5ZSI6IkpvaG4iLCJjb21wYW55IjoiTHV4eHkgSG9sZGluZ3MiLCJpbmR1c3R5ZSI6ImFmbHVudCBwcm9mZXNzaW9uYWxzIn19dfQ==
+            </div>
+            <button class="test-button" onclick="testPersonalization()">Probar Personalización</button>
+        </div>
+        
+        <div class="instructions">
+            <h3>Instrucciones de Prueba</h3>
+            <p>1. Haz clic en el botón "Probar Personalización" para abrir la URL de prueba en una nueva pestaña.</p>
+            <p>2. Verifica que los siguientes elementos se personalicen correctamente:</p>
+            <ul>
+                <li>El nombre de la marca "Coach" aparece en la sección de citas</li>
+                <li>El nombre del lector "John" aparece en el saludo personalizado</li>
+                <li>Las palabras clave de la industria aparecen en la sección de problemas</li>
+                <li>El temporizador de urgencia muestra el tiempo restante</li>
+                <li>La página se redirige correctamente después de 72 horas</li>
+            </ul>
+            <p>3. Prueba la funcionalidad de expiración:</p>
+            <ul>
+                <li>Usa una URL con una fecha de expiración en el pasado</li>
+                <li>Verifica que la página de expiración se muestra correctamente</li>
+                <li>Confirma que el temporizador funciona correctamente</li>
+            </ul>
+            <p>4. Para probar con diferentes datos, modifica el parámetro "data" en la URL con diferentes valores codificados en base64.</p>
+            <div class="code">
+                <strong>Ejemplo de datos para codificar:</strong><br>
+                <pre>
+{
+  "brandInfo": {
+    "name": "Louis Vuitton",
+    "industry": "luxury-fashion"
+  },
+  "readerInfo": {
+    "name": "Maria",
+    "company": "Premium Holdings"
+  },
+  "industryKeywords": ["billeteras premium", "cuero artesanal", "diseño exclusivo"]
+}
+                </pre>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function testPersonalization() {
+            // Open test URL in new tab
+            window.open('https://your-domain.com/invite/test123?data=eyJicmFuZEluZm8iOnsibWUuIHRlc3VybmFtZSI6IkNvYWNoIiwiY29tcHJ5ZSI6IkpvaG4iLCJjb21wYW55IjoiTHV4eHkgSG9sZGluZ3MiLCJpbmR1c3R5ZSI6ImFmbHVudCBwcm9mZXNzaW9uYWxzIn19dfQ==', '_blank');
+        }
+    </script>
+</body>
+</html>

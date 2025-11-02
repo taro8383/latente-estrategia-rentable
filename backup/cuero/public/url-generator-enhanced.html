@@ -1,0 +1,1776 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generador de URLs Personalizadas - Latente (Enhanced)</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+            min-height: 100vh;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            padding: 30px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 { 
+            color: #ffffff; 
+            text-align: center; 
+            margin-bottom: 30px; 
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+        .enhanced-url-generator {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+        }
+        .progress-container {
+            grid-column: 1 / -1;
+            margin-bottom: 30px;
+        }
+        .progress-bar {
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .step {
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
+        }
+        .step.active {
+            background: rgba(79, 70, 229, 0.3);
+            border-color: #4f46e5;
+            color: #4f46e5;
+            font-weight: 600;
+        }
+        .form-section { 
+            margin-bottom: 25px; 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 12px; 
+            padding: 25px; 
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            transition: all 0.3s ease;
+        }
+        .form-section:hover {
+            border-color: rgba(79, 70, 229, 0.4);
+            background: rgba(255, 255, 255, 0.08);
+        }
+        .section-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(79, 70, 229, 0.2);
+        }
+        .section-number {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            margin-right: 15px;
+        }
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .section-description {
+            font-size: 0.9em;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        .field-group { 
+            margin-bottom: 20px; 
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .field-group.valid {
+            border-left: 3px solid #10b981;
+            padding-left: 12px;
+        }
+        .field-group.invalid {
+            border-left: 3px solid #ef4444;
+            padding-left: 12px;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        .field-group.warning {
+            border-left: 3px solid #f59e0b;
+            padding-left: 12px;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #e2e8f0;
+            font-size: 14px;
+        }
+        .required {
+            color: #ef4444;
+            margin-left: 4px;
+        }
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #444; 
+            border-radius: 6px; 
+            background: #2d2d2d; 
+            color: #ffffff; 
+            font-size: 14px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none; 
+            border-color: #4f46e5; 
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+            background: rgba(45, 45, 45, 0.8);
+        }
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+        .field-help {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .field-preview {
+            font-size: 11px;
+            color: #64748b;
+            font-style: italic;
+            margin-top: 3px;
+            padding: 4px 8px;
+            background: rgba(100, 116, 139, 0.1);
+            border-radius: 4px;
+            display: inline-block;
+        }
+        .character-counter {
+            position: absolute;
+            right: 10px;
+            bottom: 5px;
+            font-size: 11px;
+            color: #64748b;
+            background: rgba(100, 116, 139, 0.1);
+            padding: 2px 4px;
+            border-radius: 3px;
+        }
+        .character-counter.over-limit {
+            color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+        .character-counter.under-min {
+            color: #f59e0b;
+            background: rgba(245, 158, 11, 0.1);
+        }
+        .field-error, .field-warning {
+            margin-top: 5px;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            display: flex;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        .field-error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #dc2626;
+        }
+        .field-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid #f59e0b;
+            color: #d97706;
+        }
+        .error-icon, .warning-icon {
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+        .validation-indicator {
+            position: absolute;
+            right: 10px;
+            top: 35px;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+        .validation-indicator.success {
+            background: #10b981;
+            color: white;
+        }
+        button { 
+            background: linear-gradient(45deg, #ff6b35, #f72b1b); 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+        button:disabled {
+            background: #64748b;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        .result { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: rgba(79, 70, 229, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid #4f46e5;
+            word-break: break-all;
+        }
+        .result h3 {
+            color: #4f46e5;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .result-url {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #444;
+            margin: 10px 0;
+        }
+        .copy-btn {
+            background: #4f46e5;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .copy-btn:hover {
+            background: #3d4452;
+        }
+        .preview-panel {
+            position: sticky;
+            top: 20px;
+            background: rgba(79, 70, 229, 0.1);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #4f46e5;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        .preview-section {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(79, 70, 229, 0.2);
+        }
+        .preview-section:last-child {
+            border-bottom: none;
+        }
+        .preview-section h4 {
+            color: #4f46e5;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .preview-content {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .logo-upload-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .logo-preview {
+            margin-top: 15px;
+            text-align: center;
+        }
+        .logo-preview img {
+            max-width: 200px;
+            max-height: 100px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background: #1a1a1a;
+        }
+        .remove-logo-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-top: 10px;
+        }
+        .remove-logo-btn:hover {
+            background: #b91c1c;
+        }
+        .form-errors {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #dc2626;
+            color: #dc2626;
+            padding: 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+        }
+        .form-errors h4 {
+            color: #dc2626;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        .form-errors ul {
+            list-style: disc;
+            margin-left: 20px;
+        }
+        .form-errors li {
+            margin-bottom: 4px;
+        }
+        @media (max-width: 1200px) {
+            .enhanced-url-generator {
+                grid-template-columns: 1fr;
+            }
+            
+            .preview-panel {
+                position: relative;
+                top: 0;
+            }
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-section {
+                padding: 15px;
+            }
+            
+            .progress-steps {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .step {
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 Generador de URLs Personalizadas (Enhanced)</h1>
+        
+        <div class="enhanced-url-generator">
+            <!-- Progress Indicator -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-steps">
+                    <div class="step active" data-section="basic">Básico</div>
+                    <div class="step" data-section="hero">Hero</div>
+                    <div class="step" data-section="problems">Problems</div>
+                    <div class="step" data-section="solution">Solution</div>
+                </div>
+            </div>
+            
+            <!-- Form Container -->
+            <div class="form-container">
+                <form id="enhancedGeneratorForm">
+                    <!-- Basic Information Section -->
+                    <div class="form-section" data-section="basic">
+                        <div class="section-header">
+                            <div class="section-number">1</div>
+                            <div>
+                                <div class="section-title">Información Básica</div>
+                                <div class="section-description">Datos fundamentales para la personalización</div>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="readerName">
+                                Nombre del Lector <span class="required">*</span>
+                            </label>
+                            <input type="text" id="readerName" value="Juan" required>
+                            <div class="field-preview">Ejemplo: "[reader name]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="company">
+                                Empresa <span class="required">*</span>
+                            </label>
+                            <input type="text" id="company" value="Luxury Holdings" required>
+                            <div class="field-preview">Ejemplo: "Luxury Holdings"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="industria">
+                                Industria <span class="required">*</span>
+                            </label>
+                            <input type="text" id="industria" placeholder="Ej: Cuero Premium, Tecnología, Salud..." list="industry-suggestions" required>
+                            <datalist id="industry-suggestions">
+                                <option value="Moda de Lujo">
+                                <option value="Cuero Premium">
+                                <option value="Tecnología">
+                                <option value="Salud">
+                                <option value="Finanzas">
+                                <option value="Bienes Raíces">
+                                <option value="Automotriz">
+                                <option value="Educación">
+                                <option value="Retail">
+                                <option value="Manufactura">
+                                <option value="Consultoría">
+                                <option value="Servicios Profesionales">
+                                <option value="Turismo">
+                                <option value="Entretenimiento">
+                                <option value="Medios">
+                                <option value="Construcción">
+                                <option value="Energía">
+                                <option value="Telecomunicaciones">
+                                <option value="Agricultura">
+                                <option value="Alimentos y Bebidas">
+                                <option value="Transporte">
+                                <option value="Logística">
+                            </datalist>
+                            <div class="field-preview">Ejemplo: "[industria]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="ubicacion">
+                                Ubicación <span class="required">*</span>
+                            </label>
+                            <input type="text" id="ubicacion" value="Nueva York" required>
+                            <div class="field-preview">Ejemplo: "[ubicacion]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="validHours">
+                                Vigencia en horas <span class="required">*</span>
+                            </label>
+                            <select id="validHours" required>
+                                <option value="24">24 horas</option>
+                                <option value="48">48 horas</option>
+                                <option value="72" selected>72 horas</option>
+                                <option value="168">1 semana</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- Hero Section Variables -->
+                    <div class="form-section" data-section="hero">
+                        <div class="section-header">
+                            <div class="section-number">2</div>
+                            <div>
+                                <div class="section-title">Sección Hero</div>
+                                <div class="section-description">Variables que aparecen en la sección principal</div>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="historia">
+                                Historia Personalizada
+                            </label>
+                            <textarea id="historia" placeholder="Deje vacío para generar automáticamente..."></textarea>
+                            <div class="field-preview">Ejemplo: "[historia]"</div>
+                            <div class="field-help">Narrativa personal para el componente Hero. Si se deja vacío, se generará automáticamente.</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="brandName">
+                                Nombre de Marca
+                            </label>
+                            <input type="text" id="brandName" placeholder="Usará el nombre de empresa si se deja vacío">
+                            <div class="field-preview">Ejemplo: "[brand name]"</div>
+                            <div class="field-help">Cómo aparece la marca en el contenido. Usa el nombre de empresa si no se proporciona.</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Problems Section Variables -->
+                    <div class="form-section" data-section="problems">
+                        <div class="section-header">
+                            <div class="section-number">3</div>
+                            <div>
+                                <div class="section-title">Sección Problems</div>
+                                <div class="section-description">Variables para la sección de problemas</div>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="tuMarca">
+                                Tu Marca (Problems)
+                            </label>
+                            <input type="text" id="tuMarca" placeholder="Referencia de marca en problemas">
+                            <div class="field-preview">Ejemplo: "[tu marca]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="inovacion">
+                                Innovación
+                            </label>
+                            <input type="text" id="inovacion" placeholder="Concepto de innovación">
+                            <div class="field-preview">Ejemplo: "[inovacion]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="posicionamiento">
+                                Posicionamiento
+                            </label>
+                            <input type="text" id="posicionamiento" placeholder="Estrategia de posicionamiento">
+                            <div class="field-preview">Ejemplo: "[posicionamiento]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="rollsRoyce">
+                                Referencia de Lujo
+                            </label>
+                            <input type="text" id="rollsRoyce" placeholder="Comparación con marca de lujo">
+                            <div class="field-preview">Ejemplo: "[Rolls-Royce]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="fraseDescriptiva">
+                                Frase Descriptiva
+                            </label>
+                            <input type="text" id="fraseDescriptiva" placeholder="Frase que identifica la marca">
+                            <div class="field-preview">Ejemplo: "[frase descriptiva]"</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Solution Section Variables -->
+                    <div class="form-section" data-section="solution">
+                        <div class="section-header">
+                            <div class="section-number">4</div>
+                            <div>
+                                <div class="section-title">Sección Solution</div>
+                                <div class="section-description">Variables para la sección de soluciones</div>
+                            </div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="avatar">
+                                Avatar
+                            </label>
+                            <input type="text" id="avatar" placeholder="Descripción del avatar de marca">
+                            <div class="field-preview">Ejemplo: "[avatar]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="propuestaPobre">
+                                Propuesta Pobre
+                            </label>
+                            <input type="text" id="propuestaPobre" placeholder="Propuesta de valor débil">
+                            <div class="field-preview">Ejemplo: "[propuesta pobre]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="propuestaBuena">
+                                Propuesta Buena
+                            </label>
+                            <input type="text" id="propuestaBuena" placeholder="Propuesta de valor fuerte">
+                            <div class="field-preview">Ejemplo: "[propuesta buena]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="automatizacion">
+                                Automatización
+                            </label>
+                            <input type="text" id="automatizacion" placeholder="Área de automatización">
+                            <div class="field-preview">Ejemplo: "[automatizacion]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="trabajoDeValor">
+                                Trabajo de Valor
+                            </label>
+                            <input type="text" id="trabajoDeValor" placeholder="Actividades de alto valor">
+                            <div class="field-preview">Ejemplo: "[trabajo de valor]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="proveedor">
+                                Proveedor
+                            </label>
+                            <input type="text" id="proveedor" placeholder="Tipo de proveedor o recurso">
+                            <div class="field-preview">Ejemplo: "[proveedor]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="infrautilizado">
+                                Infrautilizado
+                            </label>
+                            <input type="text" id="infrautilizado" placeholder="Uso de activos infrautilizados">
+                            <div class="field-preview">Ejemplo: "[infrautilizado]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="membresia">
+                                Membresía
+                            </label>
+                            <input type="text" id="membresia" placeholder="Concepto de membresía">
+                            <div class="field-preview">Ejemplo: "[membresia]"</div>
+                        </div>
+                        
+                        <div class="field-group">
+                            <label for="metodo">
+                                Método
+                            </label>
+                            <input type="text" id="metodo" placeholder="Nombre del método o sistema">
+                            <div class="field-preview">Ejemplo: "[metodo]"</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Logo Upload Section -->
+                    <div class="logo-upload-section">
+                        <label for="logoUpload">📷 Subir logo de la empresa (opcional):</label>
+                        <input type="file" id="logoUpload" accept="image/*" onchange="handleLogoUpload(event)">
+                        <div id="logoPreview" class="logo-preview" style="display: none;">
+                            <img id="logoImage" src="" alt="Logo preview">
+                            <br>
+                            <button type="button" class="remove-logo-btn" onclick="removeLogo()">❌ Eliminar logo</button>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" id="submitBtn">🚀 Generar URL Personalizada</button>
+                </form>
+            </div>
+            
+            <!-- Preview Panel -->
+            <div class="preview-panel">
+                <h3>📋 Vista Previa en Tiempo Real</h3>
+                <div class="preview-content" id="previewContent">
+                    <div class="preview-section">
+                        <h4>Hero Section Preview:</h4>
+                        <p>"[historia]"</p>
+                        <p>Hola [reader name],</p>
+                        <p>Tu empresa de [industria]...</p>
+                    </div>
+                    <div class="preview-section">
+                        <h4>Problems Section Preview:</h4>
+                        <p>En [ubicacion], [tu marca]...</p>
+                        <p>Usando [inovacion]...</p>
+                    </div>
+                    <div class="preview-section">
+                        <h4>Solution Section Preview:</h4>
+                        <p>[avatar]: [propuesta pobre] vs [propuesta buena]</p>
+                        <p>[automatizacion] y [trabajo de valor]...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>🔗 URL Generada</h3>
+            <div class="result-url" id="shortUrl"></div>
+            <button class="copy-btn" onclick="copyToClipboard('shortUrl')">📋 Copiar URL</button>
+            
+            <div id="urlStats" style="margin-top: 20px; padding: 15px; background: rgba(79, 70, 229, 0.1); border-radius: 8px;"></div>
+        </div>
+        
+        <div id="preview" class="result" style="display: none;">
+            <h3>📋 Vista Previa de Datos</h3>
+            <div class="preview-content" id="previewJson"></div>
+        </div>
+    </div>
+
+    <script>
+        let companyLogoData = null;
+        let companyLogoId = null;
+
+        // Variable configuration with validation rules
+        const VARIABLE_CONFIG = [
+            {
+                id: 'readerName',
+                label: 'Nombre del Lector',
+                type: 'text',
+                section: 'basic',
+                order: 1,
+                required: true,
+                maxLength: 50,
+                pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/,
+                errorMessage: 'Nombre debe contener solo letras y espacios (2-50 caracteres)'
+            },
+            {
+                id: 'company',
+                label: 'Empresa',
+                type: 'text',
+                section: 'basic',
+                order: 2,
+                required: true,
+                maxLength: 100,
+                pattern: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s&.,'-]+$/,
+                errorMessage: 'Nombre de empresa inválido (2-100 caracteres)'
+            },
+            {
+                id: 'industria',
+                label: 'Industria',
+                type: 'text',
+                section: 'basic',
+                order: 3,
+                required: true,
+                maxLength: 50,
+                pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/,
+                errorMessage: 'Industria debe contener solo letras y espacios (2-50 caracteres)'
+            },
+            {
+                id: 'ubicacion',
+                label: 'Ubicación',
+                type: 'text',
+                section: 'basic',
+                order: 4,
+                required: true,
+                maxLength: 60,
+                pattern: /^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s'-]+$/,
+                errorMessage: 'Ubicación inválida (2-60 caracteres)'
+            },
+            {
+                id: 'validHours',
+                label: 'Vigencia',
+                type: 'number',
+                section: 'basic',
+                order: 5,
+                required: true,
+                min: 1,
+                max: 720,
+                values: [24, 48, 72, 168],
+                errorMessage: 'Vigencia inválida (seleccione una opción válida)'
+            },
+            {
+                id: 'historia',
+                label: 'Historia Personalizada',
+                type: 'textarea',
+                section: 'hero',
+                order: 6,
+                required: false,
+                maxLength: 500,
+                minLength: 20,
+                errorMessage: 'Historia debe tener entre 20 y 500 caracteres'
+            },
+            {
+                id: 'brandName',
+                label: 'Nombre de Marca',
+                type: 'text',
+                section: 'hero',
+                order: 7,
+                required: false,
+                maxLength: 80,
+                minLength: 2,
+                pattern: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s&.,'-]+$/,
+                errorMessage: 'Nombre de marca inválido (2-80 caracteres)'
+            },
+            {
+                id: 'tuMarca',
+                label: 'Tu Marca (Problems)',
+                type: 'text',
+                section: 'problems',
+                order: 8,
+                required: false,
+                maxLength: 60,
+                minLength: 2,
+                pattern: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s&.,'-]+$/,
+                errorMessage: 'Nombre de marca inválido (2-60 caracteres)'
+            },
+            {
+                id: 'inovacion',
+                label: 'Innovación',
+                type: 'text',
+                section: 'problems',
+                order: 9,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Término de innovación inválido (2-100 caracteres)'
+            },
+            {
+                id: 'posicionamiento',
+                label: 'Posicionamiento',
+                type: 'text',
+                section: 'problems',
+                order: 10,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Término de posicionamiento inválido (2-100 caracteres)'
+            },
+            {
+                id: 'rollsRoyce',
+                label: 'Referencia de Lujo',
+                type: 'text',
+                section: 'problems',
+                order: 11,
+                required: false,
+                maxLength: 80,
+                minLength: 2,
+                pattern: /^[a-zA-Z0-9áéíóúÁÉÍÓÚñÑ\s&.,'-]+$/,
+                errorMessage: 'Referencia de lujo inválida (2-80 caracteres)'
+            },
+            {
+                id: 'fraseDescriptiva',
+                label: 'Frase Descriptiva',
+                type: 'text',
+                section: 'problems',
+                order: 12,
+                required: false,
+                maxLength: 120,
+                minLength: 2,
+                errorMessage: 'Frase descriptiva inválida (2-120 caracteres)'
+            },
+            {
+                id: 'avatar',
+                label: 'Avatar',
+                type: 'text',
+                section: 'solution',
+                order: 13,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Descripción de avatar inválida (2-100 caracteres)'
+            },
+            {
+                id: 'propuestaPobre',
+                label: 'Propuesta Pobre',
+                type: 'text',
+                section: 'solution',
+                order: 14,
+                required: false,
+                maxLength: 150,
+                minLength: 5,
+                errorMessage: 'Propuesta pobre inválida (5-150 caracteres)'
+            },
+            {
+                id: 'propuestaBuena',
+                label: 'Propuesta Buena',
+                type: 'text',
+                section: 'solution',
+                order: 15,
+                required: false,
+                maxLength: 150,
+                minLength: 5,
+                errorMessage: 'Propuesta buena inválida (5-150 caracteres)'
+            },
+            {
+                id: 'automatizacion',
+                label: 'Automatización',
+                type: 'text',
+                section: 'solution',
+                order: 16,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Término de automatización inválido (2-100 caracteres)'
+            },
+            {
+                id: 'trabajoDeValor',
+                label: 'Trabajo de Valor',
+                type: 'text',
+                section: 'solution',
+                order: 17,
+                required: false,
+                maxLength: 120,
+                minLength: 2,
+                errorMessage: 'Trabajo de valor inválido (2-120 caracteres)'
+            },
+            {
+                id: 'proveedor',
+                label: 'Proveedor',
+                type: 'text',
+                section: 'solution',
+                order: 18,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Término de proveedor inválido (2-100 caracteres)'
+            },
+            {
+                id: 'infrautilizado',
+                label: 'Infrautilizado',
+                type: 'text',
+                section: 'solution',
+                order: 19,
+                required: false,
+                maxLength: 150,
+                minLength: 5,
+                errorMessage: 'Concepto infrautilizado inválido (5-150 caracteres)'
+            },
+            {
+                id: 'membresia',
+                label: 'Membresía',
+                type: 'text',
+                section: 'solution',
+                order: 20,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Concepto de membresía inválido (2-100 caracteres)'
+            },
+            {
+                id: 'metodo',
+                label: 'Método',
+                type: 'text',
+                section: 'solution',
+                order: 21,
+                required: false,
+                maxLength: 100,
+                minLength: 2,
+                errorMessage: 'Concepto de método inválido (2-100 caracteres)'
+            }
+        ];
+
+        // URL Shortener Utility (existing)
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static saveMappings(mappings) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                } catch (error) {
+                    console.error('Failed to save URL mappings:', error);
+                    this.cleanupExpired();
+                    try {
+                        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                    } catch (retryError) {
+                        console.error('Failed to save mappings even after cleanup:', retryError);
+                    }
+                }
+            }
+
+            static cleanupExpired() {
+                const mappings = this.getMappings();
+                const now = Date.now();
+                let hasChanges = false;
+
+                Object.keys(mappings).forEach(shortCode => {
+                    if (now > mappings[shortCode].expiresAt) {
+                        delete mappings[shortCode];
+                        hasChanges = true;
+                    }
+                });
+
+                if (hasChanges) {
+                    this.saveMappings(mappings);
+                }
+            }
+
+            static storeMapping(shortCode, longUrl, expirationHours = 72) {
+                const mapping = {
+                    shortCode,
+                    longUrl,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                };
+
+                const mappings = this.getMappings();
+                mappings[shortCode] = mapping;
+                this.saveMappings(mappings);
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+
+                if (!mapping) {
+                    return null;
+                }
+
+                if (Date.now() > mapping.expiresAt) {
+                    delete mappings[shortCode];
+                    this.saveMappings(mappings);
+                    return null;
+                }
+
+                return mapping.longUrl;
+            }
+
+            static generateShortUrl(longUrl, expirationHours = 72) {
+                this.cleanupExpired();
+                
+                let shortCode;
+                const mappings = this.getMappings();
+                
+                do {
+                    shortCode = this.generateShortCode();
+                } while (mappings[shortCode]);
+
+                this.storeMapping(shortCode, longUrl, expirationHours);
+
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                return `${baseUrl}r/${shortCode}`;
+            }
+        }
+
+        // Logo Storage Utility (existing)
+        class LogoStorage {
+            static STORAGE_KEY = 'personalized_logos';
+            
+            static storeLogo(id, base64Data, hoursValid = 72) {
+                try {
+                    const logos = this.getLogos();
+                    logos[id] = {
+                        data: base64Data,
+                        timestamp: Date.now(),
+                        expiresAt: Date.now() + (hoursValid * 60 * 60 * 1000)
+                    };
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(logos));
+                } catch (error) {
+                    console.warn('Failed to store logo:', error);
+                    this.cleanupExpired();
+                    try {
+                        const logos = this.getLogos();
+                        logos[id] = {
+                            data: base64Data,
+                            timestamp: Date.now(),
+                            expiresAt: Date.now() + (hoursValid * 60 * 60 * 1000)
+                        };
+                        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(logos));
+                    } catch (retryError) {
+                        console.error('Failed to store logo even after cleanup:', retryError);
+                    }
+                }
+            }
+            
+            static getLogos() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse stored logos:', error);
+                    return {};
+                }
+            }
+            
+            static cleanupExpired() {
+                try {
+                    const logos = this.getLogos();
+                    const now = Date.now();
+                    let hasChanges = false;
+                    
+                    Object.keys(logos).forEach(id => {
+                        if (now > logos[id].expiresAt) {
+                            delete logos[id];
+                            hasChanges = true;
+                        }
+                    });
+                    
+                    if (hasChanges) {
+                        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(logos));
+                    }
+                } catch (error) {
+                    console.error('Failed to cleanup expired logos:', error);
+                }
+            }
+            
+            static generateLogoId() {
+                return `logo_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+            }
+        }
+
+        // Enhanced URL Generator Class
+        class EnhancedURLGenerator {
+            constructor() {
+                this.validationEngine = new ValidationEngine();
+                this.urlShortener = new URLShortener();
+                this.logoStorage = new LogoStorage();
+            }
+
+            generatePersonalizedUrl(formData, hoursValid = 72) {
+                // Validate all data first
+                const validation = this.validationEngine.validateAllFields(formData);
+                if (!validation.isValid) {
+                    throw new Error('Validation failed: ' + validation.errors.map(e => e.errors.join(', ')).join('; '));
+                }
+
+                const now = new Date();
+                const expiresAt = new Date(now.getTime() + (hoursValid * 60 * 60 * 1000));
+                const uniqueCode = this.generateUniqueCode();
+
+                // Handle logo storage
+                let logoId = null;
+                let logoData = null;
+                
+                if (companyLogoData) {
+                    logoId = this.logoStorage.generateLogoId();
+                    this.logoStorage.storeLogo(logoId, companyLogoData, hoursValid);
+                    logoData = companyLogoData;
+                }
+
+                // Enhanced personalization data structure
+                const enhancedData = {
+                    // Basic brand information
+                    brandInfo: {
+                        name: formData.brandName || formData.company, // Fallback to company name
+                        industry: formData.industria,
+                        productType: 'leather goods',
+                        targetAudience: 'affluent professionals'
+                    },
+
+                    // Reader information
+                    readerInfo: {
+                        name: formData.readerName,
+                        company: formData.company,
+                        position: 'CEO', // Default since position field removed
+                        location: formData.ubicacion
+                    },
+
+                    // Industry keywords (minimal since keywords field removed)
+                    industryKeywords: ['productos premium', 'artesanía de calidad', 'diseño exclusivo'],
+
+                    // Custom messages for all variables
+                    customMessages: {
+                        // Hero section
+                        historia: formData.historia || this.generateDefaultHistoria(formData),
+                        brandName: formData.brandName || formData.company,
+                        
+                        // Problems section
+                        tuMarca: formData.tuMarca || formData.company,
+                        inovacion: formData.inovacion,
+                        posicionamiento: formData.posicionamiento,
+                        rollsRoyce: formData.rollsRoyce,
+                        fraseDescriptiva: formData.fraseDescriptiva,
+                        
+                        // Solution section
+                        avatar: formData.avatar,
+                        propuestaPobre: formData.propuestaPobre,
+                        propuestaBuena: formData.propuestaBuena,
+                        automatizacion: formData.automatizacion,
+                        trabajoDeValor: formData.trabajoDeValor,
+                        proveedor: formData.proveedor,
+                        infrautilizado: formData.infrautilizado,
+                        membresia: formData.membresia,
+                        metodo: formData.metodo
+                    },
+
+                    // Expiration information
+                    expiration: {
+                        createdAt: now.toISOString(),
+                        expiresAt: expiresAt.toISOString(),
+                        uniqueCode,
+                        validHours: hoursValid
+                    },
+
+                    // Logo information
+                    companyLogo: logoData,
+                    companyLogoId: logoId,
+
+                    // Metadata for tracking and analytics
+                    metadata: {
+                        generatorVersion: '2.0',
+                        variableCount: this.countProvidedVariables(formData),
+                        complexity: this.calculateComplexity(formData),
+                        industry: formData.industria,
+                        hasCustomContent: this.hasCustomContent(formData)
+                    }
+                };
+
+                // Generate encoded URL (UTF-8 safe)
+                const jsonData = JSON.stringify(enhancedData);
+                const encodedData = base64EncodeUnicode(jsonData);
+                
+                // Use the same base path as Vite config for production
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                
+                // Use hash routing for GitHub Pages compatibility
+                const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodedData}`;
+                
+                // Generate short URL
+                const shortUrl = this.urlShortener.generateShortUrl(longUrl, hoursValid);
+
+                return {
+                    longUrl,
+                    shortUrl,
+                    uniqueCode,
+                    expiresAt: expiresAt.toISOString(),
+                    variableCount: this.countProvidedVariables(formData),
+                    complexity: this.calculateComplexity(formData),
+                    hasCustomContent: this.hasCustomContent(formData)
+                };
+            }
+
+            generateDefaultHistoria(formData) {
+                const templates = [
+                    `Imagina esto: tu hijo, en 2045, entra a una reunión en ${formData.ubicacion || 'Nueva York'}. Alguien ve su portafolio de ${formData.company} y dice, en voz baja: '¿Eso es de ${formData.company}? Mi abuelo tenía uno igual… lo enterraron con él.' Eso no es un producto. Es un legado. Y el legado se construye ahora mismo.`,
+                    
+                    `En 2045, tu nieto encuentra en un mercado vintage un portafolio de ${formData.company}. El vendedor le cuenta: 'Estos eran los ${formData.industria} que redefinieron el lujo en nuestra época.' Tu nieto sonríe, porque sabe que ese legado lo empezaste vos, hoy.`,
+                    
+                    `La historia cuenta que en la década de 2020, ${formData.company} tomó una decisión que cambiaría para siempre la industria ${formData.industria}. Mientras otros competían por precio, vos competiste por historia. Hoy, tu nombre no solo vende productos, vende leyendas.`
+                ];
+
+                return templates[Math.floor(Math.random() * templates.length)];
+            }
+
+            countProvidedVariables(formData) {
+                const variableFields = [
+                    'readerName', 'company', 'industria', 'ubicacion',
+                    'historia', 'brandName', 'tuMarca', 'inovacion', 'posicionamiento',
+                    'rollsRoyce', 'fraseDescriptiva', 'avatar', 'propuestaPobre',
+                    'propuestaBuena', 'automatizacion', 'trabajoDeValor', 'proveedor',
+                    'infrautilizado', 'membresia', 'metodo'
+                ];
+
+                return variableFields.filter(field => 
+                    formData[field] && formData[field].trim().length > 0
+                ).length;
+            }
+
+            calculateComplexity(formData) {
+                const variableCount = this.countProvidedVariables(formData);
+                
+                // Calculate complexity based on variable types
+                let complexity = 0;
+                
+                // Basic variables (weight: 1)
+                if (formData.readerName) complexity += 1;
+                if (formData.company) complexity += 1;
+                if (formData.industria) complexity += 1;
+                
+                // Narrative variables (weight: 2)
+                if (formData.historia) complexity += 2;
+                if (formData.fraseDescriptiva) complexity += 2;
+                
+                // Business variables (weight: 1.5)
+                if (formData.posicionamiento) complexity += 1.5;
+                if (formData.propuestaPobre) complexity += 1.5;
+                if (formData.propuestaBuena) complexity += 1.5;
+                
+                // Technical variables (weight: 1)
+                if (formData.automatizacion) complexity += 1;
+                if (formData.metodo) complexity += 1;
+                
+                // Custom variables (weight: 0.5 each)
+                const customVars = ['avatar', 'inovacion', 'trabajoDeValor', 'proveedor', 
+                                 'infrautilizado', 'membresia', 'rollsRoyce', 'tuMarca'];
+                customVars.forEach(varName => {
+                    if (formData[varName]) complexity += 0.5;
+                });
+
+                return Math.round(complexity * 10) / 10; // Round to 1 decimal
+            }
+
+            hasCustomContent(formData) {
+                const customFields = [
+                    'historia', 'avatar', 'propuestaPobre', 'propuestaBuena',
+                    'automatizacion', 'trabajoDeValor', 'proveedor', 'infrautilizado',
+                    'membresia', 'metodo', 'inovacion', 'posicionamiento',
+                    'rollsRoyce', 'fraseDescriptiva'
+                ];
+
+                return customFields.some(field => 
+                    formData[field] && formData[field].trim().length > 0
+                );
+            }
+
+            generateUniqueCode() {
+                return Math.random().toString(36).substring(2, 15) +
+                       Math.random().toString(36).substring(2, 15);
+            }
+        }
+
+        // Validation Engine Class
+        class ValidationEngine {
+            validateField(fieldId, value) {
+                const config = VARIABLE_CONFIG.find(c => c.id === fieldId);
+                if (!config) return { isValid: true };
+
+                const result = {
+                    isValid: true,
+                    errors: [],
+                    warnings: [],
+                    sanitizedValue: value
+                };
+
+                // Required field validation
+                if (config.required && (!value || !value.trim())) {
+                    result.isValid = false;
+                    result.errors.push('Este campo es requerido');
+                    return result;
+                }
+
+                // If field is empty and not required, skip other validations
+                if (!value || !value.trim()) {
+                    return result;
+                }
+
+                // Length validation
+                if (config.minLength && value.length < config.minLength) {
+                    result.isValid = false;
+                    result.errors.push(`Mínimo ${config.minLength} caracteres`);
+                }
+
+                if (config.maxLength && value.length > config.maxLength) {
+                    result.isValid = false;
+                    result.errors.push(`Máximo ${config.maxLength} caracteres`);
+                }
+
+                // Pattern validation
+                if (config.pattern && !config.pattern.test(value)) {
+                    result.isValid = false;
+                    result.errors.push(config.errorMessage || 'Formato inválido');
+                }
+
+                // Type validation
+                if (config.type === 'number') {
+                    const numValue = parseInt(value);
+                    if (isNaN(numValue)) {
+                        result.isValid = false;
+                        result.errors.push('Debe ser un número válido');
+                    } else {
+                        if (config.min && numValue < config.min) {
+                            result.isValid = false;
+                            result.errors.push(`Valor mínimo: ${config.min}`);
+                        }
+                        if (config.max && numValue > config.max) {
+                            result.isValid = false;
+                            result.errors.push(`Valor máximo: ${config.max}`);
+                        }
+                        if (config.values && !config.values.includes(numValue)) {
+                            result.isValid = false;
+                            result.errors.push('Seleccione una opción válida');
+                        }
+                    }
+                }
+
+                // Sanitization
+                result.sanitizedValue = this.sanitizeValue(value, config);
+
+                return result;
+            }
+
+            sanitizeValue(value, config) {
+                let sanitized = value.trim();
+
+                // Remove HTML tags
+                sanitized = sanitized.replace(/<[^>]*>/g, '');
+
+                // Remove excessive whitespace
+                sanitized = sanitized.replace(/\s+/g, ' ');
+
+                // Remove special characters based on pattern
+                if (config.pattern) {
+                    // Keep only characters that match pattern
+                    const cleanPattern = new RegExp(`[^${config.pattern.source.slice(1, -1)}]`, 'g');
+                    sanitized = sanitized.replace(cleanPattern, '');
+                }
+
+                return sanitized;
+            }
+
+            validateAllFields(formData) {
+                const allResults = {};
+                let isValid = true;
+    
+                // Iterate over VARIABLE_CONFIG entries and validate by id
+                VARIABLE_CONFIG.forEach(config => {
+                    const fieldId = config.id;
+                    const result = this.validateField(fieldId, formData[fieldId]);
+                    allResults[fieldId] = result;
+    
+                    if (!result.isValid) {
+                        isValid = false;
+                    }
+                });
+    
+                return {
+                    isValid,
+                    results: allResults,
+                    errors: Object.entries(allResults)
+                        .filter(([_, result]) => !result.isValid)
+                        .map(([fieldId, result]) => ({
+                            fieldId,
+                            errors: result.errors
+                        }))
+                };
+            }
+        }
+
+        // Initialize enhanced URL generator
+        const urlGenerator = new EnhancedURLGenerator();
+        let currentSection = 'basic';
+
+        // Setup event listeners
+        function setupEventListeners() {
+            // Real-time validation and preview
+            document.querySelectorAll('input, textarea, select').forEach(field => {
+                field.addEventListener('input', (e) => {
+                    validateFieldRealtime(e.target);
+                    updatePreview();
+                    updateProgress();
+                });
+
+                field.addEventListener('blur', (e) => {
+                    validateFieldRealtime(e.target, true);
+                });
+            });
+
+            // Section visibility tracking
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const section = entry.target.dataset.section;
+                        if (section) {
+                            updateActiveSection(section);
+                        }
+                    }
+                });
+            });
+
+            document.querySelectorAll('.form-section').forEach(section => {
+                observer.observe(section);
+            });
+        }
+
+        function validateFieldRealtime(field, showErrors = false) {
+            const result = urlGenerator.validationEngine.validateField(field.id, field.value);
+            
+            updateFieldUI(field, result, showErrors);
+            return result;
+        }
+
+        function updateFieldUI(field, result, showErrors) {
+            const fieldGroup = field.closest('.field-group');
+            const errorContainer = fieldGroup.querySelector('.field-error');
+            const warningContainer = fieldGroup.querySelector('.field-warning');
+            const helpContainer = fieldGroup.querySelector('.field-help');
+
+            // Remove previous validation states
+            fieldGroup.classList.remove('valid', 'invalid', 'warning');
+            if (errorContainer) errorContainer.remove();
+            if (warningContainer) warningContainer.remove();
+
+            // Add validation states
+            if (result.isValid) {
+                fieldGroup.classList.add('valid');
+                addSuccessIndicator(fieldGroup);
+            } else {
+                fieldGroup.classList.add('invalid');
+                if (showErrors || field.value.length > 0) {
+                    addErrorIndicator(fieldGroup, result.errors);
+                }
+            }
+
+            // Update character count
+            updateCharacterCount(field, result);
+        }
+
+        function addSuccessIndicator(fieldGroup) {
+            const indicator = document.createElement('div');
+            indicator.className = 'validation-indicator success';
+            indicator.innerHTML = '✓ Válido';
+            fieldGroup.appendChild(indicator);
+        }
+
+        function addErrorIndicator(fieldGroup, errors) {
+            const container = document.createElement('div');
+            container.className = 'field-error';
+            container.innerHTML = `
+                <div class="error-icon">⚠️</div>
+                <div class="error-messages">
+                    ${errors.map(error => `<div class="error-message">${error}</div>`).join('')}
+                </div>
+            `;
+            fieldGroup.appendChild(container);
+        }
+
+        function updateCharacterCount(field, result) {
+            const config = VARIABLE_CONFIG.find(c => c.id === field.id);
+            if (!config || (!config.maxLength && !config.minLength)) return;
+
+            const fieldGroup = field.closest('.field-group');
+            let counter = fieldGroup.querySelector('.character-counter');
+            
+            if (!counter) {
+                counter = document.createElement('div');
+                counter.className = 'character-counter';
+                fieldGroup.appendChild(counter);
+            }
+
+            const current = field.value.length;
+            const max = config.maxLength;
+            const min = config.minLength;
+
+            counter.innerHTML = `${current}${max ? `/${max}` : ''} caracteres`;
+            
+            if (max && current > max) {
+                counter.classList.add('over-limit');
+            } else if (min && current < min) {
+                counter.classList.add('under-min');
+            } else {
+                counter.classList.remove('over-limit', 'under-min');
+            }
+        }
+
+        function updatePreview() {
+            const formData = collectFormData();
+            const previewContent = generatePreviewContent(formData);
+            document.getElementById('previewContent').innerHTML = previewContent;
+        }
+
+        function generatePreviewContent(formData) {
+            return `
+                <div class="preview-section">
+                    <h4>Hero Section Preview:</h4>
+                    <p>"${formData.historia || '[historia]'}"</p>
+                    <p>Hola ${formData.readerName || '[reader name]'},</p>
+                    <p>Tu empresa de ${formData.industria || '[industria]'}...</p>
+                </div>
+                <div class="preview-section">
+                    <h4>Problems Section Preview:</h4>
+                    <p>En ${formData.ubicacion || '[ubicacion]'}, ${formData.tuMarca || '[tu marca]'}...</p>
+                    <p>Usando ${formData.inovacion || '[inovacion]'}...</p>
+                </div>
+                <div class="preview-section">
+                    <h4>Solution Section Preview:</h4>
+                    <p>${formData.avatar || '[avatar]'}: ${formData.propuestaPobre || '[propuesta pobre]'} vs ${formData.propuestaBuena || '[propuesta buena]'}</p>
+                    <p>${formData.automatizacion || '[automatizacion]'} y ${formData.trabajoDeValor || '[trabajo de valor]'}...</p>
+                </div>
+            `;
+        }
+
+        function updateProgress() {
+            const formData = collectFormData();
+            const validation = urlGenerator.validationEngine.validateAllFields(formData);
+            
+            // Update progress bar
+            const requiredFields = VARIABLE_CONFIG.filter(c => c.required);
+            const validRequiredFields = requiredFields.filter(config => {
+                const result = validation.results[config.id];
+                return result && result.isValid;
+            });
+            
+            const progress = (validRequiredFields.length / requiredFields.length) * 100;
+            const progressBar = document.getElementById('progressBar');
+            if (progressBar) {
+                progressBar.style.width = `${progress}%`;
+            }
+
+            // Update submit button
+            const submitBtn = document.getElementById('submitBtn');
+            if (submitBtn) {
+                submitBtn.disabled = validRequiredFields.length !== requiredFields.length;
+                submitBtn.textContent = validRequiredFields.length === requiredFields.length ? 
+                    '🚀 Generar URL Personalizada' : 
+                    '⚠️ Complete los campos requeridos';
+            }
+        }
+
+        function updateActiveSection(section) {
+            if (section !== currentSection) {
+                currentSection = section;
+                
+                // Update step indicators
+                document.querySelectorAll('.step').forEach(step => {
+                    step.classList.remove('active');
+                });
+                
+                const activeStep = document.querySelector(`.step[data-section="${section}"]`);
+                if (activeStep) {
+                    activeStep.classList.add('active');
+                }
+            }
+        }
+
+        function collectFormData() {
+            const formData = {};
+            
+            VARIABLE_CONFIG.forEach(config => {
+                const field = document.getElementById(config.id);
+                if (field) {
+                    formData[config.id] = field.value.trim();
+                }
+            });
+            
+            return formData;
+        }
+
+        function handleLogoUpload(event) {
+            const file = event.target.files[0];
+            if (file && file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    companyLogoData = e.target.result;
+                    document.getElementById('logoImage').src = companyLogoData;
+                    document.getElementById('logoPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function removeLogo() {
+            companyLogoData = null;
+            companyLogoId = null;
+            document.getElementById('logoUpload').value = '';
+            document.getElementById('logoPreview').style.display = 'none';
+        }
+
+        function copyToClipboard(elementId) {
+            const urlText = document.getElementById(elementId).textContent;
+            navigator.clipboard.writeText(urlText).then(() => {
+                alert('✅ URL copiada al portapapeles!');
+            }).catch(err => {
+                console.error('Error al copiar:', err);
+                alert('❌ Error al copiar la URL');
+            });
+        }
+
+        function showErrors(errors) {
+            const existingErrorDiv = document.getElementById('formErrors');
+            if (existingErrorDiv) {
+                existingErrorDiv.remove();
+            }
+            
+            if (errors.length > 0) {
+                const errorDiv = document.createElement('div');
+                errorDiv.id = 'formErrors';
+                errorDiv.className = 'form-errors';
+                errorDiv.innerHTML = `
+                    <h4>Por favor corrige los siguientes errores:</h4>
+                    <ul class="list-disc list-inside space-y-1">
+                        ${errors.map(error => `<li>${error.fieldId}: ${error.errors.join(', ')}</li>`).join('')}
+                    </ul>
+                `;
+                
+                const form = document.getElementById('enhancedGeneratorForm');
+                form.parentNode.insertBefore(errorDiv, form);
+            }
+        }
+
+        // Form submission handler
+        document.getElementById('enhancedGeneratorForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            try {
+                // Collect all form data
+                const formData = collectFormData();
+                
+                // Show loading state
+                const submitBtn = document.getElementById('submitBtn');
+                const originalText = submitBtn.textContent;
+                submitBtn.textContent = '⏳ Generando...';
+                submitBtn.disabled = true;
+                
+                // Generate URLs with enhanced logic
+                const result = urlGenerator.generatePersonalizedUrl(formData, parseInt(formData.validHours));
+                
+                // Display results
+                document.getElementById('shortUrl').textContent = result.shortUrl;
+                document.getElementById('result').style.display = 'block';
+                
+                // Show enhanced statistics
+                document.getElementById('urlStats').innerHTML = `
+                    <h4 style="color: #4f46e5; margin-bottom: 10px;">📊 Estadísticas Avanzadas</h4>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div>
+                            <p><strong>Variables personalizadas:</strong> ${result.variableCount}/19</p>
+                            <p><strong>Complejidad:</strong> ${result.complexity}/10</p>
+                            <p><strong>Contenido personalizado:</strong> ${result.hasCustomContent ? '✓ Sí' : 'No'}</p>
+                        </div>
+                        <div>
+                            <p><strong>URL Corta:</strong> ${result.shortUrl.length} caracteres</p>
+                            <p><strong>URL Larga:</strong> ${result.longUrl.length} caracteres</p>
+                            <p><strong>Reducción:</strong> ${Math.round((1 - result.shortUrl.length/result.longUrl.length) * 100)}%</p>
+                        </div>
+                    </div>
+                `;
+                
+                // Show data preview
+                const previewData = {
+                    basic: {
+                        readerName: formData.readerName,
+                        company: formData.company,
+                        industry: formData.industria
+                    },
+                    custom: {
+                        historia: formData.historia ? '✓ Personalizado' : 'Por defecto',
+                        avatar: formData.avatar ? '✓ Personalizado' : 'Por defecto',
+                        propuestaPobre: formData.propuestaPobre ? '✓ Personalizado' : 'Por defecto',
+                        propuestaBuena: formData.propuestaBuena ? '✓ Personalizado' : 'Por defecto'
+                    },
+                    metadata: {
+                        variableCount: result.variableCount,
+                        complexity: result.complexity,
+                        hasCustomContent: result.hasCustomContent
+                    }
+                };
+                
+                document.getElementById('previewJson').textContent = JSON.stringify(previewData, null, 2);
+                document.getElementById('preview').style.display = 'block';
+                
+                // Scroll to result
+                document.getElementById('result').scrollIntoView({ behavior: 'smooth' });
+                
+            } catch (error) {
+                console.error('URL generation failed:', error);
+                alert('❌ Error al generar URL: ' + error.message);
+            } finally {
+                // Restore button state
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+                updateProgress();
+            }
+        });
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setupEventListeners();
+            updatePreview();
+            updateProgress();
+        });
+    </script>
+</body>
+</html>

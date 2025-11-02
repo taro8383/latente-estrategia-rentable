@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complete Flow Test - URL Generator to Redirect Handler</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .debug-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            background: #fff5f5;
+            border-left-color: #dc3545;
+        }
+        .success {
+            background: #f0fff4;
+            border-left-color: #28a745;
+        }
+        .warning {
+            background: #fff8e1;
+            border-left-color: #ffc107;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        button:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .step {
+            background: #e9ecef;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border-left: 4px solid #6c757d;
+        }
+        .step.active {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+        .step.error {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+        .test-result {
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .test-result.pass {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .test-result.fail {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .url-display {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: monospace;
+            word-break: break-all;
+            margin: 10px 0;
+            border: 1px solid #dee2e6;
+        }
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media (max-width: 768px) {
+            .two-column {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>🧪 Complete Flow Test - URL Generator to Redirect Handler</h1>
+    
+    <div class="container">
+        <h2>📋 Test Overview</h2>
+        <p>This test simulates the complete flow from URL generation to redirection to identify any synchronization issues between the HTML generator and React app.</p>
+        
+        <div class="two-column">
+            <div>
+                <h3>Test Steps</h3>
+                <div id="step1" class="step">1. Clear localStorage</div>
+                <div id="step2" class="step">2. Generate Test URL</div>
+                <div id="step3" class="step">3. Verify Storage</div>
+                <div id="step4" class="step">4. Test Redirect Lookup</div>
+                <div id="step5" class="step">5. Test Complete Flow</div>
+            </div>
+            <div>
+                <h3>Test Controls</h3>
+                <button onclick="runCompleteTest()">🚀 Run Complete Test</button>
+                <button onclick="clearAllData()">🗑️ Clear All Data</button>
+                <button onclick="generateTestUrl()">🔗 Generate Test URL</button>
+                <button onclick="testRedirectLookup()">🔍 Test Redirect Lookup</button>
+                <button onclick="openTestUrl()">🌐 Open Test URL</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>📊 Test Results</h2>
+        <div id="testResults"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔍 localStorage State</h2>
+        <div id="localStorageState" class="debug-info">
+            Click "Run Complete Test" to see localStorage state
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🔗 Generated URLs</h2>
+        <div id="generatedUrls"></div>
+    </div>
+
+    <script>
+        // URL Shortener class (copied from both HTML generator and React app)
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static saveMappings(mappings) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                } catch (error) {
+                    console.error('Failed to save URL mappings:', error);
+                }
+            }
+
+            static storeMapping(shortCode, longUrl, expirationHours = 72) {
+                const mapping = {
+                    shortCode,
+                    longUrl,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                };
+
+                const mappings = this.getMappings();
+                mappings[shortCode] = mapping;
+                this.saveMappings(mappings);
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+
+                if (!mapping) {
+                    return null;
+                }
+
+                if (Date.now() > mapping.expiresAt) {
+                    delete mappings[shortCode];
+                    this.saveMappings(mappings);
+                    return null;
+                }
+
+                return mapping.longUrl;
+            }
+
+            static generateShortUrl(longUrl, expirationHours = 72) {
+                let shortCode;
+                const mappings = this.getMappings();
+                
+                do {
+                    shortCode = this.generateShortCode();
+                } while (mappings[shortCode]);
+
+                this.storeMapping(shortCode, longUrl, expirationHours);
+
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                return `${baseUrl}#/r/${shortCode}`;
+            }
+        }
+
+        // Test state
+        let testState = {
+            generatedUrls: [],
+            currentTestUrl: null,
+            testResults: []
+        };
+
+        // Update step display
+        function updateStep(stepId, status, message = '') {
+            const step = document.getElementById(stepId);
+            if (step) {
+                step.className = `step ${status}`;
+                if (message) {
+                    step.innerHTML = `${step.innerHTML.split('<br>')[0]}<br><small>${message}</small>`;
+                }
+            }
+        }
+
+        // Add test result
+        function addTestResult(testName, passed, message, details = null) {
+            const resultsDiv = document.getElementById('testResults');
+            const resultDiv = document.createElement('div');
+            resultDiv.className = `test-result ${passed ? 'pass' : 'fail'}`;
+            resultDiv.innerHTML = `
+                <strong>${testName}:</strong> ${passed ? '✅ PASS' : '❌ FAIL'}
+                ${message ? `<br><small>${message}</small>` : ''}
+                ${details ? `<br><pre>${JSON.stringify(details, null, 2)}</pre>` : ''}
+            `;
+            resultsDiv.appendChild(resultDiv);
+            
+            testState.testResults.push({ testName, passed, message, details });
+        }
+
+        // Update localStorage display
+        function updateLocalStorageDisplay() {
+            const stateDiv = document.getElementById('localStorageState');
+            const mappings = URLShortener.getMappings();
+            const keys = Object.keys(mappings);
+            
+            let html = `
+                <strong>localStorage Origin:</strong> ${window.location.origin}<br>
+                <strong>Total Mappings:</strong> ${keys.length}<br>
+                <strong>Storage Key:</strong> ${URLShortener.STORAGE_KEY}<br>
+                <strong>Available Short Codes:</strong> ${keys.length > 0 ? keys.join(', ') : 'None'}<br>
+                <strong>localStorage Size:</strong> ${JSON.stringify(localStorage).length} characters
+            `;
+
+            if (keys.length > 0) {
+                html += '<br><br><strong>Sample Mapping:</strong><pre>' + JSON.stringify(mappings[keys[0]], null, 2) + '</pre>';
+            }
+
+            stateDiv.innerHTML = html;
+        }
+
+        // Update generated URLs display
+        function updateGeneratedUrlsDisplay() {
+            const urlsDiv = document.getElementById('generatedUrls');
+            if (testState.generatedUrls.length === 0) {
+                urlsDiv.innerHTML = '<p>No URLs generated yet. Click "Generate Test URL" to create one.</p>';
+                return;
+            }
+
+            let html = '';
+            testState.generatedUrls.forEach((urlInfo, index) => {
+                html += `
+                    <div class="url-display">
+                        <strong>URL ${index + 1}:</strong><br>
+                        <strong>Short URL:</strong> <a href="${urlInfo.shortUrl}" target="_blank">${urlInfo.shortUrl}</a><br>
+                        <strong>Long URL:</strong> ${urlInfo.longUrl}<br>
+                        <strong>Short Code:</strong> ${urlInfo.shortCode}<br>
+                        <strong>Created:</strong> ${new Date(urlInfo.createdAt).toLocaleString()}<br>
+                        <button onclick="testSpecificUrl('${urlInfo.shortCode}')">Test This URL</button>
+                    </div>
+                `;
+            });
+            urlsDiv.innerHTML = html;
+        }
+
+        // Clear all data
+        function clearAllData() {
+            localStorage.removeItem('url_mappings');
+            localStorage.removeItem('incoming_personalization_payload');
+            localStorage.removeItem('incoming_personalization_payload_ts');
+            testState.generatedUrls = [];
+            testState.currentTestUrl = null;
+            testState.testResults = [];
+            
+            document.getElementById('testResults').innerHTML = '';
+            updateLocalStorageDisplay();
+            updateGeneratedUrlsDisplay();
+            
+            // Reset steps
+            for (let i = 1; i <= 5; i++) {
+                updateStep(`step${i}`, '', '');
+            }
+            
+            addTestResult('Clear Data', true, 'All localStorage data cleared');
+        }
+
+        // Generate test URL
+        function generateTestUrl() {
+            updateStep('step1', 'active', 'Clearing localStorage...');
+            clearAllData();
+            
+            updateStep('step1', '', '✅ Cleared');
+            updateStep('step2', 'active', 'Generating test URL...');
+            
+            try {
+                // Create test data similar to what the generator would create
+                const testData = {
+                    readerName: 'Test User',
+                    company: 'Test Company',
+                    referenciaDeIndustria: 'Test Industry',
+                    ubicacion: 'Test Location',
+                    gender: 'male',
+                    validHours: '72'
+                };
+                
+                // Create a long URL like the generator would
+                const uniqueCode = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+                const personalizationData = {
+                    brandInfo: {
+                        name: testData.company,
+                        industry: testData.referenciaDeIndustria
+                    },
+                    readerInfo: {
+                        name: testData.readerName,
+                        company: testData.company,
+                        location: testData.ubicacion
+                    },
+                    customMessages: {
+                        calificador: 'test calificador',
+                        historia: 'test historia'
+                    },
+                    expiration: {
+                        createdAt: new Date().toISOString(),
+                        expiresAt: new Date(Date.now() + 72 * 60 * 60 * 1000).toISOString(),
+                        uniqueCode,
+                        validHours: 72
+                    }
+                };
+                
+                const jsonData = JSON.stringify(personalizationData);
+                const encodedData = btoa(encodeURIComponent(jsonData).replace(/%([0-9A-F]{2})/g, function(match, p1) {
+                    return String.fromCharCode('0x' + p1);
+                }));
+                
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
+                
+                // Generate short URL
+                const shortUrl = URLShortener.generateShortUrl(longUrl, 72);
+                const shortCode = shortUrl.split('/r/')[1];
+                
+                const urlInfo = {
+                    shortUrl,
+                    longUrl,
+                    shortCode,
+                    createdAt: Date.now(),
+                    testData
+                };
+                
+                testState.generatedUrls.push(urlInfo);
+                testState.currentTestUrl = urlInfo;
+                
+                updateStep('step2', '', '✅ Generated');
+                updateStep('step3', 'active', 'Verifying storage...');
+                
+                // Verify storage
+                const storedMapping = URLShortener.getLongUrl(shortCode);
+                const storageWorks = storedMapping === longUrl;
+                
+                updateStep('step3', storageWorks ? '' : 'error', storageWorks ? '✅ Stored correctly' : '❌ Storage failed');
+                
+                addTestResult('URL Generation', storageWorks, 
+                    storageWorks ? 'URL generated and stored successfully' : 'URL generation or storage failed',
+                    { shortUrl, longUrl, shortCode, storedMapping }
+                );
+                
+                updateLocalStorageDisplay();
+                updateGeneratedUrlsDisplay();
+                
+            } catch (error) {
+                updateStep('step2', 'error', '❌ Generation failed');
+                addTestResult('URL Generation', false, `Error: ${error.message}`, { error });
+            }
+        }
+
+        // Test redirect lookup
+        function testRedirectLookup() {
+            if (!testState.currentTestUrl) {
+                addTestResult('Redirect Lookup', false, 'No test URL available. Generate a URL first.');
+                return;
+            }
+            
+            updateStep('step4', 'active', 'Testing redirect lookup...');
+            
+            const { shortCode, longUrl } = testState.currentTestUrl;
+            
+            // Test lookup like RedirectHandler would
+            const retrievedUrl = URLShortener.getLongUrl(shortCode);
+            const lookupWorks = retrievedUrl === longUrl;
+            
+            updateStep('step4', lookupWorks ? '' : 'error', lookupWorks ? '✅ Lookup successful' : '❌ Lookup failed');
+            
+            addTestResult('Redirect Lookup', lookupWorks,
+                lookupWorks ? 'Redirect lookup works correctly' : 'Redirect lookup failed',
+                { shortCode, expectedUrl: longUrl, retrievedUrl }
+            );
+        }
+
+        // Test specific URL
+        function testSpecificUrl(shortCode) {
+            const urlInfo = testState.generatedUrls.find(url => url.shortCode === shortCode);
+            if (!urlInfo) {
+                addTestResult('Specific URL Test', false, `URL with short code ${shortCode} not found`);
+                return;
+            }
+            
+            const retrievedUrl = URLShortener.getLongUrl(shortCode);
+            const testWorks = retrievedUrl === urlInfo.longUrl;
+            
+            addTestResult(`Specific URL Test (${shortCode})`, testWorks,
+                testWorks ? 'URL lookup successful' : 'URL lookup failed',
+                { shortCode, expectedUrl: urlInfo.longUrl, retrievedUrl }
+            );
+        }
+
+        // Open test URL in new tab
+        function openTestUrl() {
+            if (!testState.currentTestUrl) {
+                addTestResult('Open Test URL', false, 'No test URL available. Generate a URL first.');
+                return;
+            }
+            
+            const { shortUrl } = testState.currentTestUrl;
+            window.open(shortUrl, '_blank');
+            addTestResult('Open Test URL', true, `Opened ${shortUrl} in new tab`);
+        }
+
+        // Run complete test
+        async function runCompleteTest() {
+            addTestResult('Complete Test Start', true, 'Starting complete flow test...');
+            
+            // Step 1: Clear data
+            updateStep('step1', 'active', 'Clearing localStorage...');
+            clearAllData();
+            await new Promise(resolve => setTimeout(resolve, 100));
+            updateStep('step1', '', '✅ Cleared');
+            
+            // Step 2: Generate URL
+            updateStep('step2', 'active', 'Generating test URL...');
+            generateTestUrl();
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            if (!testState.currentTestUrl) {
+                updateStep('step5', 'error', '❌ Test failed - no URL generated');
+                return;
+            }
+            
+            // Step 3: Verify storage
+            updateStep('step3', 'active', 'Verifying storage...');
+            const { shortCode, longUrl } = testState.currentTestUrl;
+            const storedMapping = URLShortener.getLongUrl(shortCode);
+            const storageWorks = storedMapping === longUrl;
+            updateStep('step3', storageWorks ? '' : 'error', storageWorks ? '✅ Stored correctly' : '❌ Storage failed');
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Step 4: Test lookup
+            updateStep('step4', 'active', 'Testing redirect lookup...');
+            testRedirectLookup();
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            // Step 5: Complete flow test
+            updateStep('step5', 'active', 'Testing complete flow...');
+            
+            const allTestsPassed = testState.testResults.every(result => result.passed);
+            const failedTests = testState.testResults.filter(result => !result.passed);
+            
+            updateStep('step5', allTestsPassed ? '' : 'error', 
+                allTestsPassed ? '✅ Complete flow successful' : '❌ Some tests failed');
+            
+            addTestResult('Complete Flow Test', allTestsPassed,
+                allTestsPassed ? 'All tests passed - flow working correctly' : `Failed tests: ${failedTests.map(t => t.testName).join(', ')}`,
+                { totalTests: testState.testResults.length, passedTests: testState.testResults.length - failedTests.length, failedTests }
+            );
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateLocalStorageDisplay();
+            updateGeneratedUrlsDisplay();
+        });
+    </script>
+</body>
+</html>

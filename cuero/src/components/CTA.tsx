@@ -122,13 +122,14 @@ export const CTA = () => {
                 />
               </div>
 
-              <Button 
+              <Button
                 type="submit"
-                size="lg" 
-                className="w-full accent-gradient text-white hover:scale-105 transition-bounce shadow-medium text-lg py-6 group"
+                size="lg"
+                className="w-full accent-gradient text-white hover:scale-105 transition-bounce shadow-medium text-base sm:text-lg py-6 group"
               >
-                Agendar llamada estratégica
-                <ArrowRight className="ml-2 group-hover:translate-x-1 transition-smooth" />
+                <span className="block sm:hidden">Agendar</span>
+                <span className="hidden sm:inline">Agendar llamada estratégica</span>
+                <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />
               </Button>
 
               <p className="text-sm text-muted-foreground text-center">

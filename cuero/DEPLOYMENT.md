@@ -21,6 +21,42 @@ This project is configured to deploy to GitHub Pages using the `gh-pages` packag
    npm run deploy
    ```
 
+### Troubleshooting
+
+If you encounter issues with the deployment:
+
+1. **Make sure gh-pages is installed**:
+   ```bash
+   npm install gh-pages --save-dev
+   ```
+
+2. **Check if you have git remote configured**:
+   ```bash
+   git remote -v
+   ```
+   If no remote is configured, add it:
+   ```bash
+   git remote add origin https://github.com/taro8383/latente-estrategia-rentable.git
+   ```
+
+3. **Ensure you're on the main branch and it's up to date**:
+   ```bash
+   git checkout main
+   git pull origin main
+   ```
+
+4. **Try manual deployment** (if npm script doesn't work):
+   ```bash
+   npm run build
+   npx gh-pages -d dist --force
+   ```
+
+### Current Status
+
+Your gh-pages branch already exists, which is normal. The `--add` flag in deploy script ensures that new deployments will update the existing branch rather than trying to create a new one.
+
+If you see error "fatal: a branch named 'gh-pages' already exists", this is actually expected behavior and indicates the branch was successfully created during a previous deployment attempt.
+
 ### Subsequent Deployments
 
 Simply run the deploy command:
@@ -43,6 +79,15 @@ After your first deployment:
 4. Choose the `gh-pages` branch as the source
 5. Your site will be available at: `https://taro8383.github.io/latente-estrategia-rentable/`
 
+### Important Note About Jekyll
+
+GitHub Pages by default tries to process sites using Jekyll (a Ruby static site generator). Since this is a React/Vite application, we've included a `.nojekyll` file in the public folder to prevent this processing. This file tells GitHub Pages to serve the files as-is without any Jekyll processing.
+
+If you still encounter Jekyll-related errors:
+1. Ensure the `.nojekyll` file is present in your built files
+2. Make sure GitHub Pages is configured to use the `gh-pages` branch (not the main branch)
+3. The `.nojekyll` file should be at the root of your gh-pages branch after deployment
+
 ## Configuration Details
 
 ### Vite Configuration
@@ -56,7 +101,9 @@ This ensures all assets and routes work correctly when deployed to GitHub Pages.
 ### Package Scripts
 
 - `predeploy`: Runs `npm run build` to create the production build
-- `deploy`: Pushes the `dist` folder to the `gh-pages` branch
+- `deploy`: Force pushes to remote gh-pages branch and creates a fresh one with new files
+- `deploy:init`: Creates empty gh-pages branch on remote, then deploys to it
+- `deploy:safe`: Removes all files from gh-pages branch before deploying new ones
 
 ## Troubleshooting
 

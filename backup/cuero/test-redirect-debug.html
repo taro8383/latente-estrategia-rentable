@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Redirect Handler Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .debug-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .debug-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        pre {
+            background: #f8f8f8;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .error {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .success {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .warning {
+            color: #ffc107;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 Redirect Handler Debug Test</h1>
+    
+    <div class="container">
+        <div class="debug-section">
+            <h3>📊 Current URL Analysis</h3>
+            <div id="url-analysis"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>💾 localStorage Contents</h3>
+            <div id="localStorage-analysis"></div>
+            <button onclick="clearLocalStorage()">Clear localStorage</button>
+            <button onclick="refreshLocalStorage()">Refresh localStorage</button>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🔗 URL Mappings Analysis</h3>
+            <div id="mappings-analysis"></div>
+            <button onclick="testUrlLookup()">Test URL Lookup</button>
+        </div>
+        
+        <div class="debug-section">
+            <h3>🧪 Test Short URL</h3>
+            <input type="text" id="shortCodeInput" placeholder="Enter short code (e.g., jVIbPI)" style="width: 200px; padding: 5px;">
+            <button onclick="testShortCode()">Test Short Code</button>
+            <div id="test-result"></div>
+        </div>
+        
+        <div class="debug-section">
+            <h3>📝 Debug Log</h3>
+            <div id="debug-log"></div>
+            <button onclick="clearDebugLog()">Clear Log</button>
+        </div>
+    </div>
+
+    <script>
+        // URL Shortener class (copied from the main app)
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+
+                if (!mapping) {
+                    return null;
+                }
+
+                // Check if mapping has expired
+                if (Date.now() > mapping.expiresAt) {
+                    delete mappings[shortCode];
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                    return null;
+                }
+
+                return mapping.longUrl;
+            }
+        }
+
+        function log(message, type = 'info') {
+            const debugLog = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            
+            debugLog.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            debugLog.scrollTop = debugLog.scrollHeight;
+        }
+
+        function analyzeUrl() {
+            const currentUrl = window.location.href;
+            const hash = window.location.hash;
+            const search = window.location.search;
+            
+            const urlAnalysis = document.getElementById('url-analysis');
+            urlAnalysis.innerHTML = `
+                <p><strong>Current URL:</strong> ${currentUrl}</p>
+                <p><strong>Hash:</strong> ${hash || '(none)'}</p>
+                <p><strong>Search:</strong> ${search || '(none)'}</p>
+                <p><strong>Origin:</strong> ${window.location.origin}</p>
+                <p><strong>Pathname:</strong> ${window.location.pathname}</p>
+            `;
+            
+            // Check if this looks like a short URL
+            if (hash.includes('/r/')) {
+                log('✅ This looks like a short URL', 'success');
+                const shortCode = hash.split('/r/')[1]?.split('?')[0];
+                if (shortCode) {
+                    log(`📝 Extracted short code: ${shortCode}`, 'info');
+                }
+            } else if (hash.includes('/invite/')) {
+                log('ℹ️ This looks like an invite URL (after redirect)', 'warning');
+                const inviteCode = hash.split('/invite/')[1]?.split('?')[0];
+                if (inviteCode) {
+                    log(`📝 Extracted invite code: ${inviteCode}`, 'info');
+                }
+            } else {
+                log('❓ This doesn\'t look like a short or invite URL', 'warning');
+            }
+        }
+
+        function analyzeLocalStorage() {
+            const localStorageAnalysis = document.getElementById('localStorage-analysis');
+            
+            try {
+                // Get all localStorage keys
+                const keys = Object.keys(localStorage);
+                const contents = {};
+                
+                keys.forEach(key => {
+                    try {
+                        const value = localStorage.getItem(key);
+                        contents[key] = {
+                            value: value,
+                            length: value ? value.length : 0,
+                            preview: value ? (value.length > 100 ? value.substring(0, 100) + '...' : value) : '(empty)'
+                        };
+                    } catch (e) {
+                        contents[key] = { error: e.message };
+                    }
+                });
+                
+                let html = '<p><strong>localStorage keys:</strong> ' + keys.length + '</p>';
+                html += '<pre>' + JSON.stringify(contents, null, 2) + '</pre>';
+                
+                // Check for specific keys we care about
+                const hasIncomingPayload = !!localStorage.getItem('incoming_personalization_payload');
+                const hasUrlMappings = !!localStorage.getItem('url_mappings');
+                const hasTimestamp = !!localStorage.getItem('incoming_personalization_payload_ts');
+                
+                html += `<p><strong>incoming_personalization_payload:</strong> <span class="${hasIncomingPayload ? 'success' : 'error'}">${hasIncomingPayload ? 'EXISTS' : 'MISSING'}</span></p>`;
+                html += `<p><strong>url_mappings:</strong> <span class="${hasUrlMappings ? 'success' : 'error'}">${hasUrlMappings ? 'EXISTS' : 'MISSING'}</span></p>`;
+                html += `<p><strong>incoming_personalization_payload_ts:</strong> <span class="${hasTimestamp ? 'success' : 'error'}">${hasTimestamp ? 'EXISTS' : 'MISSING'}</span></p>`;
+                
+                localStorageAnalysis.innerHTML = html;
+                
+                log(`📊 localStorage analysis: ${keys.length} keys found`, hasIncomingPayload ? 'success' : 'warning');
+                
+            } catch (e) {
+                log('❌ Error analyzing localStorage: ' + e.message, 'error');
+                localStorageAnalysis.innerHTML = '<p class="error">Error: ' + e.message + '</p>';
+            }
+        }
+
+        function analyzeMappings() {
+            const mappingsAnalysis = document.getElementById('mappings-analysis');
+            
+            try {
+                const mappings = URLShortener.getMappings();
+                const mappingKeys = Object.keys(mappings);
+                
+                let html = `<p><strong>Total mappings:</strong> ${mappingKeys.length}</p>`;
+                
+                if (mappingKeys.length > 0) {
+                    html += '<h4>📋 All Mappings:</h4>';
+                    html += '<pre>' + JSON.stringify(mappings, null, 2) + '</pre>';
+                    
+                    html += '<h4>🔍 Mapping Details:</h4>';
+                    mappingKeys.forEach(key => {
+                        const mapping = mappings[key];
+                        const isExpired = Date.now() > mapping.expiresAt;
+                        const hasData = mapping.longUrl.includes('?data=');
+                        
+                        html += `
+                            <div style="margin: 10px 0; padding: 10px; border: 1px solid #ddd; border-radius: 4px;">
+                                <p><strong>Short Code:</strong> ${key}</p>
+                                <p><strong>Long URL:</strong> ${mapping.longUrl}</p>
+                                <p><strong>Has Data:</strong> <span class="${hasData ? 'success' : 'error'}">${hasData ? 'YES' : 'NO'}</span></p>
+                                <p><strong>Expired:</strong> <span class="${isExpired ? 'error' : 'success'}">${isExpired ? 'YES' : 'NO'}</span></p>
+                                <p><strong>Created:</strong> ${new Date(mapping.createdAt).toLocaleString()}</p>
+                                <p><strong>Expires:</strong> ${new Date(mapping.expiresAt).toLocaleString()}</p>
+                            </div>
+                        `;
+                    });
+                } else {
+                    html += '<p class="warning">⚠️ No mappings found</p>';
+                }
+                
+                mappingsAnalysis.innerHTML = html;
+                log(`📋 Mappings analysis: ${mappingKeys.length} mappings found`, mappingKeys.length > 0 ? 'success' : 'warning');
+                
+            } catch (e) {
+                log('❌ Error analyzing mappings: ' + e.message, 'error');
+                mappingsAnalysis.innerHTML = '<p class="error">Error: ' + e.message + '</p>';
+            }
+        }
+
+        function testUrlLookup() {
+            const mappings = URLShortener.getMappings();
+            const keys = Object.keys(mappings);
+            
+            log(`🧪 Testing URL lookup for ${keys.length} mappings...`, 'info');
+            
+            keys.forEach(key => {
+                const result = URLShortener.getLongUrl(key);
+                const success = result === mappings[key].longUrl;
+                log(`📝 ${key}: ${success ? '✅ SUCCESS' : '❌ FAILED'} -> ${result}`, success ? 'success' : 'error');
+            });
+        }
+
+        function testShortCode() {
+            const shortCode = document.getElementById('shortCodeInput').value.trim();
+            const testResult = document.getElementById('test-result');
+            
+            if (!shortCode) {
+                log('❌ Please enter a short code', 'error');
+                return;
+            }
+            
+            log(`🧪 Testing short code: ${shortCode}`, 'info');
+            
+            const longUrl = URLShortener.getLongUrl(shortCode);
+            
+            if (longUrl) {
+                testResult.innerHTML = `
+                    <p class="success">✅ Found long URL:</p>
+                    <p><strong>${longUrl}</strong></p>
+                    <p>Has data parameter: <strong>${longUrl.includes('?data=') ? 'YES' : 'NO'}</strong></p>
+                `;
+                log(`✅ Found long URL for ${shortCode}: ${longUrl}`, 'success');
+            } else {
+                testResult.innerHTML = `<p class="error">❌ No long URL found for short code: ${shortCode}</p>`;
+                log(`❌ No long URL found for ${shortCode}`, 'error');
+            }
+        }
+
+        function clearLocalStorage() {
+            localStorage.clear();
+            log('🗑️ localStorage cleared', 'warning');
+            refreshAll();
+        }
+
+        function refreshLocalStorage() {
+            analyzeLocalStorage();
+            log('🔄 localStorage refreshed', 'info');
+        }
+
+        function clearDebugLog() {
+            document.getElementById('debug-log').innerHTML = '';
+        }
+
+        function refreshAll() {
+            analyzeUrl();
+            analyzeLocalStorage();
+            analyzeMappings();
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            log('🚀 Debug test page loaded', 'success');
+            refreshAll();
+        });
+
+        // Listen for storage changes
+        window.addEventListener('storage', (e) => {
+            log(`💾 Storage changed: ${e.key} = ${e.newValue ? 'changed' : 'cleared'}`, 'info');
+            refreshAll();
+        });
+    </script>
+</body>
+</html>

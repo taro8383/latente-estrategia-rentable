@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>localStorage Debug Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .debug-info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border-left: 4px solid #007bff;
+        }
+        .error {
+            background: #fff5f5;
+            border-left-color: #dc3545;
+        }
+        .success {
+            background: #f0fff4;
+            border-left-color: #28a745;
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        pre {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 localStorage Synchronization Debug Test</h1>
+    
+    <div class="container">
+        <h2>📊 Current localStorage Status</h2>
+        <div id="localStorageStatus" class="debug-info">
+            Checking localStorage...
+        </div>
+    </div>
+
+    <div class="container">
+        <h2>🧪 Test URL Shortener Integration</h2>
+        <button onclick="testUrlShortener()">Test URL Shortener Functions</button>
+        <button onclick="generateTestMapping()">Generate Test Mapping</button>
+        <button onclick="clearAllMappings()">Clear All Mappings</button>
+        <div id="testResults" class="debug-info"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔗 Test Short URL Generation</h2>
+        <button onclick="generateTestShortUrl()">Generate Test Short URL</button>
+        <div id="shortUrlResults" class="debug-info"></div>
+    </div>
+
+    <div class="container">
+        <h2>🔄 Cross-Context Test</h2>
+        <p>This test simulates what happens when the HTML generator creates a mapping and the React app tries to read it.</p>
+        <button onclick="simulateHtmlGenerator()">Simulate HTML Generator</button>
+        <button onclick="simulateReactApp()">Simulate React App Lookup</button>
+        <div id="crossContextResults" class="debug-info"></div>
+    </div>
+
+    <script>
+        // URL Shortener class (copied from the React app for testing)
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static saveMappings(mappings) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                } catch (error) {
+                    console.error('Failed to save URL mappings:', error);
+                }
+            }
+
+            static storeMapping(shortCode, longUrl, expirationHours = 72) {
+                const mapping = {
+                    shortCode,
+                    longUrl,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                };
+
+                const mappings = this.getMappings();
+                mappings[shortCode] = mapping;
+                this.saveMappings(mappings);
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+
+                if (!mapping) {
+                    return null;
+                }
+
+                if (Date.now() > mapping.expiresAt) {
+                    delete mappings[shortCode];
+                    this.saveMappings(mappings);
+                    return null;
+                }
+
+                return mapping.longUrl;
+            }
+
+            static generateShortUrl(longUrl, expirationHours = 72) {
+                let shortCode;
+                const mappings = this.getMappings();
+                
+                do {
+                    shortCode = this.generateShortCode();
+                } while (mappings[shortCode]);
+
+                this.storeMapping(shortCode, longUrl, expirationHours);
+
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                return `${baseUrl}#/r/${shortCode}`;
+            }
+        }
+
+        // Update localStorage status display
+        function updateLocalStorageStatus() {
+            const status = document.getElementById('localStorageStatus');
+            const mappings = URLShortener.getMappings();
+            const keys = Object.keys(mappings);
+            
+            let html = `
+                <strong>localStorage Origin:</strong> ${window.location.origin}<br>
+                <strong>Total Mappings:</strong> ${keys.length}<br>
+                <strong>Storage Key:</strong> ${URLShortener.STORAGE_KEY}<br>
+                <strong>Available Short Codes:</strong> ${keys.length > 0 ? keys.join(', ') : 'None'}<br>
+                <strong>localStorage Size:</strong> ${JSON.stringify(localStorage).length} characters
+            `;
+
+            if (keys.length > 0) {
+                html += '<br><br><strong>Sample Mapping:</strong><pre>' + JSON.stringify(mappings[keys[0]], null, 2) + '</pre>';
+            }
+
+            status.innerHTML = html;
+            status.className = keys.length > 0 ? 'debug-info success' : 'debug-info error';
+        }
+
+        function testUrlShortener() {
+            const results = document.getElementById('testResults');
+            const testCode = 'TEST123';
+            const testUrl = 'http://localhost:8080/#/invite/test?data=eyJ0ZXN0IjoidmFsdWUifQ==';
+            
+            // Test storage
+            URLShortener.storeMapping(testCode, testUrl);
+            
+            // Test retrieval
+            const retrieved = URLShortener.getLongUrl(testCode);
+            
+            const success = retrieved === testUrl;
+            
+            results.innerHTML = `
+                <strong>Test Results:</strong><br>
+                ✅ Stored: ${testCode} → ${testUrl}<br>
+                ${success ? '✅' : '❌'} Retrieved: ${testCode} → ${retrieved}<br>
+                ${success ? '✅' : '❌'} Test ${success ? 'PASSED' : 'FAILED'}
+            `;
+            results.className = success ? 'debug-info success' : 'debug-info error';
+            
+            updateLocalStorageStatus();
+        }
+
+        function generateTestMapping() {
+            const results = document.getElementById('testResults');
+            const testCode = URLShortener.generateShortCode();
+            const testUrl = `http://localhost:8080/#/invite/${testCode}?data=eyJ0ZXN0IjoiZ2VuZXJhdGVkIn0=`;
+            
+            URLShortener.storeMapping(testCode, testUrl);
+            
+            results.innerHTML = `
+                <strong>Generated Test Mapping:</strong><br>
+                📝 Short Code: ${testCode}<br>
+                🔗 Long URL: ${testUrl}<br>
+                ✅ Stored successfully
+            `;
+            results.className = 'debug-info success';
+            
+            updateLocalStorageStatus();
+        }
+
+        function clearAllMappings() {
+            const results = document.getElementById('testResults');
+            localStorage.removeItem(URLShortener.STORAGE_KEY);
+            
+            results.innerHTML = `
+                <strong>Cleared All Mappings:</strong><br>
+                🗑️ localStorage key '${URLShortener.STORAGE_KEY}' removed
+            `;
+            results.className = 'debug-info';
+            
+            updateLocalStorageStatus();
+        }
+
+        function generateTestShortUrl() {
+            const results = document.getElementById('shortUrlResults');
+            const longUrl = 'http://localhost:8080/#/invite/testuser?data=eyJwZXJzb25hbGl6ZWQiOnRydWV9';
+            const shortUrl = URLShortener.generateShortUrl(longUrl);
+            
+            // Extract short code from the generated URL
+            const match = shortUrl.match(/#\/r\/(.+)$/);
+            const shortCode = match ? match[1] : null;
+            
+            results.innerHTML = `
+                <strong>Generated Short URL:</strong><br>
+                🔗 Short URL: ${shortUrl}<br>
+                📝 Short Code: ${shortCode}<br>
+                📄 Original Long URL: ${longUrl}<br>
+                ✅ Test the redirect by visiting: <a href="${shortUrl}" target="_blank">${shortUrl}</a>
+            `;
+            results.className = 'debug-info success';
+            
+            updateLocalStorageStatus();
+        }
+
+        function simulateHtmlGenerator() {
+            const results = document.getElementById('crossContextResults');
+            
+            // Simulate what the HTML generator does
+            const longUrl = 'http://localhost:8080/#/invite/john?data=eyJuYW1lIjoiSm9obiBEb2UifQ==';
+            const shortUrl = URLShortener.generateShortUrl(longUrl);
+            
+            results.innerHTML = `
+                <strong>HTML Generator Simulation:</strong><br>
+                📝 Generated long URL: ${longUrl}<br>
+                🔗 Generated short URL: ${shortUrl}<br>
+                ✅ Mapping stored in localStorage<br>
+                <br>
+                <strong>Next Step:</strong> Click "Simulate React App Lookup" to test if React can find this mapping.
+            `;
+            results.className = 'debug-info success';
+            
+            updateLocalStorageStatus();
+        }
+
+        function simulateReactApp() {
+            const results = document.getElementById('crossContextResults');
+            const mappings = URLShortener.getMappings();
+            const keys = Object.keys(mappings);
+            
+            if (keys.length === 0) {
+                results.innerHTML = `
+                    <strong>React App Simulation:</strong><br>
+                    ❌ No mappings found in localStorage<br>
+                    <br>
+                    <strong>Solution:</strong> Click "Simulate HTML Generator" first to create a mapping.
+                `;
+                results.className = 'debug-info error';
+                return;
+            }
+            
+            // Test lookup for the most recent mapping
+            const testCode = keys[keys.length - 1];
+            const retrieved = URLShortener.getLongUrl(testCode);
+            
+            const success = !!retrieved;
+            
+            results.innerHTML = `
+                <strong>React App Simulation:</strong><br>
+                🔍 Looking up short code: ${testCode}<br>
+                ${success ? '✅' : '❌'} Found: ${retrieved || 'NOT FOUND'}<br>
+                ${success ? '✅' : '❌'} Cross-context test ${success ? 'PASSED' : 'FAILED'}<br>
+                <br>
+                <strong>All Available Mappings:</strong><br>
+                <pre>${JSON.stringify(mappings, null, 2)}</pre>
+            `;
+            results.className = success ? 'debug-info success' : 'debug-info error';
+        }
+
+        // Initialize on page load
+        window.addEventListener('load', () => {
+            updateLocalStorageStatus();
+        });
+    </script>
+</body>
+</html>

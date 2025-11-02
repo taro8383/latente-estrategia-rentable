@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Redirection Test</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            max-width: 800px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: #f5f5f5;
+        }
+        .test-section { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            margin-bottom: 20px; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button { 
+            background: #007bff; 
+            color: white; 
+            padding: 10px 20px; 
+            border: none; 
+            border-radius: 4px; 
+            cursor: pointer; 
+            margin: 5px;
+        }
+        button:hover { background: #0056b3; }
+        .result { 
+            margin-top: 10px; 
+            padding: 10px; 
+            background: #e9ecef; 
+            border-radius: 4px; 
+            font-family: monospace;
+            word-break: break-all;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <h1>URL Redirection Test</h1>
+    
+    <div class="test-section">
+        <h2>Test URL Generation</h2>
+        <button onclick="testURLGeneration()">Generate Test URL</button>
+        <div id="generationResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test URL Shortening</h2>
+        <button onclick="testURLShortening()">Test URL Shortening</button>
+        <div id="shorteningResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Data Storage</h2>
+        <button onclick="testDataStorage()">Test Data Storage</button>
+        <div id="storageResult" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test Complete Flow</h2>
+        <button onclick="testCompleteFlow()">Test Complete Flow</button>
+        <div id="flowResult" class="result"></div>
+    </div>
+
+    <script>
+        // Mock URLShortener class for testing
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    return stored ? JSON.parse(stored) : {};
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static saveMappings(mappings) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                } catch (error) {
+                    console.error('Failed to save URL mappings:', error);
+                }
+            }
+
+            static generateShortUrl(longUrl, expirationHours = 72) {
+                let shortCode;
+                const mappings = this.getMappings();
+                
+                do {
+                    shortCode = this.generateShortCode();
+                } while (mappings[shortCode]);
+
+                const mapping = {
+                    shortCode,
+                    longUrl,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                };
+
+                mappings[shortCode] = mapping;
+                this.saveMappings(mappings);
+
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                // FIXED: Include hash prefix for HashRouter compatibility
+                return `${baseUrl}#/r/${shortCode}`;
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+
+                if (!mapping) {
+                    return null;
+                }
+
+                if (Date.now() > mapping.expiresAt) {
+                    delete mappings[shortCode];
+                    this.saveMappings(mappings);
+                    return null;
+                }
+
+                return mapping.longUrl;
+            }
+        }
+
+        function testURLGeneration() {
+            const result = document.getElementById('generationResult');
+            try {
+                // Test personalization data
+                const testData = {
+                    readerInfo: { name: 'Test User', company: 'Test Company' },
+                    brandInfo: { name: 'Test Brand', industry: 'Test Industry' },
+                    customMessages: { historia: 'Test historia personalizada' }
+                };
+
+                const encodedData = btoa(encodeURIComponent(JSON.stringify(testData)));
+                const uniqueCode = 'test_' + Date.now();
+                const longUrl = `${window.location.origin}/#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
+                
+                result.innerHTML = `<div class="success">✓ URL Generation Successful</div>
+                    <strong>Long URL:</strong> ${longUrl}<br>
+                    <strong>Encoded Data Length:</strong> ${encodedData.length}`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">✗ URL Generation Failed: ${error.message}</div>`;
+            }
+        }
+
+        function testURLShortening() {
+            const result = document.getElementById('shorteningResult');
+            try {
+                const testLongUrl = `${window.location.origin}/#/invite/test123?data=test123`;
+                const shortUrl = URLShortener.generateShortUrl(testLongUrl);
+                
+                result.innerHTML = `<div class="success">✓ URL Shortening Successful</div>
+                    <strong>Long URL:</strong> ${testLongUrl}<br>
+                    <strong>Short URL:</strong> ${shortUrl}<br>
+                    <strong>Format Check:</strong> ${shortUrl.includes('#/r/') ? '✓ Correct hash format' : '✗ Missing hash format'}`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">✗ URL Shortening Failed: ${error.message}</div>`;
+            }
+        }
+
+        function testDataStorage() {
+            const result = document.getElementById('storageResult');
+            try {
+                const testData = 'test_payload_' + Date.now();
+                localStorage.setItem('incoming_personalization_payload', testData);
+                
+                const retrieved = localStorage.getItem('incoming_personalization_payload');
+                const success = retrieved === testData;
+                
+                result.innerHTML = `<div class="${success ? 'success' : 'error'}">${success ? '✓' : '✗'} Data Storage ${success ? 'Successful' : 'Failed'}</div>
+                    <strong>Stored:</strong> ${testData}<br>
+                    <strong>Retrieved:</strong> ${retrieved}<br>
+                    <strong>Match:</strong> ${success}`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">✗ Data Storage Failed: ${error.message}</div>`;
+            }
+        }
+
+        function testCompleteFlow() {
+            const result = document.getElementById('flowResult');
+            try {
+                // Step 1: Generate personalization data
+                const personalizationData = {
+                    readerInfo: { name: 'Flow Test', company: 'Flow Company' },
+                    brandInfo: { name: 'Flow Brand', industry: 'Flow Industry' }
+                };
+                const encodedData = btoa(encodeURIComponent(JSON.stringify(personizationData)));
+                const uniqueCode = 'flow_' + Date.now();
+                const longUrl = `${window.location.origin}/#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
+                
+                // Step 2: Generate short URL
+                const shortUrl = URLShortener.generateShortUrl(longUrl);
+                const shortCode = shortUrl.split('/#/r/')[1];
+                
+                // Step 3: Simulate redirect
+                const retrievedLongUrl = URLShortener.getLongUrl(shortCode);
+                
+                // Step 4: Test data extraction
+                localStorage.setItem('incoming_personalization_payload', encodedData);
+                const storedPayload = localStorage.getItem('incoming_personalization_payload');
+                
+                const success = retrievedLongUrl && retrievedLongUrl === longUrl && storedPayload === encodedData;
+                
+                result.innerHTML = `<div class="${success ? 'success' : 'error'}">${success ? '✓' : '✗'} Complete Flow ${success ? 'Successful' : 'Failed'}</div>
+                    <strong>Step 1 - Long URL:</strong> ${longUrl}<br>
+                    <strong>Step 2 - Short URL:</strong> ${shortUrl}<br>
+                    <strong>Step 3 - Retrieved URL:</strong> ${retrievedLongUrl || 'NULL'}<br>
+                    <strong>Step 4 - Stored Payload:</strong> ${storedPayload ? '✓ Stored' : '✗ Not stored'}<br>
+                    <strong>URL Format:</strong> ${shortUrl.includes('#/r/') ? '✓ Correct hash format' : '✗ Incorrect format'}`;
+            } catch (error) {
+                result.innerHTML = `<div class="error">✗ Complete Flow Failed: ${error.message}</div>`;
+            }
+        }
+
+        // Clean up test data on load
+        window.addEventListener('load', () => {
+            localStorage.removeItem('incoming_personalization_payload');
+            const mappings = URLShortener.getMappings();
+            Object.keys(mappings).forEach(key => {
+                if (key.includes('test_') || key.includes('flow_')) {
+                    delete mappings[key];
+                }
+            });
+            URLShortener.saveMappings(mappings);
+        });
+    </script>
+</body>
+</html>
