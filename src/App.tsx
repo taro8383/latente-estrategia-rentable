@@ -17,6 +17,29 @@ const App = () => {
   useEffect(() => {
     // Enable dark mode by default
     document.documentElement.classList.add('dark');
+
+    // Handle direct short URLs (e.g., latente.net/ABC123)
+    const path = window.location.pathname;
+    const hash = window.location.hash;
+
+    // If path is a short code (not existing routes) and no hash, redirect to proper format
+    if (path.length > 1 &&
+        !path.startsWith('/invite/') &&
+        !path.startsWith('/exclusive/') &&
+        !path.startsWith('/strategy/') &&
+        !path.startsWith('/expired') &&
+        !path.startsWith('/invitation-required') &&
+        !path.startsWith('/r/') &&
+        !hash.includes('/invite/')) {
+
+      const possibleShortCode = path.slice(1); // Remove leading '/'
+
+      // Check if it looks like a short code (alphanumeric, reasonable length)
+      if (/^[a-zA-Z0-9]{3,10}$/.test(possibleShortCode)) {
+        // Redirect to the redirect handler route
+        window.location.replace(`/#/r/${possibleShortCode}`);
+      }
+    }
   }, []);
 
   return (
@@ -35,7 +58,7 @@ const App = () => {
               <Route path="/invitation-required" element={<InvitationRequired />} />
               {/* NEW: Redirect handler for short URLs */}
               <Route path="/r/:shortCode" element={<RedirectHandler />} />
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+                {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </HashRouter>
