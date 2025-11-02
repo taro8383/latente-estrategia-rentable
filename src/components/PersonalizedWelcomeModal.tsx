@@ -17,7 +17,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="
-          w-full p-0 overflow-hidden
+          w-full max-w-lg sm:max-w-xl mx-auto p-0 overflow-hidden
           transform transition-all duration-500 ease-out
           data-[state=open]:animate-modal-fade-in
           data-[state=closed]:animate-modal-fade-out
@@ -38,7 +38,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           <div className="absolute inset-0 hero-gradient opacity-95 modal-backdrop-blur"></div>
           
           {/* Content container */}
-          <div className="relative z-10 p-3 sm:p-4 md:p-6 text-center space-y-3 sm:space-y-4 max-h-[40vh] sm:max-h-[50vh] overflow-y-auto">
+          <div className="relative z-10 p-3 sm:p-4 md:p-6 text-center space-y-3 sm:space-y-4 max-h-[70vh] overflow-y-auto">
             {/* Welcome message */}
             <div className="space-y-2 sm:space-y-3">
             <p className="text-white/90 text-sm sm:text-base leading-relaxed">
@@ -47,11 +47,11 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           </div>
 
           {/* Company Logo */}
-          <div className="flex justify-center py-2 sm:py-3">
+          <div className="flex justify-center py-4 sm:py-6">
             <CompanyLogo
               logoData={data?.companyLogo}
               brandName={data?.brandInfo?.name}
-              className="max-h-8 sm:max-h-10 md:max-h-12 w-auto object-contain"
+              className="max-h-16 sm:max-h-20 md:max-h-24 w-auto object-contain"
             />
           </div>
 
