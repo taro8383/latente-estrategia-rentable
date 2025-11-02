@@ -1,46 +1,196 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Test URL Shortener</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test URL Shortener Mapping</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; line-height: 1.6; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 8px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 4px; overflow-x: auto; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+    </style>
 </head>
 <body>
-    <h1>Testing URL Shortener</h1>
-    <div id="results"></div>
+    <h1>🔍 URL Shortener Debug Test</h1>
+
+    <div class="test-section info">
+        <h3>📍 Current Page Info</h3>
+        <p><strong>URL:</strong> <span id="current-url"></span></p>
+        <p><strong>Origin:</strong> <span id="origin"></span></p>
+        <p><strong>Hostname:</strong> <span id="hostname"></span></p>
+    </div>
+
+    <div class="test-section">
+        <h3>🧪 Test URL Mappings</h3>
+        <button onclick="testMapping('1fRPHZ')">Test 1fRPHZ (Original)</button>
+        <button onclick="testMapping('w6KpbG')">Test w6KpbG (Current)</button>
+        <button onclick="testBothMappings()">Test Both</button>
+        <div id="test-results"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 Mappings File</h3>
+        <button onclick="loadMappingsFile()">Load url-mappings.json</button>
+        <div id="mappings-content"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🚀 Test Redirect</h3>
+        <input type="text" id="test-shortcode" placeholder="Enter short code to test" style="width: 200px; padding: 5px;">
+        <button onclick="testRedirect()">Test Redirect</button>
+        <div id="redirect-results"></div>
+    </div>
 
     <script>
-        async function testURLShortener() {
-            const results = document.getElementById('results');
-            results.innerHTML = '<p>Testing...</p>';
+        // Display current page info
+        document.getElementById('current-url').textContent = window.location.href;
+        document.getElementById('origin').textContent = window.location.origin;
+        document.getElementById('hostname').textContent = window.location.hostname;
+
+        async function testMapping(shortCode) {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = `<div class="info">Testing shortCode: <strong>${shortCode}</strong>...</div>`;
 
             try {
-                // Test fetching the mappings file
-                const mappingsUrl = 'https://latente.net/url-mappings.json';
-                results.innerHTML += `<p>Fetching from: ${mappingsUrl}</p>`;
+                // Determine mappings URL based on hostname
+                let mappingsUrl;
+                if (window.location.hostname.includes('github.io')) {
+                    const pathname = window.location.pathname;
+                    const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                    const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
+                    mappingsUrl = `https://${window.location.hostname}/${repoName}/url-mappings.json`;
+                } else {
+                    mappingsUrl = `${window.location.origin}/url-mappings.json`;
+                }
+
+                console.log('🔍 Fetching mappings from:', mappingsUrl);
 
                 const response = await fetch(mappingsUrl);
-                results.innerHTML += `<p>Response status: ${response.status}</p>`;
+                console.log('🔍 Response status:', response.status);
 
-                if (response.ok) {
-                    const data = await response.json();
-                    results.innerHTML += `<p>Found ${Object.keys(data.mappings || {}).length} mappings</p>`;
-
-                    const shortCode = '1fRPHZ';
-                    if (data.mappings && data.mappings[shortCode]) {
-                        const mapping = data.mappings[shortCode];
-                        results.innerHTML += `<p>Found mapping for ${shortCode}: ${mapping.longUrl}</p>`;
-                        results.innerHTML += `<p>Expires: ${new Date(mapping.expiresAt).toLocaleString()}</p>`;
-                    } else {
-                        results.innerHTML += `<p>No mapping found for ${shortCode}</p>`;
-                    }
-                } else {
-                    results.innerHTML += `<p>Failed to fetch: ${response.statusText}</p>`;
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
                 }
+
+                const mappingsData = await response.json();
+                console.log('🔍 Mappings data:', mappingsData);
+
+                const mapping = mappingsData.mappings && mappingsData.mappings[shortCode];
+
+                if (mapping) {
+                    const now = Date.now();
+                    const isValid = now <= mapping.expiresAt;
+                    const expiresAt = new Date(mapping.expiresAt).toLocaleString();
+
+                    resultsDiv.innerHTML = `
+                        <div class="success">
+                            <h4>✅ Mapping Found for ${shortCode}</h4>
+                            <p><strong>Long URL:</strong> <a href="${mapping.longUrl}" target="_blank">${mapping.longUrl}</a></p>
+                            <p><strong>Created:</strong> ${new Date(mapping.createdAt).toLocaleString()}</p>
+                            <p><strong>Expires:</strong> ${expiresAt}</p>
+                            <p><strong>Status:</strong> ${isValid ? '✅ Valid' : '❌ Expired'}</p>
+                            <p><strong>Metadata:</strong> ${JSON.stringify(mapping.metadata, null, 2)}</p>
+                            <button onclick="window.open('${mapping.longUrl}', '_blank')">Test Redirect →</button>
+                        </div>
+                    `;
+                } else {
+                    const availableCodes = Object.keys(mappingsData.mappings || {});
+                    resultsDiv.innerHTML = `
+                        <div class="error">
+                            <h4>❌ No Mapping Found for ${shortCode}</h4>
+                            <p><strong>Available shortCodes:</strong> ${availableCodes.join(', ')}</p>
+                            <p><strong>Total mappings:</strong> ${availableCodes.length}</p>
+                        </div>
+                    `;
+                }
+
             } catch (error) {
-                results.innerHTML += `<p>Error: ${error.message}</p>`;
+                console.error('Error testing mapping:', error);
+                resultsDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error Testing ${shortCode}</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
             }
         }
 
-        testURLShortener();
+        async function testBothMappings() {
+            const resultsDiv = document.getElementById('test-results');
+            resultsDiv.innerHTML = '<div class="info">Testing both mappings...</div>';
+
+            await testMapping('1fRPHZ');
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            await testMapping('w6KpbG');
+        }
+
+        async function loadMappingsFile() {
+            const contentDiv = document.getElementById('mappings-content');
+            contentDiv.innerHTML = '<div class="info">Loading mappings file...</div>';
+
+            try {
+                let mappingsUrl;
+                if (window.location.hostname.includes('github.io')) {
+                    const pathname = window.location.pathname;
+                    const pathSegments = pathname.split('/').filter(segment => segment.length > 0);
+                    const repoName = pathSegments.length > 0 ? pathSegments[0] : '';
+                    mappingsUrl = `https://${window.location.hostname}/${repoName}/url-mappings.json`;
+                } else {
+                    mappingsUrl = `${window.location.origin}/url-mappings.json`;
+                }
+
+                const response = await fetch(mappingsUrl);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+
+                const mappingsData = await response.json();
+
+                contentDiv.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Mappings File Loaded</h4>
+                        <p><strong>Total Mappings:</strong> ${Object.keys(mappingsData.mappings || {}).length}</p>
+                        <p><strong>Last Updated:</strong> ${new Date(mappingsData.lastUpdated).toLocaleString()}</p>
+                        <p><strong>Version:</strong> ${mappingsData.version}</p>
+                        <details>
+                            <summary>Raw JSON (click to expand)</summary>
+                            <pre>${JSON.stringify(mappingsData, null, 2)}</pre>
+                        </details>
+                    </div>
+                `;
+
+            } catch (error) {
+                contentDiv.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Error Loading Mappings File</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function testRedirect() {
+            const shortCode = document.getElementById('test-shortcode').value.trim();
+            const resultsDiv = document.getElementById('redirect-results');
+
+            if (!shortCode) {
+                resultsDiv.innerHTML = '<div class="error">Please enter a short code</div>';
+                return;
+            }
+
+            resultsDiv.innerHTML = `<div class="info">Testing redirect for: <strong>${shortCode}</strong></div>`;
+
+            await testMapping(shortCode);
+        }
+
+        // Auto-load mappings file on page load
+        window.addEventListener('load', () => {
+            loadMappingsFile();
+        });
     </script>
 </body>
 </html>
