@@ -2,6 +2,7 @@ import { Crown, Target, TrendingUp, CheckCircle2, ArrowRight } from "lucide-reac
 import { Button } from "@/components/ui/button";
 import successCelebration from "@/assets/success-celebration.jpg";
 import logoDi from "/LoDi-logo.svg";
+import { PersonalizedText } from "@/components/PersonalizedText";
 
 const uniqueCombination = [
   {
@@ -127,9 +128,9 @@ export const Pricing = () => {
                 <span className="text-accent font-semibold">LA ÚNICA PREGUNTA QUE IMPORTA</span>
               </div>
               
-              <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-8 mobile-center-text">
+              <PersonalizedText as="h3" className="text-3xl md:text-4xl font-bold text-foreground mb-8 mobile-center-text">
                 ¿Tienes lo que se necesita para ser el <span className="text-accent">#1 absoluto</span>?
-              </h3>
+              </PersonalizedText>
               
               <p className="text-xl text-muted-foreground leading-relaxed mb-8 mobile-center-text">
                 Eso es lo que necesitamos evaluar.

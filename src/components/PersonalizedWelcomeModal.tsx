@@ -41,9 +41,9 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           <div className="relative z-10 p-3 sm:p-4 md:p-6 text-center space-y-3 sm:space-y-4 max-h-[40vh] sm:max-h-[50vh] overflow-y-auto">
             {/* Welcome message */}
             <div className="space-y-2 sm:space-y-3">
-            <p className="text-white/90 text-sm sm:text-base leading-relaxed">
+            <PersonalizedText as="p" className="text-white/90 text-sm sm:text-base leading-relaxed">
               Tu oportunidad exclusiva de convertirte en el <span className="text-accent font-semibold">#1 absoluto</span> está lista.
-            </p>
+            </PersonalizedText>
           </div>
 
           {/* Company Logo */}

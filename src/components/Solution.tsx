@@ -16,7 +16,7 @@ const systems = [
       <PersonalizedText key="avatar">[avatar]</PersonalizedText>,
       <PersonalizedText key="propuesta-pobre">Tu propuesta de valor ya no dice '[propuesta pobre]'. Expone la mentira de tu competidor: '[propuesta buena]'</PersonalizedText>,
       "Tu mensaje no 'atrae curiosos'… Filtra a los débiles: Si tu cliente no está dispuesto a pagar un 30% más por algo que dure 30 años, no es tu cliente.",
-      "Tus alianzas ya no son 'colaboraciones con influencers'… Son alianzas con bancos privados que regalan tu billetera a sus clientes premium… porque tú les das estatus, no cuero.",
+      "Tus alianzas ya no son 'colaboraciones con influencers'… Son alianzas con bancos privados que regalan tu billetera a sus clientes premium… porque tú les das estatus.",
       "Tus métricas ya no miden 'likes'… Miden cuántos clientes llaman a su madre para mostrar lo que compraron."
     ]
   },
