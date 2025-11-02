@@ -4,6 +4,7 @@ import { ArrowRight } from "lucide-react";
 import { CompanyLogo } from "@/components/CompanyLogo";
 import { EnhancedUrgencyTimer } from "@/components/EnhancedUrgencyTimer";
 import { usePersonalization } from "@/context/PersonalizationProvider";
+import { PersonalizedText } from "@/components/PersonalizedText";
 
 interface PersonalizedWelcomeModalProps {
   isOpen: boolean;
