@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug 422 Error</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .info { background: #d1ecf1; color: #0c5460; }
+        button { padding: 10px 20px; margin: 5px; }
+        input { width: 300px; padding: 5px; margin: 5px; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Debug GitHub Actions 422 Error</h1>
+
+    <div>
+        <input type="text" id="token" placeholder="GitHub Token" value="ghp_xxxxxxxxxxxx">
+        <input type="text" id="shortCode" placeholder="Short Code" value="TEST123">
+        <input type="text" id="longUrl" placeholder="Long URL" value="https://example.com/test">
+    </div>
+
+    <div>
+        <button onclick="testMinimal()">🧪 Test Minimal Request</button>
+        <button onclick="testFull()">🧪 Test Full Request</button>
+        <button onclick="testWorkflowList()">📋 List Workflows</button>
+        <button onclick="clearResults()">🧹 Clear</button>
+    </div>
+
+    <div id="results"></div>
+
+    <script>
+        function addResult(message, type = 'info') {
+            const results = document.getElementById('results');
+            const div = document.createElement('div');
+            div.className = `result ${type}`;
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${message}`;
+            results.appendChild(div);
+        }
+
+        function clearResults() {
+            document.getElementById('results').innerHTML = '';
+        }
+
+        async function testMinimal() {
+            const token = document.getElementById('token').value;
+            const shortCode = document.getElementById('shortCode').value;
+            const longUrl = document.getElementById('longUrl').value;
+
+            addResult('🧪 Testing minimal workflow request...', 'info');
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/taro8383/latente-estrategia-rentable/actions/workflows/url-shortener.yml/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs: {
+                            shortCode: shortCode,
+                            longUrl: longUrl
+                        }
+                    })
+                });
+
+                if (response.ok || response.status === 204) {
+                    addResult('✅ Minimal request successful!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    addResult(`❌ Minimal request failed: ${response.status} ${response.statusText}`, 'error');
+                    addResult(`Details: ${JSON.stringify(errorData, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Request error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFull() {
+            const token = document.getElementById('token').value;
+            const shortCode = document.getElementById('shortCode').value;
+            const longUrl = document.getElementById('longUrl').value;
+
+            addResult('🧪 Testing full workflow request...', 'info');
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/taro8383/latente-estrategia-rentable/actions/workflows/url-shortener.yml/dispatches`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        ref: 'main',
+                        inputs: {
+                            shortCode: shortCode,
+                            longUrl: longUrl,
+                            expirationHours: '1',
+                            metadata: '{"test": true}'
+                        }
+                    })
+                });
+
+                if (response.ok || response.status === 204) {
+                    addResult('✅ Full request successful!', 'success');
+                } else {
+                    const errorData = await response.json();
+                    addResult(`❌ Full request failed: ${response.status} ${response.statusText}`, 'error');
+                    addResult(`Details: ${JSON.stringify(errorData, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Request error: ${error.message}`, 'error');
+            }
+        }
+
+        async function testWorkflowList() {
+            const token = document.getElementById('token').value;
+
+            addResult('📋 Listing available workflows...', 'info');
+
+            try {
+                const response = await fetch(`https://api.github.com/repos/taro8383/latente-estrategia-rentable/actions/workflows`, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    addResult('✅ Workflow list retrieved!', 'success');
+                    data.workflows.forEach(workflow => {
+                        addResult(`- ${workflow.name} (${workflow.path}) - ${workflow.state}`, 'info');
+                    });
+                } else {
+                    const errorData = await response.json();
+                    addResult(`❌ Workflow list failed: ${response.status} ${response.statusText}`, 'error');
+                    addResult(`Details: ${JSON.stringify(errorData, null, 2)}`, 'error');
+                }
+            } catch (error) {
+                addResult(`❌ Request error: ${error.message}`, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
