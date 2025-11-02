@@ -76,7 +76,7 @@ jobs:
         fi
 
         # Validate metadata length
-        METADATA="${{ github.event.inputs.metadata }}"
+        METADATA='${{ github.event.inputs.metadata }}'
         if [ ${#METADATA} -gt 1000 ]; then
           echo "ERROR: Metadata too long (max 1000 characters)"
           exit 1
@@ -167,7 +167,24 @@ jobs:
         const shortCode = process.env.SHORT_CODE;
         const longUrl = process.env.LONG_URL;
         const expiresAt = parseInt(process.env.EXPIRES_AT);
-        const metadata = JSON.parse(process.env.METADATA);
+
+        let metadata;
+        try {
+          metadata = JSON.parse(process.env.METADATA || '{}');
+        } catch (error) {
+          console.log('DEBUG: JSON parse failed, trying JavaScript evaluation');
+          console.log('DEBUG: Metadata input:', process.env.METADATA);
+          try {
+            // Use Function constructor for safer evaluation
+            const jsObject = new Function('return ' + process.env.METADATA)();
+            metadata = jsObject;
+            console.log('DEBUG: Successfully evaluated metadata as JavaScript object');
+          } catch (fallbackError) {
+            console.log('WARNING: Could not parse metadata, using empty object');
+            console.log('DEBUG: Original METADATA value:', process.env.METADATA);
+            metadata = {};
+          }
+        }
 
         console.log('DEBUG: Starting Node.js processing');
         console.log('DEBUG: Current mappings count:', Object.keys(mappings.mappings).length);
@@ -217,7 +234,7 @@ jobs:
         export SHORT_CODE="$SHORT_CODE"
         export LONG_URL="$LONG_URL"
         export EXPIRES_AT="$EXPIRES_AT"
-        export METADATA="$METADATA"
+        export METADATA='$METADATA'
 
         node process_mappings.js
 
