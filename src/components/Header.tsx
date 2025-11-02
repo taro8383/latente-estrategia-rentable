@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Menu, X } from "lucide-react";
-import logo from "/LoDi.svg";
+import logo from "/LoDi-logo.svg";
 
 export const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -12,11 +12,13 @@ export const Header = () => {
     { name: "Solución", href: "#solucion" },
     { name: "Cómo Funciona", href: "#como-funciona" },
     { name: "Modelo", href: "#modelo" },
-    { name: "Ofertas", href: "#ofertas" },
+    { name: "Socios Estratégicos", href: "#socios-estrategicos" },
+    { name: "#1", href: "#1", isButton: true },
   ];
 
   const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
+    // Use getElementById for section "1" since CSS IDs cannot start with numbers
+    const element = href === '#1' ? document.getElementById('1') : document.querySelector(href);
     if (element) {
       element.scrollIntoView({ behavior: 'smooth' });
     }
@@ -44,20 +46,24 @@ export const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
             {navLinks.map((link) => (
-              <button
-                key={link.name}
-                onClick={() => scrollToSection(link.href)}
-                className="text-foreground hover:text-accent transition-smooth font-medium"
-              >
-                {link.name}
-              </button>
+              link.isButton ? (
+                <Button
+                  key={link.name}
+                  onClick={() => scrollToSection(link.href)}
+                  className="accent-gradient text-white hover:scale-105 transition-bounce"
+                >
+                  {link.name}
+                </Button>
+              ) : (
+                <button
+                  key={link.name}
+                  onClick={() => scrollToSection(link.href)}
+                  className="text-foreground hover:text-accent transition-smooth font-medium"
+                >
+                  {link.name}
+                </button>
+              )
             ))}
-            <Button 
-              onClick={() => scrollToSection('#contacto')}
-              className="accent-gradient text-white hover:scale-105 transition-bounce"
-            >
-              Agendar Llamada
-            </Button>
           </nav>
 
           {/* Mobile Menu Button */}
@@ -78,20 +84,24 @@ export const Header = () => {
           <div className="md:hidden py-4 border-t border-border">
             <nav className="flex flex-col space-y-3">
               {navLinks.map((link) => (
-                <button
-                  key={link.name}
-                  onClick={() => scrollToSection(link.href)}
-                  className="text-left text-foreground hover:text-accent transition-smooth font-medium py-2"
-                >
-                  {link.name}
-                </button>
+                link.isButton ? (
+                  <Button
+                    key={link.name}
+                    onClick={() => scrollToSection(link.href)}
+                    className="accent-gradient text-white hover:scale-105 transition-bounce w-full mt-2"
+                  >
+                    {link.name}
+                  </Button>
+                ) : (
+                  <button
+                    key={link.name}
+                    onClick={() => scrollToSection(link.href)}
+                    className="text-left text-foreground hover:text-accent transition-smooth font-medium py-2"
+                  >
+                    {link.name}
+                  </button>
+                )
               ))}
-              <Button 
-                onClick={() => scrollToSection('#contacto')}
-                className="accent-gradient text-white hover:scale-105 transition-bounce w-full mt-2"
-              >
-                Agendar Llamada
-              </Button>
             </nav>
           </div>
         )}

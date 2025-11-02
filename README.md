@@ -1,73 +1,63 @@
-# Welcome to your Lovable project
+# Cuero Landing Page
 
-## Project info
+This is an exact copy of the main Latente landing page, created as a base for the leather goods and accessories industry version.
 
-**URL**: https://lovable.dev/projects/e616637f-ffc1-49c7-a2d6-f9b2a86a3b78
+## Current Status
 
-## How can I edit this code?
+✅ **Complete**: All files have been copied exactly from the original landing page
+✅ **Tested**: Build process works correctly
+✅ **Ready**: Ready for section-by-section content customization
 
-There are several ways of editing your application.
+## Next Steps
 
-**Use Lovable**
+This landing page is ready for industry-specific content updates. The plan is to customize each section for the leather goods and accessories industry:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/e616637f-ffc1-49c7-a2d6-f9b2a86a3b78) and start prompting.
+1. Hero section - Update messaging for leather business owners
+2. Problems section - Address leather industry specific challenges
+3. Solution section - Adapt for leather businesses
+4. How it works - Customize for leather manufacturing/retail
+5. Pricing - Adjust for leather industry context
+6. Offers - Create leather-specific service tiers
+7. CTA - Modify for leather business owners
+8. Navigation/Branding - Update for cuero version
 
-Changes made via Lovable will be committed automatically to this repo.
+## Development
 
-**Use your preferred IDE**
+To run the development server:
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+```bash
+cd cuero
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+To build for production:
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+```bash
+cd cuero
+npm run build
+```
 
-**Use GitHub Codespaces**
+## File Structure
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+```
+cuero/
+├── src/
+│   ├── components/          # All React components
+│   ├── pages/              # Page components
+│   ├── assets/             # Images and static assets
+│   ├── hooks/              # Custom React hooks
+│   ├── lib/                # Utility functions
+│   └── index.css           # Global styles
+├── public/                 # Public assets
+└── package.json           # Dependencies and scripts
+```
 
-## What technologies are used for this project?
+## Technology Stack
 
-This project is built with:
-
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
-
-## How can I deploy this project?
-
-Simply open [Lovable](https://lovable.dev/projects/e616637f-ffc1-49c7-a2d6-f9b2a86a3b78) and click on Share -> Publish.
-
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
+- React 18 with TypeScript
+- Vite build tool
+- Tailwind CSS for styling
+- shadcn/ui component library
+- React Router for navigation
+- React Hook Form for forms
+- React Query for state management

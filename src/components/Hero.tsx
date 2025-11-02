@@ -3,8 +3,8 @@ import { ArrowRight } from "lucide-react";
 import heroLeader from "@/assets/hero-leader.jpg";
 
 export const Hero = () => {
-  const scrollToContact = () => {
-    document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' });
+  const scrollToSection1 = () => {
+    document.getElementById('1')?.scrollIntoView({ behavior: 'smooth' });
   };
 
   return (
@@ -20,41 +20,63 @@ export const Hero = () => {
           {/* Content */}
           <div className="text-center lg:text-left space-y-4 sm:space-y-5 md:space-y-6 lg:space-y-8 order-1 md:order-1">
           <div className="inline-block px-3 py-1 sm:px-4 sm:py-1.5 md:py-2 bg-accent/10 backdrop-blur-sm rounded-full border border-accent/20 mb-2 sm:mb-3 md:mb-4">
-            <span className="text-accent font-semibold text-xs sm:text-sm md:text-base text-white">Para líderes que quieren serlo de verdad</span>
+            <span className="text-accent font-semibold text-xs sm:text-sm md:text-base text-white">Menos del 0.01% de las marcas de cuero reciben esta invitación</span>
           </div>
           
           <h1 className="leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white">
-            ¿Segundo lugar?{" "}
-            <span className="text-accent">Eso no es éxito.</span>
-            <br />
-            Es una tortura cara.
+            El segundo lugar es{" "}
+            <span className="text-accent">el primer perdedor</span>
           </h1>
+          <p className="leading-tight text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl text-white mt-4">
+            Bien. Estás aquí.
+          </p>
 
           <p className="text-base sm:text-lg md:text-xl lg:text-2xl text-white/90 max-w-3xl mx-auto lg:mx-0 leading-relaxed">
-            Trabajas más que nadie. Ganas bien. Tienes prestigio. <br className="hidden sm:block" />
-            Pero ese <strong>número uno</strong> en tu mercado te roba el sueño cada noche.
+            Si estás leyendo esto, es porque ves algo que el 99.7% de tus competidores todavía se niegan a ver,
+            pero vos con tu instinto, <strong>lo sentiste incluso antes de abrir el email que te envié</strong>.
           </p>
 
-          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto lg:mx-0">
-            No viniste a ser "el otro negocio exitoso". Viniste a <strong>dominar</strong>. <br className="hidden sm:block" />
-            Y mientras sigues atrapado en lo operativo, el reloj corre... y el legado que querías dejar se desvanece.
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto mb-4 text-center">
+            El mercado no recompensa la calidad. <br className="hidden sm:block" />
+            Recompensa al que <strong>se declara rey</strong>, y está listo para tomar ese lugar.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center md:justify-start items-center pt-4 sm:pt-6 md:pt-8">
+          <div className="bg-accent/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-accent/20 mb-6">
+            <p className="text-base sm:text-lg md:text-xl text-white/90 italic leading-relaxed">
+              "Imagina esto: tu hijo, en 2045, entra a una reunión en Nueva York. Alguien ve su portafolio y dice, en voz baja:
+              '¿Eso es de <span className="text-accent font-semibold">[tu marca]</span>? Mi abuelo tenía uno igual… lo enterraron con él.'
+              Eso no es un producto. <span className="text-accent font-bold">Es un legado.</span> Y el legado se construye ahora mismo."
+            </p>
+          </div>
+
+          <p className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto text-center">
+            Sospechas que tu empresa de cuero tiene lo necesario para ser la <strong>#1 absoluta</strong>.<br className="hidden sm:block" />
+            Tienes razón. El problema no es tu potencial... es el camino.
+          </p>
+
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4 sm:pt-6 md:pt-8">
             <Button
               size="default"
-              onClick={scrollToContact}
+              onClick={scrollToSection1}
               className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong text-sm sm:text-base md:text-lg px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 group max-w-xs sm:max-w-none mx-auto sm:mx-0"
             >
-              <span className="text-center hidden sm:inline">Quiero recuperar mi tiempo y multiplicar ganancias</span>
-              <span className="text-center sm:hidden">Recuperar tiempo y ganancias</span>
+              <span className="text-center hidden sm:inline">Quiero construir mi legado como el #1</span>
+              <span className="text-center sm:hidden">Construir mi legado #1</span>
               <ArrowRight className="ml-1 sm:ml-2 flex-shrink-0 group-hover:translate-x-1 transition-smooth w-4 h-4 sm:w-5 sm:h-5" />
             </Button>
           </div>
 
-          <p className="text-xs sm:text-sm text-white/70 pt-2 sm:pt-3 md:pt-4">
-            Sin riesgo. Solo pagas por resultados reales.
-          </p>
+          <div className="space-y-2 pt-2 sm:pt-3 md:pt-4">
+            <p className="text-xs sm:text-sm text-white/70 text-center">
+              <span className="text-accent font-semibold">⚠ Esta conversación no está abierta al público.</span>
+            </p>
+            <p className="text-xs sm:text-sm text-white/70 text-center">
+              Solo llegaste aquí por invitación directa.
+            </p>
+            <p className="text-xs sm:text-sm text-white/60 text-center font-medium">
+              Sin riesgo. Sin pagos. Solo compartimos los resultados.
+            </p>
+          </div>
         </div>
 
         {/* Image */}
@@ -62,10 +84,10 @@ export const Hero = () => {
           <div className="relative rounded-2xl sm:rounded-3xl overflow-hidden shadow-strong aspect-[4/5] sm:aspect-[3/4] md:aspect-[5/4] lg:aspect-[4/3]">
             <img
               src={heroLeader}
-              alt="Líder de negocios exitoso y confiado"
+              alt="Empresario de cuero visionario y exitoso"
               className="w-full h-full object-cover object-center"
               loading="eager"
-              fetchPriority="high"
+              fetchpriority="high"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
           </div>

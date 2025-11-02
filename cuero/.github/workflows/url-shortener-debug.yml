@@ -1,0 +1,65 @@
+name: URL Shortener Debug
+
+on:
+  workflow_dispatch:
+    inputs:
+      shortCode:
+        description: 'Short code'
+        required: true
+        type: string
+      longUrl:
+        description: 'Long URL to redirect to'
+        required: true
+        type: string
+      expirationHours:
+        description: 'Expiration in hours (default: 72)'
+        required: false
+        type: string
+        default: '72'
+      metadata:
+        description: 'Metadata (JSON format)'
+        required: false
+        type: string
+        default: '{}'
+
+jobs:
+  debug-inputs:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Debug Input Processing
+      run: |
+        echo "DEBUG: Starting input processing test"
+
+        # Test different ways of parsing the metadata
+        echo "=== METHOD 1: Double quotes ==="
+        METADATA1="${{ github.event.inputs.metadata }}"
+        echo "Length: ${#METADATA1}"
+        echo "Preview: ${METADATA1:0:100}..."
+
+        echo "=== METHOD 2: Single quotes ==="
+        METADATA2='${{ github.event.inputs.metadata }}'
+        echo "Length: ${#METADATA2}"
+        echo "Preview: ${METADATA2:0:100}..."
+
+        echo "=== METHOD 3: With printf ==="
+        METADATA3=$(printf '%s' "${{ github.event.inputs.metadata }}")
+        echo "Length: ${#METADATA3}"
+        echo "Preview: ${METADATA3:0:100}..."
+
+        echo "=== OTHER INPUTS ==="
+        echo "Short code: ${{ github.event.inputs.shortCode }}"
+        echo "Long URL length: ${{ github.event.inputs.longUrl }}"
+        echo "Long URL preview: ${{ github.event.inputs.longUrl }}"
+
+        # Create a simple test file
+        echo "Creating test file with metadata..."
+        cat > test_metadata.json << EOF
+        {
+          "input": "${{ github.event.inputs.metadata }}",
+          "length": ${#METADATA1},
+          "test": "success"
+        }
+        EOF
+
+        cat test_metadata.json

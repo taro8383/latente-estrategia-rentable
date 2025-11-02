@@ -1,4 +1,4 @@
-import logo from "/LoDi.svg";
+import logo from "/LoDi-logo.svg";
 
 export const Footer = () => {
   return (
