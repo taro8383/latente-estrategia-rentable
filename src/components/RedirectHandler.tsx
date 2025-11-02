@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
 import { AlertCircle, ExternalLink, Clock } from 'lucide-react';
 import { URLShortener } from '@/utils/urlShortener';
 
-interface RedirectHandlerProps {
-  shortCode: string;
-}
-
-export const RedirectHandler: React.FC<RedirectHandlerProps> = ({ shortCode }) => {
+export const RedirectHandler: React.FC = () => {
+  const { shortCode } = useParams<{ shortCode: string }>();
   const [isRedirecting, setIsRedirecting] = useState(true);
   const [redirectStatus, setRedirectStatus] = useState('Iniciando redirección...');
   const [countdown, setCountdown] = useState(3);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    // Check if shortCode is available
+    if (!shortCode) {
+      console.log('🔍 REDIRECT DEBUG: No shortCode provided');
+      setError('Código de redirección no proporcionado');
+      setIsRedirecting(false);
+      return;
+    }
+
     const performRedirect = async () => {
       try {
         setRedirectStatus('Buscando enlace...');
@@ -110,7 +116,7 @@ export const RedirectHandler: React.FC<RedirectHandlerProps> = ({ shortCode }) =
           <div className="flex items-center justify-center gap-2">
             <span className="text-white/70">Código:</span>
             <code className="bg-black/30 px-3 py-1 rounded-lg text-accent font-mono text-sm">
-              {shortCode}
+              {shortCode || 'N/A'}
             </code>
           </div>
         </div>
