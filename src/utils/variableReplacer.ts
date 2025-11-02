@@ -183,9 +183,9 @@ export class VariableReplacer {
 
     let result = text;
 
-    // TEMP DEBUG: Log gender processing for common phrases
-    if (text.includes('Bienvenido') || text.includes('estimado empresario') || text.includes('está listo para')) {
-      console.log('GENDER DEBUG:', { originalText: text, gender, hasGenderInfo: !!this.data.genderInfo });
+    // TEMP DEBUG: Log all gender processing for debugging
+    if (this.data.genderInfo?.gender === 'female') {
+      console.log('GENDER DEBUG (FEMALE):', { originalText: text, gender: this.data.genderInfo.gender, hasGenderInfo: !!this.data.genderInfo });
     }
 
     // Apply gender-specific replacements
@@ -196,9 +196,9 @@ export class VariableReplacer {
       }
     });
 
-    // TEMP DEBUG: Log result for common phrases
-    if (text.includes('Bienvenido') || text.includes('estimado empresario') || text.includes('está listo para')) {
-      console.log('GENDER DEBUG RESULT:', { originalText: text, result, changed: text !== result });
+    // TEMP DEBUG: Log all results for female gender
+    if (this.data.genderInfo?.gender === 'female') {
+      console.log('GENDER DEBUG RESULT (FEMALE):', { originalText: text, result, changed: text !== result });
     }
 
     return result;
@@ -210,7 +210,12 @@ export class VariableReplacer {
 
   replace(text: string): string {
     if (!text) return text;
-    
+
+    // TEMP DEBUG: Log all replace calls
+    if (this.data.genderInfo?.gender === 'female') {
+      console.log('REPLACE METHOD DEBUG (FEMALE):', { originalText: text, hasGenderInfo: !!this.data.genderInfo });
+    }
+
     // Apply gender replacements first
     let processedText = this.applyGenderReplacements(text);
     
