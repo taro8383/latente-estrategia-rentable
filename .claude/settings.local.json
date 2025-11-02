@@ -20,7 +20,8 @@
       "Bash(./test-fix-updated.sh:*)",
       "Bash(./test-final-fix.sh:*)",
       "Bash(find:*)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git pull:*)"
     ],
     "deny": [],
     "ask": []

@@ -10,33 +10,16 @@ export const RedirectHandler: React.FC = () => {
   const [countdown, setCountdown] = useState(3);
   const [error, setError] = useState<string | null>(null);
 
-  // Force cache busting - check if we're getting stale bundle
-  const isStaleBundle = document.querySelector('script[src*="index-Co5MUkOF.js"]');
-  if (isStaleBundle) {
-    console.log('🔍 REDIRECT DEBUG: Detected stale bundle, forcing reload');
-    window.location.reload(true);
-    return null;
-  }
-
-  // Debug URL parsing immediately
-  console.log('🔍 REDIRECT DEBUG: Component mounted');
-  console.log('🔍 REDIRECT DEBUG: window.location.href:', window.location.href);
-  console.log('🔍 REDIRECT DEBUG: window.location.hash:', window.location.hash);
-  console.log('🔍 REDIRECT DEBUG: useParams result:', shortCode);
-  console.log('🔍 REDIRECT DEBUG: Expected shortCode from URL:', window.location.hash.split('/')[2]);
-  console.log('🔍 REDIRECT DEBUG: Browser navigation type:', performance.navigation.type);
-  console.log('🔍 REDIRECT DEBUG: Is redirect:', performance.navigation.type === 1);
-  console.log('🔍 REDIRECT DEBUG: Referrer:', document.referrer);
-  console.log('🔍 REDIRECT DEBUG: Script elements:', document.querySelectorAll('script[src*="index-"]').length);
-
   useEffect(() => {
     // Check if shortCode is available
     if (!shortCode) {
-      console.log('🔍 REDIRECT DEBUG: No shortCode provided');
+      console.log('🔍 RedirectHandler: No shortCode provided');
       setError('Código de redirección no proporcionado');
       setIsRedirecting(false);
       return;
     }
+
+    console.log('🔍 RedirectHandler: Processing shortCode:', shortCode);
 
     const performRedirect = async () => {
       try {
@@ -45,27 +28,23 @@ export const RedirectHandler: React.FC = () => {
         // Use the async getLongUrl method to fetch from GitHub Pages
         const longUrl = await URLShortener.getLongUrl(shortCode);
 
-        console.log('🔍 REDIRECT DEBUG: ShortCode:', shortCode);
-        console.log('🔍 REDIRECT DEBUG: LongUrl result:', longUrl);
-        console.log('🔍 REDIRECT DEBUG: Current URL:', window.location.href);
-        console.log('🔍 REDIRECT DEBUG: Current origin:', window.location.origin);
+        console.log('🔍 RedirectHandler: Found longUrl:', longUrl ? '✅' : '❌');
 
         if (longUrl) {
-          console.log('🔍 REDIRECT DEBUG: About to redirect to:', longUrl);
           setRedirectStatus('Redirigiendo...');
 
           // Simple direct redirect to avoid URL malformation
           setTimeout(() => {
-            console.log('🔍 REDIRECT DEBUG: Executing window.location.replace with:', longUrl);
+            console.log('🔍 RedirectHandler: Redirecting to:', longUrl);
             window.location.replace(longUrl);
           }, 1000);
         } else {
-          console.log('🔍 REDIRECT DEBUG: No longUrl found, setting error');
+          console.log('🔍 RedirectHandler: No mapping found for shortCode');
           setError('Enlace no encontrado o expirado');
           setIsRedirecting(false);
         }
       } catch (error) {
-        console.error('Error during redirect:', error);
+        console.error('🔍 RedirectHandler: Error during redirect:', error);
         setError('Error al procesar el enlace');
         setIsRedirecting(false);
       }
