@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latente - Redirecting...</title>
+    <script>
+        // URL Shortener & SPA Redirect Handler
+        (function() {
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var hash = window.location.hash;
+
+            // Extract short code from path (remove leading/trailing slashes)
+            var shortCode = path.replace(/^\/|\/$/g, '');
+
+            console.log('Checking for short code:', shortCode);
+
+            // Try to load URL mappings and redirect if found
+            fetch('/url-mappings.json')
+                .then(function(response) {
+                    if (!response.ok) {
+                        throw new Error('Could not load URL mappings');
+                    }
+                    return response.json();
+                })
+                .then(function(data) {
+                    console.log('Loaded URL mappings:', data);
+
+                    if (data.mappings && data.mappings[shortCode]) {
+                        var mapping = data.mappings[shortCode];
+                        var now = Date.now();
+
+                        console.log('Found mapping:', mapping);
+
+                        // Check if mapping has expired
+                        if (mapping.expiresAt && now > mapping.expiresAt) {
+                            console.log('Mapping has expired');
+                            redirectToMainApp();
+                        } else {
+                            console.log('Redirecting to:', mapping.longUrl);
+                            // Redirect to the long URL
+                            window.location.replace(mapping.longUrl + search + hash);
+                        }
+                    } else {
+                        console.log('No mapping found for:', shortCode);
+                        redirectToMainApp();
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Error loading URL mappings:', error);
+                    // Fallback to main app if there's an error
+                    redirectToMainApp();
+                });
+
+            function redirectToMainApp() {
+                // Modern GitHub Pages SPA redirect
+                // Redirect to index.html with the full path preserved
+                window.location.replace(
+                    window.location.origin + '/index.html' +
+                    '#/' + path.replace(/^\//, '') + search + hash
+                );
+            }
+        })();
+    </script>
+</head>
+<body>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 50px; background: #1a1a1a; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div>
+            <h1>🔄 Redirigiendo...</h1>
+            <p>Si no eres redirigido automáticamente, <a href="/" style="color: #4f46e5;">haz clic aquí</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
