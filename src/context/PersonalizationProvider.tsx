@@ -43,27 +43,10 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
   const { isExpired, isLoading, timeRemaining, uniqueCode } = useExpirationCheck();
 
   useEffect(() => {
-    console.log('Debug: useEffect running, isLoading=', isLoading);
     // Shortened retry window for faster perceived redirects.
     // This keeps robustness but reduces waiting from ~1.2s to ~300ms.
     const RETRY_MAX_ATTEMPTS = 6;
     const RETRY_INTERVAL_MS = 50;
- // 🔍 PERSONALIZATION DEBUG: record localStorage debug keys at parse start
- try {
-   const existing = localStorage.getItem('incoming_personalization_payload');
-   const writer = localStorage.getItem('incoming_personalization_writer');
-   const ts = localStorage.getItem('incoming_personalization_payload_ts');
-   console.debug('🔍 PERSONALIZATION DEBUG: parsePersonalizationData start', {
-     hash: window.location.hash,
-     search: window.location.search,
-     existingPayloadPresent: !!existing,
-     existingPayloadLen: existing ? existing.length : 0,
-     incoming_writer: writer,
-     incoming_ts: ts
-   });
- } catch (dbgErr) {
-   console.warn('🔍 PERSONALIZATION DEBUG: unable to read debug keys from localStorage', dbgErr);
- }
     const parsePersonalizationData = () => {
       try {
         // Handle both hash routing and query parameters
@@ -105,7 +88,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
             }
 
             let parsedData: PersonalizationData | null = null;
-            console.debug('Encoded personalization payload (trim):', String(safeBase64).slice(0, 200));
 
             // 1) UTF-8 safe decode (atob -> percent-escape -> decodeURIComponent)
             try {
@@ -114,20 +96,16 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
                 .call(binary, (c: string) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
                 .join('');
               parsedData = JSON.parse(decodeURIComponent(uri));
-              console.debug('Decoded personalization payload using UTF-8-safe method');
             } catch (utfErr) {
-              console.debug('UTF-8-safe decode failed, trying URL-safe and plain atob', utfErr);
 
               // 2) URL-safe base64 variant (replace - _ -> + /)
               try {
                 const alt = (safeBase64 as string).replace(/-/g, '+').replace(/_/g, '/');
                 parsedData = JSON.parse(atob(alt));
-                console.debug('Decoded personalization payload using URL-safe atob');
               } catch (urlErr) {
                 // 3) Plain atob
                 try {
                   parsedData = JSON.parse(atob(safeBase64 as string));
-                  console.debug('Decoded personalization payload using plain atob');
                 } catch (plainErr) {
                   console.error('Failed to decode personalization payload (all strategies):', payload, plainErr);
                   parsedData = null;
@@ -137,11 +115,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
 
             if (!parsedData) {
               console.warn('Could not parse personalization payload, aborting parse');
-              console.debug('Failed payload details:', {
-                length: payload?.length,
-                preview: payload?.substring(0, 100),
-                usedIncomingPayload
-              });
               setReplacer(new VariableReplacer({}));
               setIsPersonalized(false);
               return;
@@ -151,7 +124,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
             // Defer logo lookup so we don't block the initial render.
             let deferredLogoCandidate: string | null = null;
             if ((parsedData as any).companyLogo) {
-              console.log('Company logo provided directly in payload');
             } else {
               deferredLogoCandidate =
                 (parsedData as any).companyLogoId ||
@@ -172,7 +144,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
               if (!hasRequiredFields) {
                 console.warn('Personalization data missing required structure, but proceeding anyway');
               }
-              console.log('About to setData and setReplacer');
               setData(parsedData);
               const newReplacer = new VariableReplacer(parsedData);
               setReplacer(newReplacer);
@@ -183,11 +154,9 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
                   // Try to get object URL first for instant rendering
                   const objectUrl = LogoStorage.getLogo(deferredLogoCandidate as string);
                   if (objectUrl && objectUrl.startsWith('blob:')) {
-                    console.log('Optimized: Using object URL for instant logo rendering:', deferredLogoCandidate);
                     setData(prev => ({ ...(prev as any), companyLogo: objectUrl, companyLogoId: deferredLogoCandidate }));
                   } else if (objectUrl && objectUrl.startsWith('data:')) {
                     // Object URL not available, but we have base64 - use it directly
-                    console.log('Using base64 logo data directly:', deferredLogoCandidate);
                     setData(prev => ({ ...(prev as any), companyLogo: objectUrl, companyLogoId: deferredLogoCandidate }));
                   } else {
                     // No logo data available at all
@@ -200,7 +169,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
                 sessionStorage.setItem('personalization_active_expires', String(Date.now() + 15000)); // 15s
                 const currentHash = window.location.hash || '#/';
                 localStorage.setItem('last_good_hash', currentHash);
-                console.debug('Personalization active; saved last_good_hash=', currentHash);
 
                 personalizationReady = true;
                 personalizationReadyCallbacks.forEach(callback => {
@@ -219,15 +187,11 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
               try {
                 if (usedIncomingPayload) {
                   localStorage.removeItem('incoming_personalization_payload');
-                  console.debug('Removed incoming_personalization_payload after successful parse');
                 }
               } catch (rmErr) {
                 console.warn('Failed to remove incoming_personalization_payload', rmErr);
               }
 
-              console.log('Personalization data loaded:', parsedData);
-              console.log('Replacer created:', !!newReplacer);
-              console.log('Available variables:', newReplacer.getAvailableVariables());
             } else {
               console.warn('Invalid personalization data structure');
               setReplacer(new VariableReplacer({}));
@@ -258,11 +222,9 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
           try {
             const incoming = localStorage.getItem('incoming_personalization_payload');
             if (incoming) {
-              console.debug('🔍 PERSONALIZATION DEBUG: incoming payload found in fast path, processing now');
               processEncodedPayload(incoming, true);
               return;
             }
-            console.debug('🔍 PERSONALIZATION DEBUG: no incoming payload in fast path - relying on incoming_personalization_written event');
           } catch (e) {
             console.warn('🔍 PERSONALIZATION DEBUG: error reading incoming_personalization_payload in fast path', e);
           }
@@ -284,7 +246,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
     };
 
     const onHashChange = () => {
-      console.log('Hash changed, re-parsing personalization data. newHash=', window.location.hash);
 
       // Guard: if personalization was just loaded (short-lived), prevent noisy navigation
       // to the generic /invitation-required route which causes the personalized page to flash and disappear.
@@ -311,7 +272,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
     };
 
     if (!isLoading) {
-      console.log('Debug: About to call parsePersonalizationData');
       parsePersonalizationData();
 
       // Set personalization as ready after initial parse attempt
@@ -323,7 +283,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
   
       setTimeout(() => {
         if (!personalizationReady) {
-          console.log('Debug: Setting personalizationReady = true (no data case) after wait:', readyTimeout);
           personalizationReady = true;
   
           // Notify any waiting callbacks
@@ -340,7 +299,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
         }
       }, readyTimeout); // Wait for retry window before marking ready
     } else {
-      console.log('Debug: Still loading, not parsing data');
     }
 
     // Listen for incoming_personalization_written events dispatched by RedirectHandler
@@ -392,7 +350,6 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
 
   // Show loading state while checking expiration
   if (isLoading) {
-    console.log('Debug: Showing loading state');
     return (
       <div className="min-h-screen hero-gradient text-primary-foreground flex items-center justify-center">
         <div className="text-center">

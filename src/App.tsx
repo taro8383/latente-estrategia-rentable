@@ -10,7 +10,6 @@ import NotFound from "./pages/NotFound";
 import { ExpiredOffer } from "@/components/ExpiredOffer";
 import { RedirectHandler } from "@/components/RedirectHandler";
 import InvitationRequired from "@/components/InvitationRequired";
-import { DebugDisplay } from "@/components/DebugDisplay";
 
 const queryClient = new QueryClient();
 
@@ -41,7 +40,6 @@ const App = () => {
             </Routes>
           </HashRouter>
         </PersonalizationProvider>
-          <DebugDisplay />
       </TooltipProvider>
     </QueryClientProvider>
   );
@@ -58,7 +56,6 @@ const IndexWithExpirationCheck = () => {
     // Register callback to be notified when personalization is ready
     useEffect(() => {
       onPersonalizationReady(() => {
-        console.log('Personalization ready callback triggered in IndexWithExpirationCheck');
         setWaitingForPersonalization(false);
       });
     }, []);
@@ -87,7 +84,6 @@ const IndexWithExpirationCheck = () => {
       try {
         const incomingPayload = localStorage.getItem('incoming_personalization_payload');
         if (incomingPayload) {
-          console.log('Incoming personalization payload detected in localStorage; deferring redirect and showing loading state');
           return (
             <div className="min-h-screen hero-gradient text-primary-foreground flex items-center justify-center">
               <div className="text-center">
@@ -98,56 +94,12 @@ const IndexWithExpirationCheck = () => {
           );
         }
       } catch (e) {
-        console.warn('Error reading incoming_personalization_payload from localStorage', e);
-      }
-
-      console.log('🚨 REDIRECT WOULD HAPPEN HERE - BUT DISABLED FOR DEBUGGING');
-      console.log('🚨 Debug info:');
-      console.log('  - isPersonalized:', isPersonalized);
-      console.log('  - waitingForPersonalization:', waitingForPersonalization);
-      console.log('  - isLoading:', isLoading);
-      console.log('  - hasPersonalizationData:', hasPersonalizationData);
-      console.log('  - data keys:', Object.keys(data));
-      console.log('  - data:', data);
-      console.log('  - replacer exists:', !!replacer);
-      console.log('  - replacer variables:', replacer ? Object.keys(replacer.getAvailableVariables()) : []);
-      console.log('  - current URL:', window.location.href);
-      console.log('  - hash:', window.location.hash);
-      console.log('  - search:', window.location.search);
-      
-      // Check localStorage for any stored data
-      try {
-        const incomingPayload = localStorage.getItem('incoming_personalization_payload');
-        console.log('  - incoming_personalization_payload in localStorage:', !!incomingPayload);
-        if (incomingPayload) {
-          console.log('  - payload preview:', incomingPayload.substring(0, 100));
-        }
-      } catch (e) {
-        console.log('  - error reading localStorage:', e);
-      }
-      
-      // Check sessionStorage
-      try {
-        const personalizationActive = sessionStorage.getItem('personalization_active');
-        console.log('  - personalization_active in sessionStorage:', personalizationActive);
-      } catch (e) {
-        console.log('  - error reading sessionStorage:', e);
+        // Error reading incoming_personalization_payload from localStorage
       }
       
       // Redirect to invitation-required page if no personalization data
       return <Navigate to="/invitation-required" replace />;
     }
-    
-    // Debug logging to track state
-    console.log('IndexWithExpirationCheck state:', {
-      isPersonalized,
-      isExpired,
-      isLoading,
-      waitingForPersonalization,
-      hasPersonalizationData,
-      dataKeys: Object.keys(data),
-      availableVars: replacer ? replacer.getAvailableVariables() : []
-    });
     
     // Check if invitation has expired
     if (isExpired) {

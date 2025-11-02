@@ -26,9 +26,7 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     if (logoData) {
       // Debug: log presence and a short preview of the incoming data URI
       try {
-        console.log('CompanyLogo: received logoData, startsWith data:', (logoData as string).startsWith('data:'), 'length:', logoData.length);
       } catch (e) {
-        console.log('CompanyLogo: received logoData (unable to inspect)', e);
       }
       setLogoSrc(logoData);
       setHasError(false);
@@ -80,23 +78,19 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
     logoRequestTimeRef.current = performance.now();
 
     // Try to get logo (may return base64 immediately or cached objectUrl)
-    console.debug('CompanyLogo: requesting logo for id', possibleId);
     const result = LogoStorage.getLogo(possibleId);
 
     if (result) {
       if ((result as string).startsWith('blob:')) {
-        console.debug('CompanyLogo: received objectUrl immediately for', possibleId);
         setLogoSrc(result as string);
         setHasError(false);
         setIsLoading(false);
       } else {
-        console.debug('CompanyLogo: received base64/fallback immediately for', possibleId, 'length=', (result as string).length);
         setLogoSrc(result as string);
         setHasError(false);
         setIsLoading(false);
       }
     } else {
-      console.debug('CompanyLogo: no logo returned for', possibleId);
     }
 
     // Listen for async object-url ready event and upgrade image src when ready
@@ -106,14 +100,12 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
         if (!detail || detail.id !== possibleId) return;
         const objectUrl = detail.objectUrl as string;
         const elapsed = logoRequestTimeRef.current ? Math.round(performance.now() - logoRequestTimeRef.current) : null;
-        console.debug('CompanyLogo: logoObjectUrlReady for', possibleId, 'elapsed_ms=', elapsed);
         if (objectUrl && objectUrl.startsWith('blob:')) {
           setLogoSrc(objectUrl);
           setHasError(false);
           setIsLoading(false);
         }
       } catch (err) {
-        console.debug('CompanyLogo: error handling logoObjectUrlReady', err);
       }
     };
 
@@ -149,7 +141,6 @@ export const CompanyLogo: React.FC<CompanyLogoProps> = ({
   };
 
   const handleImageLoad = () => {
-    console.log('CompanyLogo: image loaded successfully, srcPreview=', logoSrc ? ((logoSrc as string).substring(0, 80) + ((logoSrc as string).length > 80 ? '...' : '')) : 'null');
     setIsLoading(false);
     setHasError(false);
   };

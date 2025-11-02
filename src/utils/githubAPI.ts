@@ -150,7 +150,6 @@ export class GitHubAPI {
                 sha = data.sha;
             }
         } catch (error) {
-            console.log('File does not exist yet, will create new');
         }
 
         // Commit the updated file
@@ -183,7 +182,6 @@ export class GitHubAPI {
             throw new Error(`Failed to commit mappings: ${errorData.message}`);
         }
 
-        console.log('✅ Successfully committed URL mappings to GitHub');
     }
 
     /**
@@ -227,7 +225,6 @@ export class GitHubAPI {
                 `Add URL mapping: ${mapping.shortCode}`
             );
 
-            console.log('✅ URL mapping stored successfully');
 
         } catch (error) {
             console.error('❌ Failed to store URL mapping:', error);
@@ -269,9 +266,7 @@ export class GitHubAPI {
                     'Cleanup expired URL mappings'
                 );
 
-                console.log('✅ Cleaned up expired mappings');
             } else {
-                console.log('ℹ️ No expired mappings to clean up');
             }
 
         } catch (error) {

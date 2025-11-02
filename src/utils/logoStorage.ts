@@ -59,19 +59,16 @@ export class LogoStorage {
     try {
       if (this.objectUrlCache.has(id)) {
         const cached = this.objectUrlCache.get(id)!;
-        console.debug('[LogoStorage] objectUrlCache hit for', id);
         return cached;
       }
 
       const logos = this.getLogos();
       const logo = logos[id];
       if (!logo) {
-        console.debug('[LogoStorage] no logo found for', id);
         return null;
       }
 
       if (Date.now() > logo.expiresAt) {
-        console.debug('[LogoStorage] logo expired for', id);
         delete logos[id];
         localStorage.setItem(this.STORAGE_KEY, JSON.stringify(logos));
         return null;
@@ -80,7 +77,6 @@ export class LogoStorage {
       // Immediately return base64 to avoid blocking initial render.
       // Then schedule conversion to object URL asynchronously.
       const immediate = logo.data;
-      console.debug('[LogoStorage] returning immediate base64 for', id, 'scheduling async object-url conversion');
 
       // If async conversion already in progress (objectUrlCache miss but conversion scheduled), we still return base64.
       setTimeout(() => {
@@ -96,13 +92,11 @@ export class LogoStorage {
 
           if (objectUrl) {
             this.objectUrlCache.set(id, objectUrl);
-            console.debug('[LogoStorage] async conversion done for', id, 'elapsed_ms=', elapsed);
             // Do NOT persist blob: URLs to localStorage. They are invalid across sessions.
             // Notify listeners that object URL is ready
             try {
               window.dispatchEvent(new CustomEvent('logoObjectUrlReady', { detail: { id, objectUrl } }));
             } catch (e) {
-              console.debug('[LogoStorage] failed to dispatch logoObjectUrlReady event', e);
             }
           } else {
             console.warn('[LogoStorage] async conversion returned null for', id);
@@ -154,7 +148,6 @@ export class LogoStorage {
       try {
         URL.revokeObjectURL(objectUrl);
       } catch (e) {
-        console.debug('[LogoStorage] revokeObjectURL failed', e);
       }
       this.objectUrlCache.delete(id);
     }
@@ -181,7 +174,6 @@ export class LogoStorage {
       try {
         URL.revokeObjectURL(url);
       } catch (e) {
-        console.debug('[LogoStorage] revoke failed during clear', e);
       }
     });
     this.objectUrlCache.clear();
