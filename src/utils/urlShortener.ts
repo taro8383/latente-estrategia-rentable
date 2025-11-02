@@ -36,12 +36,7 @@ export class URLShortener {
     private static getMappings(): StoredMappings {
         try {
             const stored = localStorage.getItem(this.STORAGE_KEY);
-            console.log('🔍 URL SHORTENER DEBUG: Raw localStorage data:', stored);
-            console.log('🔍 URL SHORTENER DEBUG: Storage key:', this.STORAGE_KEY);
-            console.log('🔍 URL SHORTENER DEBUG: localStorage available:', typeof localStorage !== 'undefined');
-            
             const parsed = stored ? JSON.parse(stored) : {};
-            console.log('🔍 URL SHORTENER DEBUG: Parsed mappings:', parsed);
             return parsed;
         } catch (error) {
             console.error('Failed to parse URL mappings:', error);
@@ -121,38 +116,22 @@ export class URLShortener {
                 mappingsUrl = `${window.location.origin}/url-mappings.json`;
             }
 
-            console.log('🔍 URLSHORTENER DEBUG: Fetching from:', mappingsUrl);
-            console.log('🔍 URLSHORTENER DEBUG: Looking for shortCode:', shortCode);
-
             const response = await fetch(mappingsUrl);
-            console.log('🔍 URLSHORTENER DEBUG: Response status:', response.status);
-            console.log('🔍 URLSHORTENER DEBUG: Response ok:', response.ok);
 
             if (response.ok) {
                 const mappingsData = await response.json();
-                console.log('🔍 URLSHORTENER DEBUG: Mappings data keys:', Object.keys(mappingsData));
-                console.log('🔍 URLSHORTENER DEBUG: Mappings count:', Object.keys(mappingsData.mappings || {}).length);
 
                 if (mappingsData.mappings && mappingsData.mappings[shortCode]) {
                     const mapping = mappingsData.mappings[shortCode];
-                    console.log('🔍 URLSHORTENER DEBUG: Found mapping:', mapping);
 
                     // Check if mapping has expired
                     if (Date.now() <= mapping.expiresAt) {
-                        console.log('🔍 URLSHORTENER DEBUG: Mapping valid, returning:', mapping.longUrl);
                         return mapping.longUrl;
-                    } else {
-                        console.log('🔍 URLSHORTENER DEBUG: Mapping expired');
                     }
-                } else {
-                    console.log('🔍 URLSHORTENER DEBUG: No mapping found for shortCode');
-                    console.log('🔍 URLSHORTENER DEBUG: Available shortCodes:', Object.keys(mappingsData.mappings || {}));
                 }
-            } else {
-                console.log('🔍 URLSHORTENER DEBUG: Failed to fetch, response text:', await response.text());
             }
         } catch (error) {
-            console.error('🔍 URLSHORTENER DEBUG: Failed to fetch mapping from server:', error);
+            console.error('Failed to fetch mapping from server:', error);
         }
 
         return null; // Not found or expired

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { AlertCircle, ExternalLink, Clock } from 'lucide-react';
 import { URLShortener } from '@/utils/urlShortener';
+import logo from "/LoDi-logo.svg";
 
 export const RedirectHandler: React.FC = () => {
   const { shortCode } = useParams<{ shortCode: string }>();
@@ -13,13 +14,10 @@ export const RedirectHandler: React.FC = () => {
   useEffect(() => {
     // Check if shortCode is available
     if (!shortCode) {
-      console.log('🔍 RedirectHandler: No shortCode provided');
       setError('Código de redirección no proporcionado');
       setIsRedirecting(false);
       return;
     }
-
-    console.log('🔍 RedirectHandler: Processing shortCode:', shortCode);
 
     const performRedirect = async () => {
       try {
@@ -28,23 +26,18 @@ export const RedirectHandler: React.FC = () => {
         // Use the async getLongUrl method to fetch from GitHub Pages
         const longUrl = await URLShortener.getLongUrl(shortCode);
 
-        console.log('🔍 RedirectHandler: Found longUrl:', longUrl ? '✅' : '❌');
-
         if (longUrl) {
           setRedirectStatus('Redirigiendo...');
 
           // Simple direct redirect to avoid URL malformation
           setTimeout(() => {
-            console.log('🔍 RedirectHandler: Redirecting to:', longUrl);
             window.location.replace(longUrl);
           }, 1000);
         } else {
-          console.log('🔍 RedirectHandler: No mapping found for shortCode');
           setError('Enlace no encontrado o expirado');
           setIsRedirecting(false);
         }
       } catch (error) {
-        console.error('🔍 RedirectHandler: Error during redirect:', error);
         setError('Error al procesar el enlace');
         setIsRedirecting(false);
       }
@@ -81,6 +74,13 @@ export const RedirectHandler: React.FC = () => {
 
         <div className="relative z-10 text-center max-w-md w-full px-4">
           <div className="bg-accent/10 backdrop-blur-sm rounded-2xl p-8 border border-accent/20">
+            {/* Company Logo */}
+            <img
+              src={logo}
+              alt="LoDi Logo"
+              className="h-12 w-auto mx-auto mb-6"
+            />
+
             <AlertCircle className="w-20 h-20 text-accent mx-auto mb-6" />
             <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white">Enlace Inválido</h1>
             <p className="text-lg md:text-xl text-white/90 mb-8 leading-relaxed">
@@ -109,6 +109,13 @@ export const RedirectHandler: React.FC = () => {
 
       <div className="relative z-10 text-center max-w-2xl w-full px-4">
         <div className="bg-accent/10 backdrop-blur-sm rounded-2xl p-8 border border-accent/20">
+          {/* Company Logo */}
+          <img
+            src={logo}
+            alt="LoDi Logo"
+            className="h-12 w-auto mx-auto mb-8"
+          />
+
           {/* Main loading animation */}
           <div className="relative mb-8">
             <div className="w-24 h-24 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto"></div>
