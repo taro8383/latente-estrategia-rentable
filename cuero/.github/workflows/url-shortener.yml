@@ -160,74 +160,72 @@ jobs:
           mkdir -p public
         fi
 
-        # Create simple Node script
-        cat > process_mappings.js << 'EOF'
-        const fs = require('fs');
-        const mappings = JSON.parse(process.env.MAPPINGS);
-        const shortCode = process.env.SHORT_CODE;
-        const longUrl = process.env.LONG_URL;
-        const expiresAt = parseInt(process.env.EXPIRES_AT);
-
-        let metadata;
-        try {
-          metadata = JSON.parse(process.env.METADATA || '{}');
-        } catch (error) {
-          console.log('DEBUG: JSON parse failed, trying JavaScript evaluation');
-          console.log('DEBUG: Metadata input:', process.env.METADATA);
-          try {
-            // Use Function constructor for safer evaluation
-            const jsObject = new Function('return ' + process.env.METADATA)();
-            metadata = jsObject;
-            console.log('DEBUG: Successfully evaluated metadata as JavaScript object');
-          } catch (fallbackError) {
-            console.log('WARNING: Could not parse metadata, using empty object');
-            console.log('DEBUG: Original METADATA value:', process.env.METADATA);
-            metadata = {};
-          }
-        }
-
-        console.log('DEBUG: Starting Node.js processing');
-        console.log('DEBUG: Current mappings count:', Object.keys(mappings.mappings).length);
-
-        // Add new mapping
-        mappings.mappings[shortCode] = {
-          shortCode: shortCode,
-          longUrl: longUrl,
-          createdAt: Date.now(),
-          expiresAt: expiresAt,
-          metadata: metadata
-        };
-        mappings.lastUpdated = Date.now();
-
-        // Update statistics
-        const now = Date.now();
-        let activeCount = 0;
-        let expiredCount = 0;
-
-        Object.values(mappings.mappings).forEach(mapping => {
-          if (now > mapping.expiresAt) {
-            expiredCount++;
-          } else {
-            activeCount++;
-          }
-        });
-
-        mappings.statistics = {
-          totalMappings: Object.keys(mappings.mappings).length,
-          activeMappings: activeCount,
-          expiredMappings: expiredCount
-        };
-
-        // Write updated mappings
-        fs.writeFileSync('public/url-mappings.json', JSON.stringify(mappings, null, 2));
-
-        console.log('URL mapping stored successfully');
-        console.log('Short code:', shortCode);
-        console.log('Long URL:', longUrl);
-        console.log('Expires at:', new Date(expiresAt).toISOString());
-        console.log('Total mappings:', Object.keys(mappings.mappings).length);
-        console.log('Active mappings:', activeCount);
-        EOF
+        # Create simple Node script using echo to avoid heredoc issues
+        echo 'const fs = require("fs");' > process_mappings.js
+        echo 'const mappings = JSON.parse(process.env.MAPPINGS);' >> process_mappings.js
+        echo 'const shortCode = process.env.SHORT_CODE;' >> process_mappings.js
+        echo 'const longUrl = process.env.LONG_URL;' >> process_mappings.js
+        echo 'const expiresAt = parseInt(process.env.EXPIRES_AT);' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo 'let metadata;' >> process_mappings.js
+        echo 'try {' >> process_mappings.js
+        echo '  metadata = JSON.parse(process.env.METADATA || "{}");' >> process_mappings.js
+        echo '} catch (error) {' >> process_mappings.js
+        echo '  console.log("DEBUG: JSON parse failed, trying JavaScript evaluation");' >> process_mappings.js
+        echo '  console.log("DEBUG: Metadata input:", process.env.METADATA);' >> process_mappings.js
+        echo '  try {' >> process_mappings.js
+        echo '    // Use Function constructor for safer evaluation' >> process_mappings.js
+        echo '    const jsObject = new Function("return " + process.env.METADATA)();' >> process_mappings.js
+        echo '    metadata = jsObject;' >> process_mappings.js
+        echo '    console.log("DEBUG: Successfully evaluated metadata as JavaScript object");' >> process_mappings.js
+        echo '  } catch (fallbackError) {' >> process_mappings.js
+        echo '    console.log("WARNING: Could not parse metadata, using empty object");' >> process_mappings.js
+        echo '    console.log("DEBUG: Original METADATA value:", process.env.METADATA);' >> process_mappings.js
+        echo '    metadata = {};' >> process_mappings.js
+        echo '  }' >> process_mappings.js
+        echo '}' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo 'console.log("DEBUG: Starting Node.js processing");' >> process_mappings.js
+        echo 'console.log("DEBUG: Current mappings count:", Object.keys(mappings.mappings).length);' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo '// Add new mapping' >> process_mappings.js
+        echo 'mappings.mappings[shortCode] = {' >> process_mappings.js
+        echo '  shortCode: shortCode,' >> process_mappings.js
+        echo '  longUrl: longUrl,' >> process_mappings.js
+        echo '  createdAt: Date.now(),' >> process_mappings.js
+        echo '  expiresAt: expiresAt,' >> process_mappings.js
+        echo '  metadata: metadata' >> process_mappings.js
+        echo '};' >> process_mappings.js
+        echo 'mappings.lastUpdated = Date.now();' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo '// Update statistics' >> process_mappings.js
+        echo 'const now = Date.now();' >> process_mappings.js
+        echo 'let activeCount = 0;' >> process_mappings.js
+        echo 'let expiredCount = 0;' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo 'Object.values(mappings.mappings).forEach(mapping => {' >> process_mappings.js
+        echo '  if (now > mapping.expiresAt) {' >> process_mappings.js
+        echo '    expiredCount++;' >> process_mappings.js
+        echo '  } else {' >> process_mappings.js
+        echo '    activeCount++;' >> process_mappings.js
+        echo '  }' >> process_mappings.js
+        echo '});' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo 'mappings.statistics = {' >> process_mappings.js
+        echo '  totalMappings: Object.keys(mappings.mappings).length,' >> process_mappings.js
+        echo '  activeMappings: activeCount,' >> process_mappings.js
+        echo '  expiredMappings: expiredCount' >> process_mappings.js
+        echo '};' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo '// Write updated mappings' >> process_mappings.js
+        echo 'fs.writeFileSync("public/url-mappings.json", JSON.stringify(mappings, null, 2));' >> process_mappings.js
+        echo '' >> process_mappings.js
+        echo 'console.log("URL mapping stored successfully");' >> process_mappings.js
+        echo 'console.log("Short code:", shortCode);' >> process_mappings.js
+        echo 'console.log("Long URL:", longUrl);' >> process_mappings.js
+        echo 'console.log("Expires at:", new Date(expiresAt).toISOString());' >> process_mappings.js
+        echo 'console.log("Total mappings:", Object.keys(mappings.mappings).length);' >> process_mappings.js
+        echo 'console.log("Active mappings:", activeCount);' >> process_mappings.js
 
         # Run Node script
         export MAPPINGS="$MAPPINGS"
