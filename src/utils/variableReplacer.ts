@@ -102,13 +102,9 @@ export class VariableReplacer {
       male: "convertirte en el #1 absoluto",
       female: "convertirte en la #1 absoluta"
     },
-    "Tu oportunidad exclusiva de convertirte en el": {
-      male: "Tu oportunidad exclusiva de convertirte en el",
-      female: "Tu oportunidad exclusiva de convertirte en la"
-    },
-    "¿Tienes lo que se necesita para ser el #1 absoluto?": {
-      male: "¿Tienes lo que se necesita para ser el #1 absoluto?",
-      female: "¿Tienes lo que se necesita para ser la #1 absoluta?"
+    "el #1 absoluto": {
+      male: "el #1 absoluto",
+      female: "la #1 absoluta"
     },
     "Entonces… ¿Por qué seguís atrapado en el": {
       male: "Entonces… ¿Por qué seguís atrapado en el",

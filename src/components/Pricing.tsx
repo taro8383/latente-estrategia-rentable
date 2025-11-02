@@ -128,9 +128,9 @@ export const Pricing = () => {
                 <span className="text-accent font-semibold">LA ÚNICA PREGUNTA QUE IMPORTA</span>
               </div>
               
-              <PersonalizedText as="h3" className="text-3xl md:text-4xl font-bold text-foreground mb-8 mobile-center-text">
-                ¿Tienes lo que se necesita para ser el <span className="text-accent">#1 absoluto</span>?
-              </PersonalizedText>
+              <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-8 mobile-center-text">
+                ¿Tienes lo que se necesita para ser <PersonalizedText>el <span className="text-accent">#1 absoluto</span></PersonalizedText>?
+              </h3>
               
               <p className="text-xl text-muted-foreground leading-relaxed mb-8 mobile-center-text">
                 Eso es lo que necesitamos evaluar.
