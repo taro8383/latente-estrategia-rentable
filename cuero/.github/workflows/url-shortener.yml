@@ -1,4 +1,4 @@
-name: URL Shortener API
+name: URL Shortener API - DEPRECATED (Use URL Shortener Final)
 
 on:
   workflow_dispatch:
@@ -38,7 +38,8 @@ jobs:
         echo "Short Code: ${{ github.event.inputs.shortCode }}"
         echo "Long URL: ${{ github.event.inputs.longUrl }}"
         echo "Expiration Hours: ${{ github.event.inputs.expirationHours }}"
-        echo "Metadata: ${{ github.event.inputs.metadata }}"
+        echo "Metadata (safely quoted):"
+        echo "'${{ github.event.inputs.metadata }}'"
         echo "Repository: ${{ github.repository }}"
         echo "Ref: ${{ github.ref }}"
         echo "Actor: ${{ github.actor }}"
@@ -86,19 +87,24 @@ jobs:
         echo "SHORT_CODE=$SHORT_CODE" >> $GITHUB_ENV
         echo "LONG_URL=$LONG_URL" >> $GITHUB_ENV
         echo "EXPIRATION_HOURS=$EXPIRATION_HOURS" >> $GITHUB_ENV
-        echo "METADATA=$METADATA" >> $GITHUB_ENV
+        echo "METADATA='$METADATA'" >> $GITHUB_ENV
 
         echo "DEBUG: Validation passed"
         echo "DEBUG: Sanitized SHORT_CODE: $SHORT_CODE"
         echo "DEBUG: Sanitized LONG_URL: $LONG_URL"
 
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
-    
+    - name: Setup Node.js
+      uses: actions/setup-node@1e60f620b9541d16f28e01576558c4f2f0d7ce1f # v4.1.0
+      with:
+        node-version: '20'
+        cache: 'npm'
+
     - name: Debug - Show repository structure
       run: |
         echo "DEBUG: Repository Structure"
@@ -122,13 +128,13 @@ jobs:
         SHORT_CODE="${{ env.SHORT_CODE }}"
         LONG_URL="${{ env.LONG_URL }}"
         EXPIRATION_HOURS="${{ env.EXPIRATION_HOURS }}"
-        METADATA="${{ env.METADATA }}"
+        METADATA='${{ env.METADATA }}'
 
         echo "DEBUG: Parsed inputs"
         echo "SHORT_CODE: $SHORT_CODE"
         echo "LONG_URL: $LONG_URL"
         echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
-        echo "METADATA: $METADATA"
+        echo "METADATA: '$METADATA'"
 
         # Validate inputs
         if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
@@ -155,38 +161,98 @@ jobs:
           mkdir -p public
         fi
 
-        # Simple bash-based JSON creation
-        echo "DEBUG: Starting simple JSON creation"
+        # Create simple Node script
+        cat > process_mappings.cjs << 'EOF'
+        const fs = require('fs');
+        const mappings = JSON.parse(process.env.MAPPINGS);
+        const shortCode = process.env.SHORT_CODE;
+        const longUrl = process.env.LONG_URL;
+        const expiresAt = parseInt(process.env.EXPIRES_AT);
 
-        # Create public directory if it doesn't exist
-        mkdir -p public
+        // Handle metadata that might be JavaScript object notation or JSON
+        let metadata;
+        try {
+          metadata = JSON.parse(process.env.METADATA);
+        } catch (error) {
+          // If JSON.parse fails, try to safely evaluate as JavaScript object notation
+          try {
+            console.log('DEBUG: Attempting to evaluate metadata as JavaScript object notation');
+            console.log('DEBUG: Metadata input:', process.env.METADATA);
 
-        # Create or update mappings file with simple echo
-        TIMESTAMP=$(date +%s)000
-        echo "DEBUG: Timestamp: $TIMESTAMP"
-        echo "DEBUG: SHORT_CODE: $SHORT_CODE"
-        echo "DEBUG: LONG_URL: $LONG_URL"
+            // Use Function constructor for safer evaluation
+            const jsObject = new Function('return ' + process.env.METADATA)();
+            metadata = jsObject;
+            console.log('DEBUG: Successfully evaluated metadata as JavaScript object');
+          } catch (fallbackError) {
+            console.log('WARNING: Could not parse metadata as JSON or JavaScript object notation');
+            console.log('DEBUG: Original METADATA value:', process.env.METADATA);
+            console.log('DEBUG: JSON error:', error.message);
+            console.log('DEBUG: JavaScript evaluation error:', fallbackError.message);
 
-        # Create basic JSON structure
-        cat > public/url-mappings.json << EOF
-{
-  "mappings": {
-    "$SHORT_CODE": {
-      "shortCode": "$SHORT_CODE",
-      "longUrl": "$LONG_URL",
-      "createdAt": $TIMESTAMP,
-      "expiresAt": $EXPIRES_AT,
-      "metadata": $METADATA
-    }
-  },
-  "lastUpdated": $TIMESTAMP,
-  "version": "1.0"
-}
-EOF
+            // As a safe fallback, use an empty object
+            console.log('DEBUG: Using empty metadata object as safe fallback');
+            metadata = {};
+          }
+        }
 
-        echo "DEBUG: JSON file created successfully"
-        echo "DEBUG: File contents:"
-        cat public/url-mappings.json
+        console.log('DEBUG: Starting Node.js processing');
+        console.log('DEBUG: Current mappings count:', Object.keys(mappings.mappings).length);
+
+        // Add new mapping
+        mappings.mappings[shortCode] = {
+          shortCode: shortCode,
+          longUrl: longUrl,
+          createdAt: Date.now(),
+          expiresAt: expiresAt,
+          metadata: metadata
+        };
+        mappings.lastUpdated = Date.now();
+
+        // Update statistics
+        const now = Date.now();
+        let activeCount = 0;
+        let expiredCount = 0;
+
+        Object.values(mappings.mappings).forEach(mapping => {
+          if (now > mapping.expiresAt) {
+            expiredCount++;
+          } else {
+            activeCount++;
+          }
+        });
+
+        mappings.statistics = {
+          totalMappings: Object.keys(mappings.mappings).length,
+          activeMappings: activeCount,
+          expiredMappings: expiredCount
+        };
+
+        // Write updated mappings
+        fs.writeFileSync('public/url-mappings.json', JSON.stringify(mappings, null, 2));
+
+        console.log('URL mapping stored successfully');
+        console.log('Short code:', shortCode);
+        console.log('Long URL:', longUrl);
+        console.log('Expires at:', new Date(expiresAt).toISOString());
+        console.log('Total mappings:', Object.keys(mappings.mappings).length);
+        console.log('Active mappings:', activeCount);
+        EOF
+
+        # Run Node script
+        export MAPPINGS="$MAPPINGS"
+        export SHORT_CODE="$SHORT_CODE"
+        export LONG_URL="$LONG_URL"
+        export EXPIRES_AT="$EXPIRES_AT"
+        export METADATA="$METADATA"
+
+        node process_mappings.cjs
+
+        if [ $? -ne 0 ]; then
+          echo "ERROR: Node.js processing failed"
+          exit 1
+        fi
+
+        echo "DEBUG: Node.js processing completed"
 
     - name: Debug - Verify mapping was stored
       run: |
@@ -229,7 +295,7 @@ EOF
 
     - name: Deploy to GitHub Pages
       if: success()
-      uses: peaceiris/actions-gh-pages@v4
+      uses: peaceiris/actions-gh-pages@4f9cc6600d4bf148f4c5980e0e7e8722d642f18a # v4.0.0
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./public
