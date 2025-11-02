@@ -27,7 +27,9 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
         ">
           <DialogHeader className="relative z-10 p-3 sm:p-4 md:p-6 pb-2 sm:pb-4">
             <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-white leading-tight text-center">
-              Bienvenido, <span className="text-accent">{data?.readerInfo?.name || 'Invitado'}</span>
+              <PersonalizedText>
+                Bienvenido, <span className="text-accent">{data?.readerInfo?.name || 'Invitado'}</span>
+              </PersonalizedText>
             </DialogTitle>
           </DialogHeader>
   
