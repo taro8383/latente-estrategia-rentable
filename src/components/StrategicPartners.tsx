@@ -1,13 +1,14 @@
 import { Search, Map, Shield, Users, Crown, CheckCircle2, ArrowRight, Clock, TrendingUp } from "lucide-react";
 import strategicPartnersImage from "@/assets/Stategic-Partnership.png";
 import { Button } from "@/components/ui/button";
+import { PersonalizedText } from "@/components/PersonalizedText";
 
 const partnershipSteps = [
   {
     number: "1",
     icon: Search,
     title: "Descubrir si tu empresa es una mina de oro sin explotar",
-    subtitle: "¿Eres campeón? → Evaluación en 12 min",
+    subtitle: "¿Eres campeón? → Evaluación en 12 min", // This will be wrapped in PersonalizedText where it's rendered
     description: "La evaluación no es una entrevista. Es un algoritmo de 12 minutos que analiza tu capacidad real de dominio, basado en datos reales de +47 empresas que ya lo usaron."
   },
   {
@@ -90,7 +91,7 @@ export const StrategicPartners = () => {
                   </div>
                   <div className="mb-3 mobile-center">
                     <span className="inline-block px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center-block">
-                      <span className="text-accent font-semibold text-sm">{step.subtitle}</span>
+                      <PersonalizedText className="text-accent font-semibold text-sm">{step.subtitle}</PersonalizedText>
                     </span>
                   </div>
                   <p className="text-lg text-muted-foreground leading-relaxed mobile-center-text">
@@ -160,7 +161,7 @@ export const StrategicPartners = () => {
                 size="lg"
                 className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 whitespace-normal break-words text-center group mt-6 mobile-center-block"
               >
-                <span className="block sm:inline">Quiero ser socio estratégico de Latente</span>
+                <PersonalizedText className="block sm:inline">Quiero ser socio estratégico de Latente</PersonalizedText>
                 <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />
               </Button>
             </div>

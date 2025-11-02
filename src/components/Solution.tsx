@@ -185,9 +185,9 @@ export const Solution = () => {
           <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-3xl p-8 md:p-12 border border-accent/30 mobile-center">
             <div className="text-center space-y-6 mobile-center">
               <div className="space-y-4 mobile-center">
-                <h3 className="text-2xl md:text-3xl font-bold text-foreground mobile-center-text">
+                <PersonalizedText as="h3" className="text-2xl md:text-3xl font-bold text-foreground mobile-center-text">
                   ¿Podrías construir esto solo?
-                </h3>
+                </PersonalizedText>
                 <p className="text-xl text-muted-foreground mobile-center-text">
                   Sí. Con 10–15 años de errores que cuestan millones… y la suerte de sobrevivir.
                 </p>
@@ -220,7 +220,7 @@ export const Solution = () => {
               size="lg"
               className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 group mt-6 mobile-center-block"
             >
-              <span className="block sm:inline">Quiero ser el #1 en mi mercado</span>
+              <PersonalizedText className="block sm:inline">Quiero ser el #1 en mi mercado</PersonalizedText>
               <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />
             </Button>
           </div>

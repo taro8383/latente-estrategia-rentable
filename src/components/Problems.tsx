@@ -108,10 +108,10 @@ export const Problems = () => {
           </div>
         </div>
         
-        <h2 className="mb-6 mobile-center-text">
+        <PersonalizedText as="h2" className="mb-6 mobile-center-text">
           Entonces… ¿Por qué seguís atrapado en el{" "}
           <span className="text-accent">segundo pelotón?</span>
-        </h2>
+        </PersonalizedText>
         <p className="text-xl text-muted-foreground mb-4 mobile-center-text">
           No es suerte. Es que estás jugando con las reglas equivocadas.
         </p>
@@ -131,9 +131,9 @@ export const Problems = () => {
                     <Icon className="w-8 h-8 text-accent" />
                   </div>
                   <div className="flex-1 space-y-4 mobile-center-text">
-                    <h3 className="text-2xl font-bold text-foreground mobile-center-text">
+                    <PersonalizedText as="h3" className="text-2xl font-bold text-foreground mobile-center-text">
                       {problem.title}
-                    </h3>
+                    </PersonalizedText>
                     
                     <div className="grid md:grid-cols-3 gap-6 mobile-stack">
                       <div className="space-y-2 mobile-center-text">
@@ -152,9 +152,9 @@ export const Problems = () => {
                       
                       <div className="space-y-2 mobile-center-text">
                         <p className="text-sm font-semibold text-foreground uppercase tracking-wider mobile-center-text">Resultado:</p>
-                        <p className="text-foreground font-medium leading-relaxed mobile-center-text">
+                        <PersonalizedText className="text-foreground font-medium leading-relaxed mobile-center-text">
                           {problem.result}
-                        </p>
+                        </PersonalizedText>
                       </div>
                     </div>
                   </div>

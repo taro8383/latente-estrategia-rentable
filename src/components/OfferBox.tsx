@@ -61,9 +61,9 @@ export const OfferBox = () => {
                     <div className="flex-shrink-0 w-6 h-6 rounded-full bg-accent flex items-center justify-center mt-0.5 mobile-center-block">
                       <span className="text-white text-xs font-bold">✓</span>
                     </div>
-                    <p className="text-lg text-foreground font-medium mobile-center-text">
+                    <PersonalizedText className="text-lg text-foreground font-medium mobile-center-text">
                       Estás listo para actuar en 72 horas <span className="text-muted-foreground">(no "cuando pueda")</span>
-                    </p>
+                    </PersonalizedText>
                   </div>
                 </div>
               </div>

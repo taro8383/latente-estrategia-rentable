@@ -44,9 +44,9 @@ export const FinalCTA = () => {
               </h3>
               
               <div className="space-y-6 mobile-center">
-                <p className="text-xl text-white/90 leading-relaxed mobile-center-text">
+                <PersonalizedText className="text-xl text-white/90 leading-relaxed mobile-center-text">
                   Y si estás listo para dejar de competir y empezar a dominar…
-                </p>
+                </PersonalizedText>
                 
                 <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-accent/20 mobile-center">
                   <PersonalizedText as="p" className="text-2xl font-bold text-accent mb-4 mobile-center-text">
@@ -89,13 +89,13 @@ export const FinalCTA = () => {
                     No te pedimos fe.
                   </p>
                   
-                  <p className="text-lg text-white/90 mobile-center-text">
+                  <PersonalizedText className="text-lg text-white/90 mobile-center-text">
                     Solo necesitamos 12 minutos para estar seguros de podes ser el próximo rey.
-                  </p>
+                  </PersonalizedText>
                   
-                  <p className="text-lg text-white/90 mobile-center-text">
+                  <PersonalizedText className="text-lg text-white/90 mobile-center-text">
                     Por que si eres seleccionado y no generamos un 20% en ganancias nuevas en 90 días. Seremos nosotros los que te paguen $20 Millones de pesos.
-                  </p>
+                  </PersonalizedText>
                   
                   <p className="text-lg text-white/90 mobile-center-text">
                     Eso no es promesa.
@@ -138,7 +138,7 @@ export const FinalCTA = () => {
                     <Target className="w-5 h-5 text-accent" />
                     <span className="text-foreground font-medium">Oportunidad única</span>
                   </div>
-                  <p className="text-muted-foreground mobile-center-text">El próximo rey será decidido en las próximas 72 horas.</p>
+                  <PersonalizedText className="text-muted-foreground mobile-center-text">El próximo rey será decidido en las próximas 72 horas.</PersonalizedText>
                 </div>
               </div>
             </div>

@@ -158,9 +158,9 @@ export const FAQ = () => {
                 ¿Todavía tienes dudas?
               </h3>
               
-              <p className="text-xl text-muted-foreground leading-relaxed mb-8 mobile-center-text">
+              <PersonalizedText className="text-xl text-muted-foreground leading-relaxed mb-8 mobile-center-text">
                 Los reyes no se paralizan por el análisis. Actúan con información suficiente y dominio.
-              </p>
+              </PersonalizedText>
               
               <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-accent/20 mb-8 mobile-center">
                 <p className="text-lg text-foreground leading-relaxed text-center mobile-center-text">
