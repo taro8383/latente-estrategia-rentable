@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, ChevronUp, HelpCircle, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { PersonalizedText } from "@/components/PersonalizedText";
 
 const faqData = [
   {

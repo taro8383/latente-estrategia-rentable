@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Clock, Shield, AlertTriangle, Crown } from "lucide-react";
 import logo from "/LoDi-logo.svg";
 import { LocalTimeCountdown } from "@/components/LocalTimeCountdown";
+import { PersonalizedText } from "@/components/PersonalizedText";
 
 export const OfferBox = () => {
   const scrollToSection1 = () => {
