@@ -4,20 +4,20 @@ on:
   workflow_dispatch:
     inputs:
       shortCode:
-        description: 'Short code (alphanumeric only, max 20 chars)'
+        description: 'Short code'
         required: true
         type: string
       longUrl:
-        description: 'Long URL to redirect to (must start with http:// or https://)'
+        description: 'Long URL to redirect to'
         required: true
         type: string
       expirationHours:
-        description: 'Expiration in hours (1-168, default: 72)'
+        description: 'Expiration in hours (default: 72)'
         required: false
         type: string
         default: '72'
       metadata:
-        description: 'Metadata (JSON format, max 1000 chars)'
+        description: 'Metadata (JSON format)'
         required: false
         type: string
         default: '{}'
@@ -25,103 +25,51 @@ on:
 jobs:
   store-mapping:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     permissions:
       contents: write
       pages: write
       id-token: write
 
     steps:
-    - name: Debug - Show workflow inputs
+    - name: Debug - Show workflow inputs safely
       run: |
         echo "DEBUG: Workflow Inputs"
         echo "Short Code: ${{ github.event.inputs.shortCode }}"
         echo "Long URL: ${{ github.event.inputs.longUrl }}"
         echo "Expiration Hours: ${{ github.event.inputs.expirationHours }}"
-        echo "Metadata: ${{ github.event.inputs.metadata }}"
+        echo "Metadata (safely quoted):"
+        echo "'${{ github.event.inputs.metadata }}'"
         echo "Repository: ${{ github.repository }}"
         echo "Ref: ${{ github.ref }}"
         echo "Actor: ${{ github.actor }}"
 
-    - name: Simple input processing (bypass complex validation)
-      run: |
-        echo "DEBUG: Simple input processing"
-        echo "DEBUG: All inputs received"
-        echo "SHORT_CODE_INPUT: '${{ github.event.inputs.shortCode }}'"
-        echo "LONG_URL_INPUT: '${{ github.event.inputs.longUrl }}'"
-        echo "EXPIRATION_HOURS_INPUT: '${{ github.event.inputs.expirationHours }}'"
-        echo "METADATA_INPUT: '${{ github.event.inputs.metadata }}'"
-
-        # Simple assignment - no sed, no head, no complex validation
-        SHORT_CODE="${{ github.event.inputs.shortCode }}"
-        LONG_URL="${{ github.event.inputs.longUrl }}"
-        EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
-        METADATA="${{ github.event.inputs.metadata }}"
-
-        echo "DEBUG: Variables assigned"
-        echo "SHORT_CODE: '$SHORT_CODE'"
-        echo "LONG_URL: '$LONG_URL'"
-
-        # Basic validation only
-        if [[ -z "$SHORT_CODE" ]]; then
-          echo "ERROR: Short code is empty"
-          exit 1
-        fi
-
-        if [[ -z "$LONG_URL" ]]; then
-          echo "ERROR: Long URL is empty"
-          exit 1
-        fi
-
-        echo "DEBUG: Basic validation passed"
-
-        # Set environment variables for next steps
-        echo "SHORT_CODE=$SHORT_CODE" >> $GITHUB_ENV
-        echo "LONG_URL=$LONG_URL" >> $GITHUB_ENV
-        echo "EXPIRATION_HOURS=$EXPIRATION_HOURS" >> $GITHUB_ENV
-        echo "METADATA=$METADATA" >> $GITHUB_ENV
-
-        echo "DEBUG: Environment variables set"
-
     - name: Checkout repository
-      uses: actions/checkout@v5
+      uses: actions/checkout@v4
       with:
         token: ${{ secrets.GITHUB_TOKEN }}
         fetch-depth: 0
 
-    
-    - name: Debug - Show repository structure
-      run: |
-        echo "DEBUG: Repository Structure"
-        pwd
-        ls -la
-        echo "DEBUG: Public directory"
-        ls -la public/ || echo "Public directory not found"
-        echo "DEBUG: Check for url-mappings.json"
-        if [ -f "public/url-mappings.json" ]; then
-          echo "url-mappings.json exists"
-          head -20 public/url-mappings.json
-        else
-          echo "url-mappings.json NOT found"
-        fi
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
 
-    - name: Store URL mapping
+    - name: Store URL mapping with proper handling
       run: |
         echo "DEBUG: Starting URL mapping storage"
-        echo "DEBUG: All environment variables:"
-        env | grep -E "^(SHORT_CODE|LONG_URL|EXPIRATION_HOURS|METADATA)="
 
-        # Use validated and sanitized environment variables
-        SHORT_CODE="${{ env.SHORT_CODE }}"
-        LONG_URL="${{ env.LONG_URL }}"
-        EXPIRATION_HOURS="${{ env.EXPIRATION_HOURS }}"
-        METADATA="${{ env.METADATA }}"
+        # Parse inputs with single quotes to prevent shell interpretation
+        SHORT_CODE="${{ github.event.inputs.shortCode }}"
+        LONG_URL="${{ github.event.inputs.longUrl }}"
+        EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
+        METADATA='${{ github.event.inputs.metadata }}'
 
-        echo "DEBUG: Parsed inputs"
-        echo "SHORT_CODE: '$SHORT_CODE'"
-        echo "LONG_URL: '$LONG_URL'"
-        echo "EXPIRATION_HOURS: '$EXPIRATION_HOURS'"
-        echo "METADATA: '$METADATA'"
+        echo "DEBUG: Parsed inputs safely"
+        echo "SHORT_CODE: $SHORT_CODE"
+        echo "LONG_URL: $LONG_URL"
+        echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
+        echo "METADATA length: ${#METADATA}"
+        echo "METADATA preview (first 200 chars): ${METADATA:0:200}..."
 
         # Validate inputs
         if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
@@ -129,67 +77,134 @@ jobs:
           exit 1
         fi
 
-        echo "DEBUG: Input validation passed"
+        # Calculate expiration
+        EXPIRES_AT=$(node -e "console.log(Date.now() + (${EXPIRATION_HOURS} * 60 * 60 * 1000))")
+        echo "DEBUG: Expiration timestamp: $EXPIRES_AT"
 
-        # Calculate expiration using bash only (no bc, no Node.js)
-        CURRENT_TIME=$(date +%s)
-        EXPIRATION_SECONDS=$((${EXPIRATION_HOURS} * 3600))
-        EXPIRES_AT=$((${CURRENT_TIME} + ${EXPIRATION_SECONDS}))
-        EXPIRES_AT_MS="${EXPIRES_AT}000"
-        echo "DEBUG: Current time: $CURRENT_TIME"
-        echo "DEBUG: Expiration seconds: $EXPIRATION_SECONDS"
-        echo "DEBUG: Expiration timestamp: $EXPIRES_AT_MS"
-        echo "DEBUG: Current timestamp: ${CURRENT_TIME}000"
+        # Read current mappings
+        MAPPINGS_FILE="public/url-mappings.json"
+        echo "DEBUG: Checking mappings file: $MAPPINGS_FILE"
 
-        # Create public directory
-        echo "DEBUG: Creating public directory"
-        mkdir -p public
-        echo "DEBUG: Directory creation successful"
-
-        # Create timestamp using bash
-        TIMESTAMP=$(date +%s)000
-        echo "DEBUG: Timestamp: $TIMESTAMP"
-
-        echo "DEBUG: About to create JSON file"
-
-        # Test basic commands first
-        echo "DEBUG: Testing basic commands"
-        echo "test" > /tmp/test.txt
-        if [ $? -eq 0 ]; then
-          echo "DEBUG: Basic file creation works"
+        if [ -f "$MAPPINGS_FILE" ]; then
+          echo "DEBUG: Reading existing mappings"
+          MAPPINGS=$(cat "$MAPPINGS_FILE")
         else
-          echo "ERROR: Basic file creation failed"
+          echo "DEBUG: Creating new mappings file"
+          MAPPINGS='{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}'
+          mkdir -p public
+        fi
+
+        # Create Node script with robust metadata handling
+        cat > process_mappings.cjs << 'EOF'
+        const fs = require('fs');
+
+        console.log('DEBUG: Starting Node.js processing');
+
+        let mappings, metadata;
+
+        try {
+          mappings = JSON.parse(process.env.MAPPINGS);
+          console.log('DEBUG: Successfully parsed MAPPINGS');
+        } catch (error) {
+          console.error('ERROR: Failed to parse MAPPINGS:', error.message);
+          process.exit(1);
+        }
+
+        try {
+          metadata = JSON.parse(process.env.METADATA || '{}');
+          console.log('DEBUG: Successfully parsed METADATA as JSON');
+        } catch (error) {
+          console.log('DEBUG: JSON parse failed, trying JavaScript evaluation');
+          console.log('DEBUG: Metadata input:', process.env.METADATA);
+
+          try {
+            // Use Function constructor for safer evaluation
+            const jsObject = new Function('return ' + process.env.METADATA)();
+            metadata = jsObject;
+            console.log('DEBUG: Successfully evaluated metadata as JavaScript object');
+          } catch (fallbackError) {
+            console.log('WARNING: Could not parse metadata, using empty object');
+            console.log('DEBUG: Original METADATA value:', process.env.METADATA);
+            metadata = {};
+          }
+        }
+
+        const shortCode = process.env.SHORT_CODE;
+        const longUrl = process.env.LONG_URL;
+        const expiresAt = parseInt(process.env.EXPIRES_AT);
+
+        console.log('DEBUG: Processing mapping for short code:', shortCode);
+        console.log('DEBUG: Long URL:', longUrl);
+        console.log('DEBUG: Expires at:', new Date(expiresAt).toISOString());
+        console.log('DEBUG: Metadata:', JSON.stringify(metadata));
+
+        // Add new mapping
+        mappings.mappings[shortCode] = {
+          shortCode: shortCode,
+          longUrl: longUrl,
+          createdAt: Date.now(),
+          expiresAt: expiresAt,
+          metadata: metadata
+        };
+        mappings.lastUpdated = Date.now();
+
+        // Update statistics
+        const now = Date.now();
+        let activeCount = 0;
+        let expiredCount = 0;
+
+        Object.values(mappings.mappings).forEach(mapping => {
+          if (now > mapping.expiresAt) {
+            expiredCount++;
+          } else {
+            activeCount++;
+          }
+        });
+
+        mappings.statistics = {
+          totalMappings: Object.keys(mappings.mappings).length,
+          activeMappings: activeCount,
+          expiredMappings: expiredCount
+        };
+
+        // Write updated mappings
+        fs.writeFileSync('public/url-mappings.json', JSON.stringify(mappings, null, 2));
+
+        console.log('URL mapping stored successfully');
+        console.log('Short code:', shortCode);
+        console.log('Total mappings:', Object.keys(mappings.mappings).length);
+        console.log('Active mappings:', activeCount);
+        EOF
+
+        # Run Node script with proper environment setup
+        export MAPPINGS="$MAPPINGS"
+        export SHORT_CODE="$SHORT_CODE"
+        export LONG_URL="$LONG_URL"
+        export EXPIRES_AT="$EXPIRES_AT"
+        export METADATA="$METADATA"
+
+        node process_mappings.cjs
+
+        if [ $? -ne 0 ]; then
+          echo "ERROR: Node.js processing failed"
           exit 1
         fi
 
-        # Create JSON using simple echo
-        echo "DEBUG: Creating JSON with echo"
-        echo '{"mappings":{"'"$SHORT_CODE"'":{"shortCode":"'"$SHORT_CODE"'","longUrl":"'"$LONG_URL"'","createdAt":'"$TIMESTAMP"',"expiresAt":'"$EXPIRES_AT_MS"',"metadata":'"$METADATA"'"}},"lastUpdated":'"$TIMESTAMP"',"version":"1.0"}' > public/url-mappings.json
+        echo "DEBUG: Node.js processing completed"
 
-        if [ $? -eq 0 ]; then
-          echo "DEBUG: JSON file created successfully"
-        else
-          echo "ERROR: JSON file creation failed"
-          exit 1
-        fi
-
-        echo "DEBUG: File contents:"
-        cat public/url-mappings.json
-
-    - name: Debug - Verify mapping was stored
+    - name: Verify mapping was stored
       run: |
         echo "DEBUG: Verifying mapping was stored"
         if [ -f "public/url-mappings.json" ]; then
           echo "url-mappings.json exists"
           echo "DEBUG: File size: $(wc -c < public/url-mappings.json)"
           echo "DEBUG: Content preview:"
-          head -30 public/url-mappings.json
-          echo "DEBUG: Looking for short code: ${{ env.SHORT_CODE }}"
-          if grep -q "${{ env.SHORT_CODE }}" public/url-mappings.json; then
-            echo "Short code found in mappings"
-            echo "DEBUG: Mapping verification successful"
+          head -20 public/url-mappings.json
+          echo "DEBUG: Looking for short code: ${{ github.event.inputs.shortCode }}"
+          if grep -q "${{ github.event.inputs.shortCode }}" public/url-mappings.json; then
+            echo "Short code found in mappings ✓"
           else
-            echo "Short code NOT found in mappings"
+            echo "Short code NOT found in mappings ✗"
             exit 1
           fi
         else
@@ -210,7 +225,7 @@ jobs:
           echo "DEBUG: No changes to commit"
         else
           echo "DEBUG: Committing changes"
-          git commit -m "Add URL mapping: ${{ env.SHORT_CODE }}"
+          git commit -m "Add URL mapping: ${{ github.event.inputs.shortCode }}"
           echo "DEBUG: Pushing to repository"
           git push
         fi
@@ -221,9 +236,8 @@ jobs:
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
         publish_dir: ./public
-        keep_files: true
 
-    - name: Debug - Final status
+    - name: Final status
       if: always()
       run: |
         echo "DEBUG: Final workflow status"
