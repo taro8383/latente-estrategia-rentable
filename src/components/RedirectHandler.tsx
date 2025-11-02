@@ -16,6 +16,9 @@ export const RedirectHandler: React.FC = () => {
   console.log('🔍 REDIRECT DEBUG: window.location.hash:', window.location.hash);
   console.log('🔍 REDIRECT DEBUG: useParams result:', shortCode);
   console.log('🔍 REDIRECT DEBUG: Expected shortCode from URL:', window.location.hash.split('/')[2]);
+  console.log('🔍 REDIRECT DEBUG: Browser navigation type:', performance.navigation.type);
+  console.log('🔍 REDIRECT DEBUG: Is redirect:', performance.navigation.type === 1);
+  console.log('🔍 REDIRECT DEBUG: Referrer:', document.referrer);
 
   useEffect(() => {
     // Check if shortCode is available
