@@ -230,12 +230,31 @@ jobs:
           git push
         fi
 
+    - name: Pull latest changes and build React app
+      run: |
+        echo "DEBUG: Pulling latest changes and building React app"
+        git pull origin main
+
+        # Setup Node.js and build
+        npm ci
+
+        # Ensure url-mappings.json is copied to dist before build
+        echo "DEBUG: Ensuring url-mappings.json is available for build"
+
+        npm run build
+        echo "DEBUG: React app built successfully"
+
+        # Copy the updated url-mappings.json to the dist folder
+        cp public/url-mappings.json dist/url-mappings.json
+        echo "DEBUG: Copied updated url-mappings.json to dist folder"
+
     - name: Deploy to GitHub Pages
       if: success()
       uses: peaceiris/actions-gh-pages@v4
       with:
         github_token: ${{ secrets.GITHUB_TOKEN }}
-        publish_dir: ./public
+        publish_dir: ./dist
+        keep_files: true
 
     - name: Final status
       if: always()
