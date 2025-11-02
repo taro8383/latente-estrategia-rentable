@@ -84,7 +84,7 @@ export const Hero = () => {
 
             <PersonalizedText as="p" className="text-sm sm:text-base md:text-lg lg:text-xl text-white/80 max-w-2xl mx-auto mb-4 text-center mobile-center-text">
               El mercado no recompensa la calidad. <br className="hidden sm:block" />
-              Recompensa al que <strong>se declara rey</strong>, y está listo para tomar ese lugar.
+              Recompensa a el que <strong>se declara rey</strong>, y está listo para tomar ese lugar.
             </PersonalizedText>
 
             <div className="bg-accent/10 backdrop-blur-sm rounded-2xl p-4 sm:p-6 border border-accent/20 mb-6 mobile-center-block">
