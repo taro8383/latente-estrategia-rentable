@@ -127,13 +127,13 @@ jobs:
         SHORT_CODE="${{ env.SHORT_CODE }}"
         LONG_URL="${{ env.LONG_URL }}"
         EXPIRATION_HOURS="${{ env.EXPIRATION_HOURS }}"
-        METADATA="${{ env.METADATA }}"
+        METADATA='${{ env.METADATA }}'
 
         echo "DEBUG: Parsed inputs"
         echo "SHORT_CODE: $SHORT_CODE"
         echo "LONG_URL: $LONG_URL"
         echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
-        echo "METADATA: $METADATA"
+        echo "METADATA: '$METADATA'"
 
         # Validate inputs
         if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
