@@ -4,87 +4,29 @@
     <meta charset="UTF-8">
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de URLs Personalizadas - Latente</title>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
-    <link rel="icon" type="image/png" href="/favicon.png">
+    <title>Generador de URLs Personalizadas - Latente (Enhanced)</title>
     <style>
-        :root {
-            --background: 220 18% 8%;
-            --foreground: 0 0% 98%;
-            --card: 220 16% 10%;
-            --card-foreground: 0 0% 98%;
-            --primary: 220 70% 12%;
-            --primary-foreground: 0 0% 98%;
-            --secondary: 220 16% 16%;
-            --secondary-foreground: 0 0% 95%;
-            --muted: 220 16% 16%;
-            --muted-foreground: 220 10% 75%;
-            --accent: 25 95% 53%;
-            --accent-foreground: 0 0% 100%;
-            --border: 220 16% 20%;
-            --input: 220 16% 20%;
-            --ring: 0 0% 98%;
-
-            /* Custom tokens for Latente brand */
-            --hero-gradient: linear-gradient(135deg, hsl(220 70% 12%) 0%, hsl(240 65% 20%) 100%);
-            --accent-gradient: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(15 90% 48%) 100%);
-            --subtle-gradient: linear-gradient(180deg, hsl(220 18% 8%) 0%, hsl(220 20% 12%) 100%);
-
-            --shadow-soft: 0 2px 8px -2px hsl(220 15% 15% / 0.08);
-            --shadow-medium: 0 8px 24px -4px hsl(220 15% 15% / 0.12);
-            --shadow-strong: 0 16px 48px -8px hsl(220 15% 15% / 0.2);
-
-            --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-
-            --glow-pulse: 0 0 20px hsl(25 95% 53% / 0.3);
-            --glow-pulse-hover: 0 0 30px hsl(25 95% 53% / 0.5);
-        }
-
-        * {
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Inter', sans-serif;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-            background: hsl(var(--background));
-            color: hsl(var(--foreground));
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 1400px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
             min-height: 100vh;
-            line-height: 1.6;
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
         }
-
-        .container {
-            background: hsl(var(--card));
-            border-radius: 12px;
-            padding: 40px;
-            box-shadow: var(--shadow-strong);
-            border: 1px solid hsl(var(--border));
-            position: relative;
-            overflow: hidden;
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            padding: 30px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
         }
-
-        .container::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 2px;
-            background: var(--accent-gradient);
-        }
-
-        h1 {
-            color: hsl(var(--foreground));
-            text-align: center;
-            margin-bottom: 40px;
+        h1 { 
+            color: #ffffff; 
+            text-align: center; 
+            margin-bottom: 30px; 
             font-size: 2.5em;
             font-weight: 700;
-            letter-spacing: -0.025em;
         }
         .enhanced-url-generator {
             display: grid;
@@ -96,149 +38,118 @@
             margin-bottom: 30px;
         }
         .progress-bar {
-            height: 3px;
-            background: var(--accent-gradient);
+            height: 4px;
+            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
             border-radius: 2px;
-            transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: width 0.3s ease;
             width: 0%;
-            box-shadow: var(--glow-pulse);
         }
-
         .progress-steps {
             display: flex;
             justify-content: space-between;
-            margin-top: 12px;
+            margin-top: 10px;
         }
-
         .step {
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 5px 10px;
+            border-radius: 15px;
             font-size: 12px;
-            font-weight: 500;
-            background: hsl(var(--muted));
-            color: hsl(var(--muted-foreground));
-            border: 1px solid hsl(var(--border));
-            transition: var(--transition-smooth);
-            letter-spacing: 0.025em;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.3s ease;
         }
-
         .step.active {
-            background: var(--accent-gradient);
-            border-color: hsl(var(--accent));
-            color: hsl(var(--accent-foreground));
+            background: rgba(79, 70, 229, 0.3);
+            border-color: #4f46e5;
+            color: #4f46e5;
             font-weight: 600;
-            box-shadow: var(--shadow-soft);
         }
-        .form-section {
-            margin-bottom: 32px;
-            background: hsl(var(--card));
-            border-radius: 12px;
-            padding: 32px;
-            border: 1px solid hsl(var(--border));
-            transition: var(--transition-smooth);
-            position: relative;
+        .form-section { 
+            margin-bottom: 25px; 
+            background: rgba(255, 255, 255, 0.05); 
+            border-radius: 12px; 
+            padding: 25px; 
+            border: 1px solid rgba(79, 70, 229, 0.2);
+            transition: all 0.3s ease;
         }
-
         .form-section:hover {
-            border-color: hsl(var(--accent) / 0.3);
-            background: hsl(var(--card));
-            box-shadow: var(--shadow-medium);
+            border-color: rgba(79, 70, 229, 0.4);
+            background: rgba(255, 255, 255, 0.08);
         }
         .section-header {
             display: flex;
             align-items: center;
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid hsl(var(--border));
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(79, 70, 229, 0.2);
         }
-
         .section-number {
             display: flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
-            height: 40px;
+            width: 30px;
+            height: 30px;
             border-radius: 50%;
-            background: var(--accent-gradient);
-            color: hsl(var(--accent-foreground));
-            font-weight: 600;
-            font-size: 16px;
-            margin-right: 16px;
-            box-shadow: var(--shadow-soft);
-        }
-
-        .section-title {
-            font-size: 1.25em;
-            font-weight: 600;
-            color: hsl(var(--foreground));
-            letter-spacing: -0.025em;
-        }
-
-        .section-description {
-            font-size: 0.875em;
-            color: hsl(var(--muted-foreground));
-            margin-top: 4px;
-            line-height: 1.5;
-        }
-        .field-group {
-            margin-bottom: 24px;
-            position: relative;
-            transition: var(--transition-smooth);
-        }
-
-        .field-group.valid {
-            border-left: 3px solid hsl(142 71% 45%);
-            padding-left: 12px;
-            background: hsl(142 71% 45% / 0.05);
-        }
-
-        .field-group.invalid {
-            border-left: 3px solid hsl(0 84% 60%);
-            padding-left: 12px;
-            background: hsl(0 84% 60% / 0.05);
-        }
-
-        .field-group.warning {
-            border-left: 3px solid hsl(45 93% 47%);
-            padding-left: 12px;
-            background: hsl(45 93% 47% / 0.05);
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 500;
-            color: hsl(var(--foreground));
+            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            color: white;
+            font-weight: bold;
             font-size: 14px;
-            letter-spacing: 0.025em;
+            margin-right: 15px;
         }
-
+        .section-title {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: #4f46e5;
+        }
+        .section-description {
+            font-size: 0.9em;
+            color: #94a3b8;
+            margin-top: 5px;
+        }
+        .field-group { 
+            margin-bottom: 20px; 
+            position: relative;
+            transition: all 0.3s ease;
+        }
+        .field-group.valid {
+            border-left: 3px solid #10b981;
+            padding-left: 12px;
+        }
+        .field-group.invalid {
+            border-left: 3px solid #ef4444;
+            padding-left: 12px;
+            background: rgba(239, 68, 68, 0.05);
+        }
+        .field-group.warning {
+            border-left: 3px solid #f59e0b;
+            padding-left: 12px;
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #e2e8f0;
+            font-size: 14px;
+        }
         .required {
-            color: hsl(0 84% 60%);
+            color: #ef4444;
             margin-left: 4px;
         }
-        input, textarea, select {
-            width: 100%;
-            padding: 12px 16px;
-            border: 1px solid hsl(var(--border));
-            border-radius: 8px;
-            background: hsl(var(--background));
-            color: hsl(var(--foreground));
+        input, textarea, select { 
+            width: 100%; 
+            padding: 12px; 
+            border: 1px solid #444; 
+            border-radius: 6px; 
+            background: #2d2d2d; 
+            color: #ffffff; 
             font-size: 14px;
             box-sizing: border-box;
-            transition: var(--transition-smooth);
-            font-family: inherit;
+            transition: all 0.3s ease;
         }
-
         input:focus, textarea:focus, select:focus {
-            outline: none;
-            border-color: hsl(var(--accent));
-            box-shadow: 0 0 0 3px hsl(var(--ring) / 0.1);
-            background: hsl(var(--background));
-        }
-
-        input::placeholder, textarea::placeholder {
-            color: hsl(var(--muted-foreground));
+            outline: none; 
+            border-color: #4f46e5; 
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
+            background: rgba(45, 45, 45, 0.8);
         }
         textarea {
             resize: vertical;
@@ -246,46 +157,38 @@
         }
         .field-help {
             font-size: 12px;
-            color: hsl(var(--muted-foreground));
-            margin-top: 6px;
+            color: #94a3b8;
+            margin-top: 5px;
             font-style: italic;
-            line-height: 1.4;
         }
-
         .field-preview {
             font-size: 12px;
-            color: hsl(var(--foreground));
+            color: #ffffff;
             font-style: italic;
-            margin-top: 4px;
-            padding: 6px 12px;
-            background: hsl(var(--muted));
-            border-radius: 6px;
+            margin-top: 3px;
+            padding: 4px 8px;
+            background: rgba(100, 116, 139, 0.2);
+            border-radius: 4px;
             display: inline-block;
-            border: 1px solid hsl(var(--border));
-            line-height: 1.4;
         }
-
         .field-error, .field-warning {
-            margin-top: 6px;
-            padding: 10px;
-            border-radius: 6px;
+            margin-top: 5px;
+            padding: 8px;
+            border-radius: 4px;
             font-size: 12px;
             display: flex;
             align-items: flex-start;
-            gap: 6px;
-            line-height: 1.4;
+            gap: 5px;
         }
-
         .field-error {
-            background: hsl(0 84% 60% / 0.1);
-            border: 1px solid hsl(0 84% 60%);
-            color: hsl(0 62% 30%);
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid #ef4444;
+            color: #dc2626;
         }
-
         .field-warning {
-            background: hsl(45 93% 47% / 0.1);
-            border: 1px solid hsl(45 93% 47%);
-            color: hsl(38 92% 50%);
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid #f59e0b;
+            color: #d97706;
         }
         .error-icon, .warning-icon {
             flex-shrink: 0;
@@ -293,155 +196,107 @@
         }
         .validation-indicator {
             position: absolute;
-            right: 12px;
-            top: 42px;
-            font-size: 11px;
-            padding: 4px 8px;
-            border-radius: 6px;
-            font-weight: 500;
-            letter-spacing: 0.025em;
+            right: 10px;
+            top: 35px;
+            font-size: 12px;
+            padding: 2px 6px;
+            border-radius: 4px;
         }
-
         .validation-indicator.success {
-            background: hsl(142 71% 45%);
-            color: hsl(0 0% 100%);
-            box-shadow: var(--shadow-soft);
+            background: #10b981;
+            color: white;
         }
-        button {
-            background: var(--accent-gradient);
-            color: hsl(var(--accent-foreground));
-            padding: 14px 28px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 16px;
+        button { 
+            background: linear-gradient(45deg, #ff6b35, #f72b1b); 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
             font-weight: 600;
             width: 100%;
-            margin-top: 12px;
-            transition: var(--transition-bounce);
-            position: relative;
-            overflow: hidden;
-            letter-spacing: 0.025em;
-            box-shadow: var(--shadow-soft);
+            margin-top: 10px;
+            transition: all 0.3s ease;
         }
-
-        button:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-medium), var(--glow-pulse-hover);
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
         }
-
-        button:active {
-            transform: translateY(0);
-        }
-
         button:disabled {
-            background: hsl(var(--muted));
-            color: hsl(var(--muted-foreground));
+            background: #64748b;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
-
-        /* Brand attention effect for buttons */
-        button:not(:disabled):hover {
-            animation: glowPulseHover 1.5s ease-in-out infinite;
-        }
-        .result {
-            margin-top: 32px;
-            padding: 24px;
-            background: hsl(var(--card));
-            border-radius: 12px;
-            border: 1px solid hsl(var(--border));
+        .result { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: rgba(79, 70, 229, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid #4f46e5;
             word-break: break-all;
-            box-shadow: var(--shadow-medium);
         }
-
         .result h3 {
-            color: hsl(var(--foreground));
-            margin-bottom: 16px;
-            font-size: 18px;
-            font-weight: 600;
-            background: var(--hero-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #4f46e5;
+            margin-bottom: 10px;
+            font-size: 16px;
         }
-
         .result-url {
-            background: hsl(var(--background));
-            padding: 20px;
-            border-radius: 8px;
-            font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
-            font-size: 14px;
-            border: 1px solid hsl(var(--border));
-            margin: 12px 0;
-            color: hsl(var(--foreground));
-            word-break: break-all;
-            line-height: 1.5;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #444;
+            margin: 10px 0;
         }
-
         .copy-btn {
-            background: var(--accent-gradient);
-            color: hsl(var(--accent-foreground));
+            background: #4f46e5;
+            color: white;
             border: none;
-            padding: 10px 18px;
-            border-radius: 6px;
+            padding: 8px 16px;
+            border-radius: 4px;
             cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            margin-left: 12px;
-            transition: var(--transition-smooth);
-            box-shadow: var(--shadow-soft);
+            font-size: 12px;
+            margin-left: 10px;
         }
-
         .copy-btn:hover {
-            transform: translateY(-1px);
-            box-shadow: var(--shadow-medium), var(--glow-pulse-hover);
+            background: #3d4452;
         }
         .preview-panel {
             position: sticky;
             top: 20px;
-            background: hsl(var(--card));
+            background: rgba(79, 70, 229, 0.1);
             border-radius: 12px;
-            padding: 24px;
-            border: 1px solid hsl(var(--border));
-            height: calc(100vh - 160px); /* Full height minus header and margins */
+            padding: 20px;
+            border: 1px solid #4f46e5;
+            max-height: 80vh;
             overflow-y: auto;
-            box-shadow: var(--shadow-medium);
         }
-
         .preview-section {
-            margin-bottom: 24px;
-            padding-bottom: 16px;
-            border-bottom: 1px solid hsl(var(--border));
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid rgba(79, 70, 229, 0.2);
         }
-
         .preview-section:last-child {
             border-bottom: none;
         }
-
         .preview-section h4 {
-            color: hsl(var(--foreground));
-            margin-bottom: 12px;
-            font-size: 15px;
-            font-weight: 600;
-            background: var(--accent-gradient);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
+            color: #4f46e5;
+            margin-bottom: 10px;
+            font-size: 14px;
         }
-
         .preview-content {
-            background: hsl(var(--background));
-            padding: 20px;
-            border-radius: 8px;
-            font-family: inherit;
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 14px;
             white-space: normal;
             max-height: 300px;
             overflow-y: auto;
-            line-height: 1.6;
-            border: 1px solid hsl(var(--border));
+            line-height: 1.5;
         }
         .hero-preview, .problems-preview, .solution-preview {
             display: flex;
@@ -516,148 +371,58 @@
         .form-errors li {
             margin-bottom: 4px;
         }
-        /* Brand animations */
-        @keyframes glowPulse {
-            0%, 100% {
-                box-shadow: 0 0 20px hsl(25 95% 53% / 0.3);
-            }
-            50% {
-                box-shadow: 0 0 35px hsl(25 95% 53% / 0.5);
-            }
-        }
-
-        @keyframes glowPulseHover {
-            0%, 100% {
-                box-shadow: 0 0 30px hsl(25 95% 53% / 0.5);
-            }
-            50% {
-                box-shadow: 0 0 45px hsl(25 95% 53% / 0.7);
-            }
-        }
-
-        /* Responsive design */
         @media (max-width: 1200px) {
             .enhanced-url-generator {
                 grid-template-columns: 1fr;
             }
-
+            
             .preview-panel {
                 position: relative;
                 top: 0;
-                height: auto;
-                min-height: 400px;
             }
         }
-
-        @media (max-width: 768px) {
+        @media (max-width: 600px) {
             .container {
-                padding: 20px;
-                margin: 10px;
+                padding: 10px;
             }
-
+            
             .form-section {
-                padding: 24px;
-                margin-bottom: 24px;
+                padding: 15px;
             }
-
-            .section-header {
-                flex-direction: column;
-                text-align: center;
-                gap: 12px;
-            }
-
-            .section-number {
-                margin-right: 0;
-                margin-bottom: 8px;
-            }
-
-            h1 {
-                font-size: 2em;
-                margin-bottom: 32px;
-            }
-
-            .gender-selector {
-                padding: 12px;
-            }
-
+            
             .progress-steps {
                 flex-direction: column;
-                gap: 8px;
+                gap: 5px;
             }
-
+            
             .step {
                 text-align: center;
-                width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .container {
-                padding: 16px;
-                margin: 8px;
-            }
-
-            .form-section {
-                padding: 20px;
-            }
-
-            h1 {
-                font-size: 1.75em;
-            }
-
-            .section-number {
-                width: 36px;
-                height: 36px;
-                font-size: 14px;
-            }
-
-            .section-title {
-                font-size: 1.125em;
-            }
-
-            input, textarea, select {
-                padding: 10px 14px;
-                font-size: 16px; /* Prevents zoom on iOS */
-            }
-
-            button {
-                padding: 12px 20px;
-                font-size: 16px;
             }
         }
 
         /* Gender selector styles */
         .gender-selector {
-            background: hsl(var(--background));
+            background: rgba(255, 255, 255, 0.05);
             border-radius: 8px;
-            padding: 16px;
-            border: 1px solid hsl(var(--border));
-            margin-top: 12px;
-        }
-
-        .gender-selector label {
-            display: flex;
-            align-items: center;
-            cursor: pointer;
-            padding: 8px 12px;
-            border-radius: 6px;
-            transition: var(--transition-smooth);
-            margin-bottom: 4px;
+            padding: 15px;
+            border: 1px solid #444;
+            margin-top: 10px;
         }
 
         .gender-selector label:hover {
-            background: hsl(var(--accent) / 0.1);
-            border: 1px solid hsl(var(--accent) / 0.2);
+            background: rgba(79, 70, 229, 0.1);
+            border-radius: 4px;
+            padding: 5px 10px;
+            transition: all 0.3s ease;
         }
 
         .gender-selector input[type="radio"]:checked + span {
-            color: hsl(var(--accent));
+            color: #4f46e5;
             font-weight: 600;
         }
 
         .gender-selector input[type="radio"] {
-            accent-color: hsl(var(--accent));
-            margin-right: 8px;
+            accent-color: #4f46e5;
         }
 
         @media (max-width: 600px) {
@@ -681,14 +446,19 @@
 </head>
 <body>
     <div class="container">
-        <h1>🔗 Generador de URLs Personalizadas</h1>
-
-        <!-- Company Logo -->
-        <div style="text-align: center; margin-bottom: 40px;">
-            <img src="/LoDi-logo.svg" alt="Latente" style="max-width: 200px; height: auto; filter: brightness(0) invert(1);" />
-        </div>
-
+        <h1>🔗 Generador de URLs Personalizadas (Enhanced)</h1>
+        
         <div class="enhanced-url-generator">
+            <!-- Progress Indicator -->
+            <div class="progress-container">
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-steps">
+                    <div class="step active" data-section="basic">Básico</div>
+                    <div class="step" data-section="hero">Hero</div>
+                    <div class="step" data-section="problems">Problems</div>
+                    <div class="step" data-section="solution">Solution</div>
+                </div>
+            </div>
             
             <!-- Form Container -->
             <div class="form-container">
@@ -1434,26 +1204,62 @@
                     logoData = companyLogoData;
                 }
 
-                // Create minimal data for URL encoding (only essential personalization)
-                const minimalData = {
-                    basic: {
-                        readerName: formData.readerName,
-                        company: formData.company,
+                // Prepare metadata for GitHub API
+                const mappingMetadata = {
+                    generatorVersion: '2.1',
+                    variableCount: this.countProvidedVariables(formData),
+                    complexity: this.calculateComplexity(formData),
+                    industry: formData.referenciaDeIndustria,
+                    hasCustomContent: this.hasCustomContent(formData),
+                    company: formData.company,
+                    readerName: formData.readerName
+                };
+
+                // Enhanced personalization data structure
+                const enhancedData = {
+                    // Basic brand information
+                    brandInfo: {
+                        name: formData.brandName || formData.company, // Fallback to company name
                         industry: formData.referenciaDeIndustria,
-                        location: formData.ubicacion,
-                        gender: formData.gender
+                        productType: 'leather goods',
+                        targetAudience: 'affluent professionals'
                     },
-                    custom: {
+
+                    // Reader information
+                    readerInfo: {
+                        name: formData.readerName,
+                        company: formData.company,
+                        position: 'CEO', // Default since position field removed
+                        location: formData.ubicacion
+                    },
+
+                    // Industry keywords (minimal since keywords field removed)
+                    industryKeywords: ['productos premium', 'artesanía de calidad', 'diseño exclusivo'],
+
+                    // Gender information
+                    genderInfo: formData.gender ? {
+                        gender: formData.gender,
+                        genderSpecificText: {}
+                    } : undefined,
+
+                    // Custom messages for all variables
+                    customMessages: {
+                        // Hero section
+                        calificador: formData.calificador || 'marcas de cuero',
                         historia: formData.historia || this.generateDefaultHistoria(formData),
-                        avatar: formData.avatar,
-                        propuestaPobre: formData.propuestaPobre,
-                        propuestaBuena: formData.propuestaBuena,
-                        calificador: formData.calificador,
                         brandName: formData.brandName || formData.company,
+
+                        // Problems section
+                        tuMarca: formData.brandName || formData.company,
                         inovacion: formData.inovacion,
                         malPosicionamiento: formData.malPosicionamiento,
                         rollsRoyce: formData.rollsRoyce,
                         fraseDescriptiva: formData.fraseDescriptiva,
+
+                        // Solution section
+                        avatar: formData.avatar,
+                        propuestaPobre: formData.propuestaPobre,
+                        propuestaBuena: formData.propuestaBuena,
                         automatizacion: formData.automatizacion,
                         trabajoDeValor: formData.trabajoDeValor,
                         proveedor: formData.proveedor,
@@ -1461,23 +1267,25 @@
                         membresia: formData.membresia,
                         metodo: formData.metodo
                     },
-                    metadata: {
-                        generatorVersion: '2.1',
-                        variableCount: this.countProvidedVariables(formData),
-                        complexity: this.calculateComplexity(formData),
-                        industry: formData.referenciaDeIndustria,
-                        hasCustomContent: this.hasCustomContent(formData),
-                        company: formData.company,
-                        readerName: formData.readerName,
-                        companyLogo: logoData,
-                        companyLogoId: logoId,
-                        uniqueCode: uniqueCode,
-                        expiresAt: expiresAt.toISOString()
-                    }
+
+                    // Expiration information
+                    expiration: {
+                        createdAt: now.toISOString(),
+                        expiresAt: expiresAt.toISOString(),
+                        uniqueCode,
+                        validHours: hoursValid
+                    },
+
+                    // Logo information
+                    companyLogo: logoData,
+                    companyLogoId: logoId,
+
+                    // Metadata for tracking and analytics
+                    metadata: mappingMetadata
                 };
 
                 // Generate encoded URL (UTF-8 safe)
-                const jsonData = JSON.stringify(minimalData);
+                const jsonData = JSON.stringify(enhancedData);
                 const encodedData = base64EncodeUnicode(jsonData);
 
                 // Determine base URL
@@ -1501,7 +1309,7 @@
                 const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
 
                 // Generate short URL using GitHub API (async)
-                const shortUrl = await this.urlShortener.generateShortUrl(longUrl, hoursValid, minimalData.metadata);
+                const shortUrl = await this.urlShortener.generateShortUrl(longUrl, hoursValid, mappingMetadata);
 
                 return {
                     longUrl,
@@ -1823,161 +1631,100 @@
         }
 
         function generatePreviewContent(formData) {
-            // Full landing page copy preview with user inputs in bold
+            // Enhanced preview with actual landing page content
             const heroContent = generateHeroPreview(formData);
             const problemsContent = generateProblemsPreview(formData);
             const solutionContent = generateSolutionPreview(formData);
-
+            
             return `
                 <div class="preview-section">
-                    <h4>🚀 Hero Section - Vista Previa Completa</h4>
+                    <h4>🚀 Hero Section</h4>
                     <div class="preview-content">${heroContent}</div>
                 </div>
                 <div class="preview-section">
-                    <h4>⚠️ Problems Section - Vista Previa Completa</h4>
+                    <h4>⚠️ Problems Section</h4>
                     <div class="preview-content">${problemsContent}</div>
                 </div>
                 <div class="preview-section">
-                    <h4>💡 Solution Section - Vista Previa Completa</h4>
+                    <h4>💡 Solution Section</h4>
                     <div class="preview-content">${solutionContent}</div>
                 </div>
             `;
         }
 
         function generateHeroPreview(formData) {
-            const historia = formData.historia || 'Imagina esto: tu hijo, en 2045, entra a una reunión en Nueva York. Alguien ve su portafolio y dice, en voz baja: \'¿Eso es de tu marca? Mi abuelo tenía uno igual… lo enterraron con él.\' Eso no es un producto. Es un legado. Y el legado se construye ahora mismo.';
+            const gender = formData.gender || 'male';
+            const historia = formData.historia || '[historia]';
             const readerName = formData.readerName || '[reader name]';
-            const referenciaDeIndustria = formData.referenciaDeIndustria || '[industria]';
+            const referenciaDeIndustria = formData.referenciaDeIndustria || '[referencia de industria]';
             const calificador = formData.calificador || '[calificador]';
-            const brandName = formData.brandName || formData.company || '[tu marca]';
-
-            // Bold user inputs when they have values
-            const boldReaderName = formData.readerName ? `<strong>${readerName}</strong>` : readerName;
-            const boldReferencia = formData.referenciaDeIndustria ? `<strong>${referenciaDeIndustria}</strong>` : referenciaDeIndustria;
-            const boldCalificador = formData.calificador ? `<strong>${calificador}</strong>` : calificador;
-            const boldBrandName = formData.brandName || formData.company ? `<strong>${brandName}</strong>` : brandName;
-            const boldHistoria = formData.historia ? historia.replace(brandName, `<strong>${brandName}</strong>`) : historia;
-
+            
+            // Apply gender-specific text
+            let greeting = gender === 'female' ? 'estimada empresaria' : 'estimado empresario';
+            let kingText = gender === 'female' ? 'quien se declara líder absoluta' : 'el que se declara rey';
+            let readyText = gender === 'female' ? 'está lista para tomar ese lugar' : 'está listo para tomar ese lugar';
+            
             return `
                 <div class="hero-preview">
-                    <div class="bg-accent/10 backdrop-blur-sm rounded-2xl p-4 border border-accent/20 mb-6">
-                        <p style="font-size: 14px; margin-bottom: 12px; line-height: 1.6; font-style: italic; color: hsl(var(--foreground));">
-                            "${boldHistoria}"
-                        </p>
-                    </div>
-
-                    <h3 style="font-size: 18px; margin-bottom: 16px; font-weight: 700; color: hsl(var(--foreground));">
-                        El segundo lugar es <span style="color: hsl(var(--accent));">el primer perdedor</span>
-                    </h3>
-
-                    <p style="font-size: 16px; margin-bottom: 16px; font-weight: 700; color: hsl(var(--foreground));">
-                        Bien. Estás aquí.
-                    </p>
-
-                    <p style="font-size: 14px; margin-bottom: 12px; line-height: 1.6; color: hsl(var(--foreground));">
-                        Si estás leyendo esto, ${boldReaderName}, es porque ves algo que el 99.7% de tus competidores todavía se niegan a ver, pero vos con tu instinto, <strong>lo sentiste incluso antes de abrir el email que te envié</strong>.
-                    </p>
-
-                    <p style="font-size: 14px; margin-bottom: 12px; line-height: 1.6; color: hsl(var(--foreground));">
-                        El mercado no recompensa la calidad.<br>
-                        Recompensa al que <strong>se declara rey</strong>, y está listo para tomar ese lugar.
-                    </p>
-
-                    <p style="font-size: 14px; margin-bottom: 12px; line-height: 1.6; color: hsl(var(--foreground));">
-                        Sospechas que tu empresa de ${boldReferencia} tiene lo necesario para ser la <strong>#1 absoluta</strong>.<br>
-                        Tienes razón. El problema no es tu potencial... es el camino.
-                    </p>
-
-                    <p style="font-size: 13px; margin-top: 16px; padding: 12px; background: hsl(var(--accent) / 0.1); border-radius: 8px; border-left: 3px solid hsl(var(--accent));">
-                        <strong style="color: hsl(var(--accent));">Nota:</strong> Esta vista previa muestra cómo aparecerá tu contenido personalizado en la página real. Los campos en <strong>negrita</strong> son tus datos personalizados.
-                    </p>
+                    <p><strong>Invitación Exclusiva:</strong><br>
+                    "Menos del 0.01% de las ${calificador} reciben esta invitación"</p>
+                    
+                    <p><strong>Cita Principal:</strong><br>
+                    "${historia}"</p>
+                    
+                    <p><strong>Personalización:</strong><br>
+                    "Si estás leyendo esto, ${readerName}, es porque ves algo que el 99.7% de tus competidores todavía se niegan a ver, pero vos con tu instinto, <strong>lo sentiste incluso antes de abrir el email que te envié</strong>."</p>
+                    
+                    <p><strong>Mensaje de Mercado:</strong><br>
+                    "El mercado no recompensa la calidad. Recompensa al <strong>${kingText}</strong>, y ${readyText}."</p>
+                    
+                    <p><strong>Potencial:</strong><br>
+                    "Sospechas que tu empresa de ${referenciaDeIndustria} tiene lo necesario para ser la <strong>#1 absoluta</strong>. Tienes razón. El problema no es tu potencial... es el camino."</p>
                 </div>
             `;
         }
 
         function generateProblemsPreview(formData) {
+            const gender = formData.gender || 'male';
             const ubicacion = formData.ubicacion || '[ubicacion]';
+            const brandName = formData.brandName || '[brand name]';
             const inovacion = formData.inovacion || '[inovacion]';
             const malPosicionamiento = formData.malPosicionamiento || '[malPosicionamiento]';
             const rollsRoyce = formData.rollsRoyce || '[Rolls-Royce]';
             const fraseDescriptiva = formData.fraseDescriptiva || '[frase descriptiva]';
-
-            // Bold user inputs when they have values
-            const boldUbicacion = formData.ubicacion ? `<strong>${ubicacion}</strong>` : ubicacion;
-            const boldInovacion = formData.inovacion ? `<strong>${inovacion}</strong>` : inovacion;
-            const boldMalPosicionamiento = formData.malPosicionamiento ? `<strong>${malPosicionamiento}</strong>` : malPosicionamiento;
-            const boldRollsRoyce = formData.rollsRoyce ? `<strong>${rollsRoyce}</strong>` : rollsRoyce;
-            const boldFraseDescriptiva = formData.fraseDescriptiva ? `<strong>${fraseDescriptiva}</strong>` : fraseDescriptiva;
-
+            
+            // Apply gender-specific text
+            let losersText = gender === 'female' ? 'son la moneda de cambio de quienes pierden' : 'son la moneda de cambio de los perdedores';
+            let queenText = gender === 'female' ? "'¡La reina ha vuelto!'" : "'¡El rey ha vuelto!'";
+            
             return `
                 <div class="problems-preview">
-                    <h3 style="font-size: 18px; margin-bottom: 16px; font-weight: 700; color: hsl(var(--foreground)); text-align: center;">
-                        Entonces… ¿Por qué seguís atrapado en el <span style="color: hsl(var(--accent));">segundo pelotón?</span>
-                    </h3>
-
-                    <p style="font-size: 16px; margin-bottom: 16px; color: hsl(var(--muted-foreground)); text-align: center;">
-                        No es suerte. Es que estás jugando con las reglas equivocadas.
-                    </p>
-
-                    <div style="background: hsl(var(--card)); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--border)); margin-bottom: 20px;">
-                        <h4 style="color: hsl(var(--accent)); margin-bottom: 12px; font-weight: 600;">
-                            🔒 Padecés el 'Síndrome del Fundador Prisionero'
-                        </h4>
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: hsl(var(--foreground));">
-                            <strong>Después:</strong> Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos revisás el diseño de tu próxima colección en un café de ${boldUbicacion}.
-                        </p>
-                        <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--muted-foreground));">
-                            <strong>Resultado:</strong> Ahora eres el estratega, no el bombero.
-                        </p>
-                    </div>
-
-                    <div style="background: hsl(var(--card)); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--border)); margin-bottom: 20px;">
-                        <h4 style="color: hsl(var(--accent)); margin-bottom: 12px; font-weight: 600;">
-                            🎯 Tu mensaje se diluye porque competís en atributos cuando deberías dominar por posicionamiento
-                        </h4>
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: hsl(var(--foreground));">
-                            <strong>Antes:</strong> ${boldMalPosicionamiento} son la moneda de cambio de los perdedores. Sin un framework de posicionamiento radical, sos solo otro producto caro en un mar de similares.
-                        </p>
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: hsl(var(--foreground));">
-                            <strong>Después:</strong> Tus clientes te describen como '${boldRollsRoyce}'… y cuando alguien pregunta '¿dónde lo compraste?', no necesitan esperar realmente la respuesta, ya lo intuyen.
-                        </p>
-                        <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--muted-foreground));">
-                            <strong>Resultado:</strong> Ya no vendes producto. Vendes estatus. Y eso no se compite… se domina.
-                        </p>
-                    </div>
-
-                    <div style="background: hsl(var(--card)); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--border)); margin-bottom: 20px;">
-                        <h4 style="color: hsl(var(--accent)); margin-bottom: 12px; font-weight: 600;">
-                            👥 Tu equipo no está roto - está mal cableado
-                        </h4>
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: hsl(var(--foreground));">
-                            <strong>Después:</strong> Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando ${boldInovacion}… y ya tiene un prototipo en tu escritorio.
-                        </p>
-                        <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--muted-foreground));">
-                            <strong>Resultado:</strong> Ahora no tenés empleados. Tenés game-changers entrenados para ganar.
-                        </p>
-                    </div>
-
-                    <div style="background: hsl(var(--accent) / 0.1); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--accent) / 0.3); margin-bottom: 16px;">
-                        <h4 style="color: hsl(var(--accent)); margin-bottom: 12px; font-weight: 600;">
-                            🔥 No estás quemado - estás estratégicamente hambriento
-                        </h4>
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 8px; color: hsl(var(--foreground));">
-                            <strong>Después:</strong> Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '${boldFraseDescriptiva}', tu nombre es el primero—y el único—que suena.
-                        </p>
-                        <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--muted-foreground));">
-                            <strong>Resultado:</strong> Ese rey sos vos.
-                        </p>
-                    </div>
-
-                    <p style="font-size: 13px; margin-top: 16px; padding: 12px; background: hsl(var(--accent) / 0.1); border-radius: 8px; border-left: 3px solid hsl(var(--accent));">
-                        <strong style="color: hsl(var(--accent));">Nota:</strong> Esta vista previa muestra cómo aparecerán tus problemas personalizados en la página real. Los campos en <strong>negrita</strong> son tus datos personalizados.
-                    </p>
+                    <p><strong>Problema de Posicionamiento:</strong><br>
+                    "${malPosicionamiento} ${losersText}. Sin un framework de posicionamiento radical, sos solo otro producto caro en un mar de similares."</p>
+                    
+                    <p><strong>Solución de Posicionamiento:</strong><br>
+                    "Tus clientes te describen como '${rollsRoyce}'... y cuando alguien pregunta '¿dónde lo compraste?', no necesitan esperar realmente la respuesta, ya lo intuyen."</p>
+                    
+                    <p><strong>Problema de Innovación:</strong><br>
+                    "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando ${inovacion}... y ya tiene un prototipo en tu escritorio."</p>
+                    
+                    <p><strong>Problema de Ubicación:</strong><br>
+                    "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos revisás el diseño de tu próxima colección en un café de ${ubicacion}."</p>
+                    
+                    <p><strong>Problema de Marca:</strong><br>
+                    "Tu último lanzamiento se agotó en 9 minutos, y ahora tu competidor vende una imitación en Mercado Libre... con tus clientes dejando reseñas: 'No es lo mismo que ${brandName}'."</p>
+                    
+                    <p><strong>Resultado Final:</strong><br>
+                    "Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '${fraseDescriptiva}', tu nombre es el primero—y el único—que suena."</p>
+                    
+                    <p><strong>Resultado Final:</strong><br>
+                    "Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '${fraseDescriptiva}', tu nombre es el primero—y el único—que suena. ${queenText}"</p>
                 </div>
             `;
         }
 
         function generateSolutionPreview(formData) {
+            const gender = formData.gender || 'male';
             const avatar = formData.avatar || '[avatar]';
             const propuestaPobre = formData.propuestaPobre || '[propuesta pobre]';
             const propuestaBuena = formData.propuestaBuena || '[propuesta buena]';
@@ -1987,170 +1734,35 @@
             const infrautilizado = formData.infrautilizado || '[infrautilizado]';
             const membresia = formData.membresia || '[membresia]';
             const metodo = formData.metodo || '[metodo]';
-
-            // Bold user inputs when they have values
-            const boldAvatar = formData.avatar ? `<strong>${avatar}</strong>` : avatar;
-            const boldPropuestaPobre = formData.propuestaPobre ? `<strong>${propuestaPobre}</strong>` : propuestaPobre;
-            const boldPropuestaBuena = formData.propuestaBuena ? `<strong>${propuestaBuena}</strong>` : propuestaBuena;
-            const boldAutomatizacion = formData.automatizacion ? `<strong>${automatizacion}</strong>` : automatizacion;
-            const boldTrabajoDeValor = formData.trabajoDeValor ? `<strong>${trabajoDeValor}</strong>` : trabajoDeValor;
-            const boldProveedor = formData.proveedor ? `<strong>${proveedor}</strong>` : proveedor;
-            const boldInfrautilizado = formData.infrautilizado ? `<strong>${infrautilizado}</strong>` : infrautilizado;
-            const boldMembresia = formData.membresia ? `<strong>${membresia}</strong>` : membresia;
-            const boldMetodo = formData.metodo ? `<strong>${metodo}</strong>` : metodo;
-
+            
+            // Apply gender-specific text
+            let strategistText = gender === 'female' ? 'sos la estratega, no la bombera' : 'eres el estratega, no el bombero';
+            let championText = gender === 'female' ? 'sos campeona' : 'eres campeón';
+            let kingText = gender === 'female' ? 'esa reina sos vos' : 'ese rey sos vos';
+            let queenText = gender === 'female' ? 'La próxima reina será decidida' : 'El próximo rey será decidido';
+            
             return `
                 <div class="solution-preview">
-                    <h3 style="font-size: 18px; margin-bottom: 16px; font-weight: 700; color: hsl(var(--foreground)); text-align: center;">
-                        No es inspiración. Es ingeniería de dominio.
-                    </h3>
-
-                    <div style="background: hsl(var(--accent) / 0.1); backdrop-blur-sm rounded-2xl p-6 border border-accent/30 mb-8 text-center;">
-                        <p style="font-size: 16px; line-height: 1.6; color: hsl(var(--foreground)); font-weight: 500;">
-                            El <span style="color: hsl(var(--accent)); font-weight: bold;">#1 no gana por tener mejores productos.</span> Gana por operar con tres sistemas que el resto ni imagina.
-                        </p>
-                    </div>
-
-                    <div style="background: hsl(var(--card)); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--border)); margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 8px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                01
-                            </div>
-                            <div>
-                                <h4 style="color: hsl(var(--accent)); margin-bottom: 4px; font-weight: 600;">
-                                    El Protocolo de la «Elección Obvia»
-                                </h4>
-                                <p style="font-size: 13px; color: hsl(var(--muted-foreground));">
-                                    (para duplicar ventas en 12 meses)
-                                </p>
-                            </div>
-                        </div>
-
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: hsl(var(--muted-foreground)); font-style: italic;">
-                            Cómo reprogramar la percepción del mercado para que tus clientes vean a tus competidores como meras imitaciones baratas.
-                        </p>
-
-                        <div style="space-y: 8px;">
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    ${boldAvatar}
-                                </p>
-                            </div>
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Tu propuesta de valor ya no dice '${boldPropuestaPobre}'. Expone la mentira de tu competidor: '${boldPropuestaBuena}'
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="background: hsl(var(--card)); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--border)); margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 8px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                02
-                            </div>
-                            <div>
-                                <h4 style="color: hsl(var(--accent)); margin-bottom: 4px; font-weight: 600;">
-                                    El sistema «Hidratación Rentable»
-                                </h4>
-                                <p style="font-size: 13px; color: hsl(var(--muted-foreground));">
-                                    (para liberar un 30% de flujo de caja sin despedir a nadie)
-                                </p>
-                            </div>
-                        </div>
-
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: hsl(var(--muted-foreground)); font-style: italic;">
-                            Cómo identificar y eliminar las 3-5 fugas silenciosas de capital que están drenando un 30% de tu flujo de caja.
-                        </p>
-
-                        <div style="space-y: 8px;">
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Automatizas no para ahorrar, sino para liberar tu mente de lo trivial —así puedes enfocarte en ${boldAutomatizacion}.
-                                </p>
-                            </div>
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Tu equipo no 'trabaja más', trabaja en lo que solo ellos pueden hacer: ${boldTrabajoDeValor}.
-                                </p>
-                            </div>
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Tus proveedores no 'bajan precios'… Firman acuerdos de lealtad: te reservan ${boldProveedor}… a cambio de volumen garantizado por 3 años.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="background: hsl(var(--card)); padding: 16px; border-radius: 12px; border: 1px solid hsl(var(--border)); margin-bottom: 20px;">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
-                            <div style="flex-shrink: 0; width: 40px; height: 40px; border-radius: 8px; background: var(--accent-gradient); display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">
-                                03
-                            </div>
-                            <div>
-                                <h4 style="color: hsl(var(--accent)); margin-bottom: 4px; font-weight: 600;">
-                                    La matriz de los «ingresos ocultos»
-                                </h4>
-                                <p style="font-size: 13px; color: hsl(var(--muted-foreground));">
-                                    que tus competidores ni siquiera saben que existen
-                                </p>
-                            </div>
-                        </div>
-
-                        <p style="font-size: 14px; line-height: 1.6; margin-bottom: 12px; color: hsl(var(--muted-foreground)); font-style: italic;">
-                            Cómo activar flujos de ingresos ocultos que existen dentro de tu operación actual.
-                        </p>
-
-                        <div style="space-y: 8px;">
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Tus máquinas infrautilizadas no 'cuestan'… ${boldInfrautilizado}.
-                                </p>
-                            </div>
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Tus clientes no 'compran una vez'… ${boldMembresia}… y el 10% de lo que generan al referir a otros.
-                                </p>
-                            </div>
-                            <div style="display: flex; align-items: start; gap: 8px;">
-                                <span style="color: hsl(var(--accent));">✓</span>
-                                <p style="font-size: 14px; line-height: 1.6; color: hsl(var(--foreground));">
-                                    Tus procesos internos no son 'secretos'… Son licenciables: ${boldMetodo}.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div style="background: linear-gradient(to right, hsl(var(--accent) / 0.1), hsl(var(--accent) / 0.05)); padding: 20px; border-radius: 16px; border: 1px solid hsl(var(--accent) / 0.3); margin-bottom: 16px;">
-                        <div style="text-align: center; space-y: 12px;">
-                            <h4 style="font-size: 18px; font-weight: 700; color: hsl(var(--foreground));">
-                                ¿Podrías construir esto solo?
-                            </h4>
-                            <p style="font-size: 16px; color: hsl(var(--muted-foreground));">
-                                Sí. Con 10–15 años de errores que cuestan millones… y la suerte de sobrevivir.
-                            </p>
-
-                            <div style="width: 100%; height: 1px; background: linear-gradient(to right, transparent, hsl(var(--accent) / 0.5), transparent); margin: 16px 0;"></div>
-
-                            <h4 style="font-size: 18px; font-weight: 700; color: hsl(var(--accent));">
-                                O podríamos implantarlo juntos en 12 meses.
-                            </h4>
-                            <p style="font-size: 16px; color: hsl(var(--foreground));">
-                                Usando sistemas que ya crearon +150% en joyería, -35% en costos en salud, y dominio absoluto en manufactura.
-                            </p>
-                        </div>
-                    </div>
-
-                    <p style="font-size: 13px; margin-top: 16px; padding: 12px; background: hsl(var(--accent) / 0.1); border-radius: 8px; border-left: 3px solid hsl(var(--accent));">
-                        <strong style="color: hsl(var(--accent));">Nota:</strong> Esta vista previa muestra cómo aparecerán tus sistemas personalizados en la página real. Los campos en <strong>negrita</strong> son tus datos personalizados.
-                    </p>
+                    <p><strong>Sistema 01 - Protocolo de la Elección Obvia:</strong><br>
+                    • ${avatar}<br>
+                    • Tu propuesta de valor ya no dice '${propuestaPobre}'. Expone la mentira de tu competidor: '${propuestaBuena}'<br>
+                    • Tus alianzas ya no son 'colaboraciones con influencers'... Son alianzas con bancos privados que regalan tu billetera a sus clientes premium... porque tú les das estatus, no cuero.</p>
+                    
+                    <p><strong>Sistema 02 - Hidratación Rentable:</strong><br>
+                    • Automatizas no para ahorrar, sino para liberar tu mente de lo trivial —así puedes enfocarte en '${automatizacion}'.<br>
+                    • Tu equipo no 'trabaja más', trabaja en lo que solo ellos pueden hacer: '${trabajoDeValor}'.<br>
+                    • Tus proveedores no 'bajan precios'... Firman acuerdos de lealtad: te reservan '${proveedor}'... a cambio de volumen garantizado por 3 años.</p>
+                    
+                    <p><strong>Sistema 03 - Matriz de Ingresos Ocultos:</strong><br>
+                    • Tus máquinas infrautilizadas no 'cuestan'... '${infrautilizado}'.<br>
+                    • Tus clientes no 'compran una vez'... '${membresia}'... y el 10% de lo que generan al referir a otros.<br>
+                    • Tus procesos internos no son 'secretos'... Son licenciables: '${metodo}'.</p>
+                    
+                    <p><strong>Resultado Final:</strong><br>
+                    "¿Podrías construir esto solo? Sí. Con 10-5 años de errores que cuestan millones... y la suerte de sobrevivir. O podríamos implantarlo juntos en 12 meses."</p>
+                    
+                    <p><strong>Resultado Final:</strong><br>
+                    "No estás quemado - estás estratégicamente hambriento. Hay un rey en vos esperando salir. Y el mercado ya tiene un nuevo rey: ${kingText}."</p>
                 </div>
             `;
         }
@@ -2196,12 +1808,11 @@
             if (section !== currentSection) {
                 currentSection = section;
                 
-                // Update step indicators (if they exist)
-                const stepElements = document.querySelectorAll('.step');
-                stepElements.forEach(step => {
+                // Update step indicators
+                document.querySelectorAll('.step').forEach(step => {
                     step.classList.remove('active');
                 });
-
+                
                 const activeStep = document.querySelector('.step[data-section="' + section + '"]');
                 if (activeStep) {
                     activeStep.classList.add('active');
