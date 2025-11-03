@@ -110,21 +110,35 @@ jobs:
           process.exit(1);
         }
 
+        // Read metadata from temp file to avoid command line length issues
+        let metadataStr;
         try {
-          metadata = JSON.parse(process.env.METADATA || '{}');
+          if (fs.existsSync('./metadata_temp.json')) {
+            metadataStr = fs.readFileSync('./metadata_temp.json', 'utf8');
+            console.log('DEBUG: Read metadata from temp file, length:', metadataStr.length);
+          } else {
+            metadataStr = process.env.METADATA || '{}';
+            console.log('DEBUG: Read metadata from environment, length:', metadataStr.length);
+          }
+        } catch (error) {
+          console.log('WARNING: Could not read metadata, using empty object');
+          metadataStr = '{}';
+        }
+
+        try {
+          metadata = JSON.parse(metadataStr);
           console.log('DEBUG: Successfully parsed METADATA as JSON');
         } catch (error) {
           console.log('DEBUG: JSON parse failed, trying JavaScript evaluation');
-          console.log('DEBUG: Metadata input:', process.env.METADATA);
+          console.log('DEBUG: Metadata input length:', metadataStr.length);
 
           try {
             // Use Function constructor for safer evaluation
-            const jsObject = new Function('return ' + process.env.METADATA)();
+            const jsObject = new Function('return ' + metadataStr)();
             metadata = jsObject;
             console.log('DEBUG: Successfully evaluated metadata as JavaScript object');
           } catch (fallbackError) {
             console.log('WARNING: Could not parse metadata, using empty object');
-            console.log('DEBUG: Original METADATA value:', process.env.METADATA);
             metadata = {};
           }
         }
@@ -176,14 +190,21 @@ jobs:
         console.log('Active mappings:', activeCount);
         EOF
 
+        # Write metadata to temp file to avoid command line length issues
+        echo "$METADATA" > metadata_temp.json
+        echo "DEBUG: Wrote metadata to temp file, size: $(wc -c < metadata_temp.json)"
+
         # Run Node script with proper environment setup
         export MAPPINGS="$MAPPINGS"
         export SHORT_CODE="$SHORT_CODE"
         export LONG_URL="$LONG_URL"
         export EXPIRES_AT="$EXPIRES_AT"
-        export METADATA="$METADATA"
+        # Don't export METADATA as environment variable - read from file instead
 
         node process_mappings.cjs
+
+        # Clean up temp file
+        rm -f metadata_temp.json
 
         if [ $? -ne 0 ]; then
           echo "ERROR: Node.js processing failed"
