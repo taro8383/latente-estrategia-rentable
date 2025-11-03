@@ -100,17 +100,21 @@ jobs:
 
         console.log('DEBUG: Starting Node.js processing');
 
-        let mappings, metadata;
-
+        // Read all large data from temp files to avoid command line length issues
+        let mappingsStr;
         try {
-          mappings = JSON.parse(process.env.MAPPINGS);
-          console.log('DEBUG: Successfully parsed MAPPINGS');
+          if (fs.existsSync('./mappings_temp.json')) {
+            mappingsStr = fs.readFileSync('./mappings_temp.json', 'utf8');
+            console.log('DEBUG: Read mappings from temp file, length:', mappingsStr.length);
+          } else {
+            mappingsStr = process.env.MAPPINGS || '{}';
+            console.log('DEBUG: Read mappings from environment, length:', mappingsStr.length);
+          }
         } catch (error) {
-          console.error('ERROR: Failed to parse MAPPINGS:', error.message);
-          process.exit(1);
+          console.log('WARNING: Could not read mappings, using empty object');
+          mappingsStr = '{"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}}';
         }
 
-        // Read metadata and long URL from temp files to avoid command line length issues
         let metadataStr;
         try {
           if (fs.existsSync('./metadata_temp.json')) {
@@ -203,23 +207,25 @@ jobs:
         console.log('Active mappings:', activeCount);
         EOF
 
-        # Write metadata and long URL to temp files to avoid command line length issues
+        # Write all large data to temp files to avoid command line length issues
+        echo "$MAPPINGS" > mappings_temp.json
+        echo "DEBUG: Wrote mappings to temp file, size: $(wc -c < mappings_temp.json)"
+
         echo "$METADATA" > metadata_temp.json
         echo "DEBUG: Wrote metadata to temp file, size: $(wc -c < metadata_temp.json)"
 
         echo "$LONG_URL" > longurl_temp.txt
         echo "DEBUG: Wrote long URL to temp file, size: $(wc -c < longurl_temp.txt)"
 
-        # Run Node script with proper environment setup
-        export MAPPINGS="$MAPPINGS"
+        # Run Node script with minimal environment variables
         export SHORT_CODE="$SHORT_CODE"
         export EXPIRES_AT="$EXPIRES_AT"
-        # Don't export METADATA and LONG_URL as environment variables - read from files instead
+        # Don't export MAPPINGS, METADATA, and LONG_URL as environment variables - read from files instead
 
         node process_mappings.cjs
 
-        # Clean up temp files
-        rm -f metadata_temp.json longurl_temp.txt
+        # Clean up all temp files
+        rm -f metadata_temp.json longurl_temp.txt mappings_temp.json
 
         if [ $? -ne 0 ]; then
           echo "ERROR: Node.js processing failed"
