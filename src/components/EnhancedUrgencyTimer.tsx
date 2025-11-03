@@ -2,9 +2,13 @@ import { Clock } from "lucide-react";
 import { usePersonalization } from "@/context/PersonalizationProvider";
 
 export const EnhancedUrgencyTimer = () => {
-  const { timeRemaining, isPersonalized, isVeryUrgent, getSecondsRemaining } = usePersonalization();
+  const { timeRemaining, isPersonalized, isVeryUrgent, getSecondsRemaining, data } = usePersonalization();
 
   if (!isPersonalized || !timeRemaining) return null;
+
+  // Simple direct gender replacement
+  const gender = data?.genderInfo?.gender || 'male';
+  const isFemale = gender === 'female';
 
   const isUrgent = !timeRemaining.includes('d') && parseInt(timeRemaining) < 24;
   const veryUrgent = isVeryUrgent();
@@ -87,11 +91,11 @@ export const EnhancedUrgencyTimer = () => {
           : 'text-orange-200/80'
         }
       `}>
-        {veryUrgent 
+        {veryUrgent
           ? '¡SEGUNDOS para que tu oportunidad desaparezca para siempre!'
-          : isUrgent 
+          : isUrgent
           ? 'Tu invitación expira pronto. Actúa ahora o pierde para siempre.'
-          : 'Después de esto, la oportunidad de ser el #1 desaparecerá.'
+          : `Después de esto, la oportunidad de ser ${isFemale ? 'la #1' : 'el #1'} desaparecerá.`
         }
       </p>
       
