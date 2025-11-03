@@ -2234,11 +2234,12 @@
             if (section !== currentSection) {
                 currentSection = section;
                 
-                // Update step indicators
-                document.querySelectorAll('.step').forEach(step => {
+                // Update step indicators (if they exist)
+                const stepElements = document.querySelectorAll('.step');
+                stepElements.forEach(step => {
                     step.classList.remove('active');
                 });
-                
+
                 const activeStep = document.querySelector('.step[data-section="' + section + '"]');
                 if (activeStep) {
                     activeStep.classList.add('active');
