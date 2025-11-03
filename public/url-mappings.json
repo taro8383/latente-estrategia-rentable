@@ -119,9 +119,24 @@
         "company": "Luxury Holdings",
         "readerName": "Macarena"
       }
+    },
+    "rss1kV": {
+      "shortCode": "rss1kV",
+      "longUrl": "https://latente.net/#/invite/93gjso6ebduj0b5ravy0a?data=eyJicmFuZEluZm8iOnsibmFtZSI6ImdmZGZmZmQiLCJpbmR1c3RyeSI6ImhmZGgiLCJwcm9kdWN0VHlwZSI6ImxlYXRoZXIgZ29vZHMiLCJ0YXJnZXRBdWRpZW5jZSI6ImFmZmx1ZW50IHByb2Zlc3Npb25hbHMifSwicmVhZGVySW5mbyI6eyJuYW1lIjoiSnVhbiIsImNvbXBhbnkiOiJMdXh1cnkgSG9sZGluZ3MiLCJwb3NpdGlvbiI6IkNFTyIsImxvY2F0aW9uIjoiTnVldmEgWW9yayJ9LCJpbmR1c3RyeUtleXdvcmRzIjpbInByb2R1Y3RvcyBwcmVtaXVtIiwiYXJ0ZXNhbsOtYSBkZSBjYWxpZGFkIiwiZGlzZcOxbyBleGNsdXNpdm8iXSwiZ2VuZGVySW5mbyI6eyJnZW5kZXIiOiJmZW1hbGUiLCJnZW5kZXJTcGVjaWZpY1RleHQiOnt9fSwiY3VzdG9tTWVzc2FnZXMiOnsiY2FsaWZpY2Fkb3IiOiJmZ2QiLCJoaXN0b3JpYSI6Imdkc2ciLCJicmFuZE5hbWUiOiJmZGdmZmQiLCJ0dU1hcmNhIjoiZ2RzZ2ZkIiwiaW5vdmFjaW9uIjoiZmRmZ2RnIiwibWFsUG9zaWNpb25hbWllbnRvIjoiZmRnZyIsInJvbGxzUm95Y2UiOiJnZGZmZyIsImZyYXNlRGVzY3JpcHRpdmEiOiJkZ2RmIiwiYXZhdGFyIjoiampmIiwicHJvcHVlc3RhUG9icmUiOiJqZmRqIiwicHJvcHVlc3RhQnVlbmEiOiJmZGpmZCIsImF1dG9tYXRpemFjaW9uIjoiamZkamkiLCJ0cmFiYWpvRGVWYWxvciI6ImpkZmpkZiIsInByb3ZlZWRvciI6ImZkamRmaiIsImluZnJhdXRpbGl6YWRvIjoiZmRqIiwibWVtYnJlc2lhIjoiZmRqIiwibWV0b2RvIjoiZmpkamRmIn0sImV4cGlyYXRpb24iOnsiY3JlYXRlZEF0IjoiMjAyNS0xMS0wM1QxMjo1MzoyMy43NDAiLCJleHBpcmVzQXQiOiIyMDI1LTExLTA2VDEyOjUzOjIzLjc0MCIsInVuaXF1ZUNvZGUiOiI5M2dqczZlYmR1ajBiNXJhdnljYSIsInZhbGlkSG91cnMiOjcyfSwiY29tcGFueUxvZ28iOm51bGwsImNvbXBhbnlMb2dvSWQiOm51bGwsIm1ldGFkYXRhIjp7ImdlbmVyYXRvclZlcnNpb24iOiIyLjEiLCJ2YXJpYWJsZUNvdW50IjoyMCwiY29tcGxleGl0eSI6MTcsImluZHVzdHJ5IjoiaGZkaCIsImhhc0N1c3RvbUNvbnRlbnQiOnRydWUsImNvbXBhbnkiOiJMdXh1cnkgSG9sZGluZ3MiLCJyZWFkZXJOYW1lIjoiSnVhbiJ9fQ%3D%3D",
+      "createdAt": 1762430769043,
+      "expiresAt": 1762689969043,
+      "metadata": {
+        "generatorVersion": "2.1",
+        "variableCount": 20,
+        "complexity": 17,
+        "industry": "hfdh",
+        "hasCustomContent": true,
+        "company": "Luxury Holdings",
+        "readerName": "Juan"
+      }
     }
   },
-  "lastUpdated": 1762164482523,
+  "lastUpdated": 1762172051223,
   "version": "1.0",
   "statistics": {
     "totalMappings": 8,
