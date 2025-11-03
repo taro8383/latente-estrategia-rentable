@@ -1434,15 +1434,14 @@
                     logoData = companyLogoData;
                 }
 
-                // Prepare metadata for GitHub API
+                // Prepare minimal metadata for GitHub API (to avoid shell argument length limits)
                 const mappingMetadata = {
-                    generatorVersion: '2.1',
-                    variableCount: this.countProvidedVariables(formData),
-                    complexity: this.calculateComplexity(formData),
-                    industry: formData.referenciaDeIndustria,
-                    hasCustomContent: this.hasCustomContent(formData),
-                    company: formData.company,
-                    readerName: formData.readerName
+                    v: '2.1', // Shortened key
+                    vc: this.countProvidedVariables(formData), // variableCount
+                    cx: this.calculateComplexity(formData), // complexity
+                    hc: this.hasCustomContent(formData) ? 1 : 0, // hasCustomContent
+                    co: formData.company || '', // company
+                    rn: formData.readerName || '' // readerName
                 };
 
                 // Enhanced personalization data structure
