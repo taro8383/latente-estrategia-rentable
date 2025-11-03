@@ -18,8 +18,12 @@ export const PersonalizedText: React.FC<PersonalizedTextProps> = ({
   const processNode = (node: any): React.ReactNode => {
     if (typeof node === 'string') {
       if (!replacer) return node;
-      const replaced = replacer.replace(node);
+
+      // Apply gender replacements FIRST on the raw string with HTML tags intact
+      const genderReplaced = replacer.applyGenderReplacements(node);
+      const replaced = replacer.replace(genderReplaced);
       const processedText = replacer.replaceIndustryKeywords(replaced);
+
       const parts = processedText.split(/(<[^>]*>)/);
       return parts.map((part, index) => {
         if (part.startsWith('<') && part.endsWith('>')) {
