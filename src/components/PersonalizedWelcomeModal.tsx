@@ -14,6 +14,11 @@ interface PersonalizedWelcomeModalProps {
 export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcomeModalProps) => {
   const { data } = usePersonalization();
 
+  // Simple direct gender replacement
+  const gender = data?.genderInfo?.gender || 'male';
+  const isFemale = gender === 'female';
+  console.log('Welcome modal - Gender:', gender, 'IsFemale:', isFemale);
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="
@@ -42,7 +47,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
             {/* Welcome message */}
             <div className="space-y-2 sm:space-y-3">
             <p className="text-white/90 text-sm sm:text-base leading-relaxed">
-              Tu oportunidad exclusiva de convertirte en <PersonalizedText>el <span className="text-accent font-semibold">#1 absoluto</span></PersonalizedText> está lista.
+              Tu oportunidad exclusiva de convertirte en <span className="text-accent font-semibold">{isFemale ? 'la #1 absoluta' : 'el #1 absoluto'}</span> está lista.
             </p>
           </div>
 

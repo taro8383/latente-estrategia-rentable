@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import successCelebration from "@/assets/success-celebration.jpg";
 import logoDi from "/LoDi-logo.svg";
 import { PersonalizedText } from "@/components/PersonalizedText";
+import { usePersonalization } from "@/context/PersonalizationProvider";
 
 const uniqueCombination = [
   {
@@ -23,6 +24,13 @@ const uniqueCombination = [
 ];
 
 export const Pricing = () => {
+  const { data } = usePersonalization();
+
+  // Simple direct gender replacement
+  const gender = data?.genderInfo?.gender || 'male';
+  const isFemale = gender === 'female';
+  console.log('Pricing component - Gender:', gender, 'IsFemale:', isFemale);
+
   const scrollToContact = () => {
     document.getElementById('contacto')?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -129,7 +137,7 @@ export const Pricing = () => {
               </div>
               
               <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-8 mobile-center-text">
-                ¿Tienes lo que se necesita para ser <PersonalizedText>el <span className="text-accent">#1 absoluto</span></PersonalizedText>?
+                ¿Tienes lo que se necesita para ser <span className="text-accent">{isFemale ? 'la #1 absoluta' : 'el #1 absoluto'}</span>?
               </h3>
               
               <p className="text-xl text-muted-foreground leading-relaxed mb-8 mobile-center-text">

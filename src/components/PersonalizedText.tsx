@@ -19,8 +19,13 @@ export const PersonalizedText: React.FC<PersonalizedTextProps> = ({
     if (typeof node === 'string') {
       if (!replacer) return node;
 
+      // DEBUG: Log what we're processing
+      console.log('PersonalizedText processing:', node);
+      console.log('Gender data:', replacer.data?.genderInfo?.gender);
+
       // Apply gender replacements FIRST on the raw string with HTML tags intact
       const genderReplaced = replacer.applyGenderReplacements(node);
+      console.log('After gender replacement:', genderReplaced);
       const replaced = replacer.replace(genderReplaced);
       const processedText = replacer.replaceIndustryKeywords(replaced);
 
