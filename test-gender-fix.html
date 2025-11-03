@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gender Replacement Test</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .male { color: blue; }
+        .female { color: red; }
+        .text-accent { color: #d97706; font-weight: 600; }
+        .code { background: #f5f5f5; padding: 10px; font-family: monospace; margin: 5px 0; }
+    </style>
+</head>
+<body>
+    <h1>Gender Replacement Debug Test</h1>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Simplified VariableReplacer for testing
+        class VariableReplacer {
+            constructor(data) {
+                this.data = data;
+                this.GENDER_MAPPINGS = {
+                    "el <span className=\"text-accent font-semibold\">#1 absoluto</span>": {
+                        male: "el <span className=\"text-accent font-semibold\">#1 absoluto</span>",
+                        female: "la <span className=\"text-accent font-semibold\">#1 absoluta</span>"
+                    },
+                    "el <span className=\"text-accent\">#1 absoluto</span>": {
+                        male: "el <span className=\"text-accent\">#1 absoluto</span>",
+                        female: "la <span className=\"text-accent\">#1 absoluta</span>"
+                    },
+                    "convertirte en el <span className=\"text-accent font-semibold\">#1 absoluto</span>": {
+                        male: "convertirte en el <span className=\"text-accent font-semibold\">#1 absoluto</span>",
+                        female: "convertirte en la <span className=\"text-accent font-semibold\">#1 absoluta</span>"
+                    },
+                    "a el que <strong>se declara rey</strong>": {
+                        male: "a el que <strong>se declara rey</strong>",
+                        female: "a la que <strong>se declara reina</strong>"
+                    },
+                    "está listo para tomar ese lugar": {
+                        male: "está listo para tomar ese lugar",
+                        female: "está lista para tomar ese lugar"
+                    }
+                };
+            }
+
+            applyGenderReplacements(text) {
+                const gender = (this.data.genderInfo?.gender) || 'male';
+                let result = text;
+
+                console.log(`🔍 Testing with gender: ${gender}`);
+                console.log(`📝 Original text: ${text}`);
+
+                Object.entries(this.GENDER_MAPPINGS).forEach(([maleText, genderMap]) => {
+                    const replacement = genderMap[gender];
+                    if (replacement && result.includes(maleText)) {
+                        console.log(`✅ Found match: "${maleText}" -> "${replacement}"`);
+                        result = result.replace(new RegExp(this.escapeRegExp(maleText), 'g'), replacement);
+                    }
+                });
+
+                console.log(`🎯 Result: ${result}`);
+                console.log('---');
+                return result;
+            }
+
+            escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            }
+        }
+
+        function TestComponent() {
+            const [gender, setGender] = useState('male');
+            const [results, setResults] = useState({});
+
+            useEffect(() => {
+                const testData = {
+                    genderInfo: { gender }
+                };
+                const replacer = new VariableReplacer(testData);
+
+                const testTexts = [
+                    "Tu oportunidad exclusiva de convertirte en <span className=\"text-accent font-semibold\">#1 absoluto</span> está lista.",
+                    "Recompensa a el que <strong>se declara rey</strong>, y está listo para tomar ese lugar.",
+                    "¿Tienes lo que se necesita para ser <span className=\"text-accent\">#1 absoluto</span>?"
+                ];
+
+                const newResults = {};
+                testTexts.forEach((text, index) => {
+                    newResults[`text${index + 1}`] = replacer.applyGenderReplacements(text);
+                });
+                setResults(newResults);
+            }, [gender]);
+
+            return (
+                <div>
+                    <div className="test-section">
+                        <h2>Gender Control</h2>
+                        <button onClick={() => setGender('male')} style={{ marginRight: '10px' }}>
+                            Test Male
+                        </button>
+                        <button onClick={() => setGender('female')}>
+                            Test Female
+                        </button>
+                        <p>Current Gender: <strong className={gender}>{gender}</strong></p>
+                    </div>
+
+                    <div className="test-section">
+                        <h2>Test Results</h2>
+
+                        <div className="test-item">
+                            <h3>Text 1: PersonalizedWelcomeModal</h3>
+                            <div className="code">Original: Tu oportunidad exclusiva de convertirte en el #1 absoluto está lista.</div>
+                            <div className={gender}>
+                                Result: <span dangerouslySetInnerHTML={{ __html: results.text1 }} />
+                            </div>
+                        </div>
+
+                        <div className="test-item">
+                            <h3>Text 2: Hero Component</h3>
+                            <div className="code">Original: Recompensa a el que se declara rey, y está listo para tomar ese lugar.</div>
+                            <div className={gender}>
+                                Result: <span dangerouslySetInnerHTML={{ __html: results.text2 }} />
+                            </div>
+                        </div>
+
+                        <div className="test-item">
+                            <h3>Text 3: Pricing Component</h3>
+                            <div className="code">Original: ¿Tienes lo que se necesita para ser el #1 absoluto?</div>
+                            <div className={gender}>
+                                Result: <span dangerouslySetInnerHTML={{ __html: results.text3 }} />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        ReactDOM.render(<TestComponent />, document.getElementById('root'));
+    </script>
+</body>
+</html>

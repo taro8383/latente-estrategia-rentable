@@ -106,6 +106,10 @@ export class VariableReplacer {
       male: "convertirte en el #1 absoluto",
       female: "convertirte en la #1 absoluta"
     },
+    "convertirte en el <span className=\"text-accent font-semibold\">#1 absoluto</span>": {
+      male: "convertirte en el <span className=\"text-accent font-semibold\">#1 absoluto</span>",
+      female: "convertirte en la <span className=\"text-accent font-semibold\">#1 absoluta</span>"
+    },
     "el #1 absoluto": {
       male: "el #1 absoluto",
       female: "la #1 absoluta"
@@ -114,9 +118,17 @@ export class VariableReplacer {
       male: "el <span class=\"text-accent font-semibold\">#1 absoluto</span>",
       female: "la <span class=\"text-accent font-semibold\">#1 absoluta</span>"
     },
+    "el <span className=\"text-accent font-semibold\">#1 absoluto</span>": {
+      male: "el <span className=\"text-accent font-semibold\">#1 absoluto</span>",
+      female: "la <span className=\"text-accent font-semibold\">#1 absoluta</span>"
+    },
     "el <span class=\"text-accent\">#1 absoluto</span>": {
       male: "el <span class=\"text-accent\">#1 absoluto</span>",
       female: "la <span class=\"text-accent\">#1 absoluta</span>"
+    },
+    "el <span className=\"text-accent\">#1 absoluto</span>": {
+      male: "el <span className=\"text-accent\">#1 absoluto</span>",
+      female: "la <span className=\"text-accent\">#1 absoluta</span>"
     },
     "Entonces… ¿Por qué seguís atrapado en el": {
       male: "Entonces… ¿Por qué seguís atrapado en el",
