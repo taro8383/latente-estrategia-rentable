@@ -161,6 +161,15 @@ jobs:
           }
         }
 
+        let mappings;
+        try {
+          mappings = JSON.parse(mappingsStr);
+          console.log('DEBUG: Successfully parsed MAPPINGS as JSON');
+        } catch (error) {
+          console.log('WARNING: Could not parse mappings, using default structure');
+          mappings = {"mappings": {}, "lastUpdated": 0, "version": "1.0", "statistics": {"totalMappings": 0, "activeMappings": 0, "expiredMappings": 0}};
+        }
+
         const shortCode = process.env.SHORT_CODE;
         const expiresAt = parseInt(process.env.EXPIRES_AT);
 
