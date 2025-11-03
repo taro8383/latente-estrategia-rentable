@@ -1434,62 +1434,26 @@
                     logoData = companyLogoData;
                 }
 
-                // Prepare metadata for GitHub API (minimal - only essential fields)
-                const mappingMetadata = {
-                    generatorVersion: '2.1',
-                    variableCount: this.countProvidedVariables(formData),
-                    complexity: this.calculateComplexity(formData),
-                    industry: formData.referenciaDeIndustria,
-                    hasCustomContent: this.hasCustomContent(formData),
-                    company: formData.company,
-                    readerName: formData.readerName
-                };
-
-                // Enhanced personalization data structure
-                const enhancedData = {
-                    // Basic brand information
-                    brandInfo: {
-                        name: formData.brandName || formData.company, // Fallback to company name
-                        industry: formData.referenciaDeIndustria,
-                        productType: 'leather goods',
-                        targetAudience: 'affluent professionals'
-                    },
-
-                    // Reader information
-                    readerInfo: {
-                        name: formData.readerName,
+                // Create minimal data for URL encoding (only essential personalization)
+                const minimalData = {
+                    basic: {
+                        readerName: formData.readerName,
                         company: formData.company,
-                        position: 'CEO', // Default since position field removed
-                        location: formData.ubicacion
+                        industry: formData.referenciaDeIndustria,
+                        location: formData.ubicacion,
+                        gender: formData.gender
                     },
-
-                    // Industry keywords (minimal since keywords field removed)
-                    industryKeywords: ['productos premium', 'artesanía de calidad', 'diseño exclusivo'],
-
-                    // Gender information
-                    genderInfo: formData.gender ? {
-                        gender: formData.gender,
-                        genderSpecificText: {}
-                    } : undefined,
-
-                    // Custom messages for all variables
-                    customMessages: {
-                        // Hero section
-                        calificador: formData.calificador || 'marcas de cuero',
+                    custom: {
                         historia: formData.historia || this.generateDefaultHistoria(formData),
+                        avatar: formData.avatar,
+                        propuestaPobre: formData.propuestaPobre,
+                        propuestaBuena: formData.propuestaBuena,
+                        calificador: formData.calificador,
                         brandName: formData.brandName || formData.company,
-
-                        // Problems section
-                        tuMarca: formData.brandName || formData.company,
                         inovacion: formData.inovacion,
                         malPosicionamiento: formData.malPosicionamiento,
                         rollsRoyce: formData.rollsRoyce,
                         fraseDescriptiva: formData.fraseDescriptiva,
-
-                        // Solution section
-                        avatar: formData.avatar,
-                        propuestaPobre: formData.propuestaPobre,
-                        propuestaBuena: formData.propuestaBuena,
                         automatizacion: formData.automatizacion,
                         trabajoDeValor: formData.trabajoDeValor,
                         proveedor: formData.proveedor,
@@ -1497,25 +1461,23 @@
                         membresia: formData.membresia,
                         metodo: formData.metodo
                     },
-
-                    // Expiration information
-                    expiration: {
-                        createdAt: now.toISOString(),
-                        expiresAt: expiresAt.toISOString(),
-                        uniqueCode,
-                        validHours: hoursValid
-                    },
-
-                    // Logo information
-                    companyLogo: logoData,
-                    companyLogoId: logoId,
-
-                    // Metadata for tracking and analytics
-                    metadata: mappingMetadata
+                    metadata: {
+                        generatorVersion: '2.1',
+                        variableCount: this.countProvidedVariables(formData),
+                        complexity: this.calculateComplexity(formData),
+                        industry: formData.referenciaDeIndustria,
+                        hasCustomContent: this.hasCustomContent(formData),
+                        company: formData.company,
+                        readerName: formData.readerName,
+                        companyLogo: logoData,
+                        companyLogoId: logoId,
+                        uniqueCode: uniqueCode,
+                        expiresAt: expiresAt.toISOString()
+                    }
                 };
 
                 // Generate encoded URL (UTF-8 safe)
-                const jsonData = JSON.stringify(enhancedData);
+                const jsonData = JSON.stringify(minimalData);
                 const encodedData = base64EncodeUnicode(jsonData);
 
                 // Determine base URL
@@ -1539,7 +1501,7 @@
                 const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
 
                 // Generate short URL using GitHub API (async)
-                const shortUrl = await this.urlShortener.generateShortUrl(longUrl, hoursValid, mappingMetadata);
+                const shortUrl = await this.urlShortener.generateShortUrl(longUrl, hoursValid, minimalData.metadata);
 
                 return {
                     longUrl,
