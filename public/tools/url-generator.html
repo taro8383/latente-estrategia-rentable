@@ -1278,15 +1278,15 @@
                 let logoData = null;
 
                 if (companyLogoData) {
-                    logoId = this.logoStorage.generateLogoId();
+                    logoId = LogoStorage.generateLogoId();
                     try {
                         // Store logo in localStorage for GitHub Actions to access
-                        const fileExtension = this.urlShortener.getLogoFileExtension(companyLogoData);
+                        const fileExtension = GitHubActionsURLShortener.getLogoFileExtension(companyLogoData);
                         localStorage.setItem(`logo_${logoId}`, companyLogoData);
                         localStorage.setItem(`logo_extension_${logoId}`, fileExtension);
 
                         // Also store in logo storage for local fallback
-                        this.logoStorage.storeLogo(logoId, companyLogoData, hoursValid);
+                        LogoStorage.storeLogo(logoId, companyLogoData, hoursValid);
                         console.log('LogoStorage.storeLogo succeeded, logoId:', logoId);
                         console.log('Logo stored for GitHub Actions, shortCode will reference:', logoId);
                     } catch (err) {
@@ -1401,7 +1401,7 @@
                 const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
 
                 // Generate short URL using GitHub API (async)
-                const shortUrl = await this.urlShortener.generateShortUrl(longUrl, hoursValid, mappingMetadata);
+                const shortUrl = await GitHubActionsURLShortener.generateShortUrl(longUrl, hoursValid, mappingMetadata);
 
                 return {
                     longUrl,
