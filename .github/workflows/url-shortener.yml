@@ -3,6 +3,7 @@ name: URL Shortener Final
 on:
   workflow_dispatch:
     inputs:
+    inputs:
       shortCode:
         description: 'Short code'
         required: true
