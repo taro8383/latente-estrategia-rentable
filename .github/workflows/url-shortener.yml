@@ -339,12 +339,26 @@ jobs:
             processedMetadata = JSON.parse(processedMetadata);
           }
 
+          // Add logoFileExtension to metadata if available (for logo display)
+          const logoExtension = process.env.LOGO_EXTENSION;
+          if (logoExtension) {
+            console.log('DEBUG: Adding logoFileExtension to metadata:', logoExtension);
+            processedMetadata.logoFileExtension = logoExtension;
+          }
+
           // Store metadata as string for JSON storage
           processedMetadata = JSON.stringify(processedMetadata);
           console.log('DEBUG: Processed metadata for storage, length:', processedMetadata.length);
         } catch (error) {
           console.log('DEBUG: Failed to process metadata, using original:', error);
-          processedMetadata = JSON.stringify({});
+          // Even if metadata processing fails, try to add logoFileExtension
+          const logoExtension = process.env.LOGO_EXTENSION;
+          if (logoExtension) {
+            console.log('DEBUG: Adding logoFileExtension to fallback metadata:', logoExtension);
+            processedMetadata = JSON.stringify({ logoFileExtension: logoExtension });
+          } else {
+            processedMetadata = JSON.stringify({});
+          }
         }
 
         // Add new mapping
