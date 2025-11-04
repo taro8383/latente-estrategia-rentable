@@ -175,6 +175,8 @@ jobs:
         fi
 
     - name: Store URL mapping with proper handling
+      env:
+        RAW_METADATA: "${{ github.event.inputs.metadata }}"
       run: |
         echo "DEBUG: Starting URL mapping storage"
 
@@ -183,32 +185,27 @@ jobs:
         LONG_URL="${{ github.event.inputs.longUrl }}"
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
 
-        # Handle metadata with multiple safety layers to prevent shell injection
-        RAW_METADATA="${{ github.event.inputs.metadata }}"
+        echo "DEBUG: Processing metadata using environment variable approach (GitHub recommended)"
 
-        # Initialize METADATA as empty object if RAW_METADATA is problematic
+        # Initialize METADATA as empty object
         METADATA='{}'
 
         # Check if RAW_METADATA looks like valid JSON (starts with { and ends with })
         if [[ "$RAW_METADATA" =~ ^\{.*\}$ ]]; then
           echo "DEBUG: Valid JSON structure detected, processing safely"
-          # Use a temporary file to avoid shell interpretation issues
-          echo "$RAW_METADATA" > /tmp/metadata_temp.json
           # Validate JSON with jq (available on GitHub runners)
-          if jq empty /tmp/metadata_temp.json 2>/dev/null; then
+          if echo "$RAW_METADATA" | jq empty 2>/dev/null; then
             echo "DEBUG: JSON validation passed, using original metadata"
-            METADATA=$(cat /tmp/metadata_temp.json)
+            METADATA="$RAW_METADATA"
           else
             echo "DEBUG: JSON validation failed, using empty object"
             METADATA='{}'
           fi
-          rm -f /tmp/metadata_temp.json
         else
           echo "DEBUG: Invalid JSON structure detected, using empty object"
           echo "DEBUG: RAW_METADATA preview: ${RAW_METADATA:0:50}..."
         fi
 
-        # Final safety check: ensure METADATA doesn't contain shell commands
         echo "DEBUG: Final METADATA safety check - preview first 100 chars"
         echo "DEBUG: METADATA preview: ${METADATA:0:100}..."
         # Logo data is handled separately to avoid size limits
