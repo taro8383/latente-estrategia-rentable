@@ -21,7 +21,7 @@ on:
         required: false
         type: string
         default: '{}'
-  
+        
 jobs:
   store-mapping:
     runs-on: ubuntu-latest
