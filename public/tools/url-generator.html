@@ -1064,7 +1064,7 @@
                     localStorage.setItem(`full_url_${shortCode}`, longUrl);
 
                     // Create the payload with metadata (personalization data) but without large embedded data
-                    const metadataPayload = JSON.stringify(enhancedData);
+                    const metadataPayload = JSON.stringify(metadata);
                     console.log('📏 Metadata payload size:', metadataPayload.length, 'chars');
 
                     const payload = {
@@ -1409,7 +1409,7 @@
                 const longUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
 
                 // Generate short URL using GitHub API (async)
-                const shortUrl = await GitHubActionsURLShortener.generateShortUrl(longUrl, hoursValid, mappingMetadata);
+                const shortUrl = await GitHubActionsURLShortener.generateShortUrl(longUrl, hoursValid, enhancedData);
 
                 return {
                     longUrl,
