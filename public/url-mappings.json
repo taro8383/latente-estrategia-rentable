@@ -186,15 +186,22 @@
       "createdAt": 1762252619549,
       "expiresAt": 1762511819495,
       "metadata": {}
+    },
+    "7zq0VD": {
+      "shortCode": "7zq0VD",
+      "longUrl": "https://latente.net/",
+      "createdAt": 1762252990287,
+      "expiresAt": 1762512190234,
+      "metadata": {}
     }
   },
-  "lastUpdated": 1762252619549,
+  "lastUpdated": 1762252990287,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 13,
-    "activeMappings": 13,
+    "totalMappings": 14,
+    "activeMappings": 14,
     "expiredMappings": 0,
-    "lastCleanup": 1762252619549,
+    "lastCleanup": 1762252990287,
     "lastCleanupCount": 0
   }
 }
