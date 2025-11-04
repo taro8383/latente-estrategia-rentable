@@ -200,15 +200,22 @@
       "createdAt": 1762259703038,
       "expiresAt": 1762518902985,
       "metadata": {}
+    },
+    "1oxitK": {
+      "shortCode": "1oxitK",
+      "longUrl": "https://latente.net/#/invite/ptoouyho7ow3msngvez7g",
+      "createdAt": 1762260220708,
+      "expiresAt": 1762519420644,
+      "metadata": {}
     }
   },
-  "lastUpdated": 1762259703038,
+  "lastUpdated": 1762260220708,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 15,
-    "activeMappings": 15,
+    "totalMappings": 16,
+    "activeMappings": 16,
     "expiredMappings": 0,
-    "lastCleanup": 1762259703038,
+    "lastCleanup": 1762260220708,
     "lastCleanupCount": 0
   }
 }
