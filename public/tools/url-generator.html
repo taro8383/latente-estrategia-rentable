@@ -982,7 +982,7 @@
             }
 
             static async generateShortUrl(longUrl, expirationHours = 72, metadata = {}) {
-                const shortCode = this.generateShortCode();
+                const shortCode = GitHubActionsURLShortener.generateShortCode();
 
                 // Generate short URL format
                 let baseUrl;
@@ -1036,7 +1036,7 @@
                     }
 
                     // Trigger GitHub Action workflow
-                    await this.triggerGitHubAction(owner, repo, token, shortCode, longUrl, expirationHours, metadata);
+                    await GitHubActionsURLShortener.triggerGitHubAction(owner, repo, token, shortCode, longUrl, expirationHours, metadata);
 
                     console.log('�?Generated short URL:', shortUrl);
                     console.log('🔗 Points to:', longUrl);
@@ -1281,7 +1281,7 @@
                     logoId = this.logoStorage.generateLogoId();
                     try {
                         // Store logo in localStorage for GitHub Actions to access
-                        const fileExtension = URLShortener.getLogoFileExtension(companyLogoData);
+                        const fileExtension = this.urlShortener.getLogoFileExtension(companyLogoData);
                         localStorage.setItem(`logo_${logoId}`, companyLogoData);
                         localStorage.setItem(`logo_extension_${logoId}`, fileExtension);
 
