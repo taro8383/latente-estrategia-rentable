@@ -193,15 +193,22 @@
       "createdAt": 1762252990287,
       "expiresAt": 1762512190234,
       "metadata": {}
+    },
+    "KYIRgg": {
+      "shortCode": "KYIRgg",
+      "longUrl": "https://latente.net/#/invite/6m17tbd21e2rlnub5rnydi",
+      "createdAt": 1762259703038,
+      "expiresAt": 1762518902985,
+      "metadata": {}
     }
   },
-  "lastUpdated": 1762252990287,
+  "lastUpdated": 1762259703038,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 14,
-    "activeMappings": 14,
+    "totalMappings": 15,
+    "activeMappings": 15,
     "expiredMappings": 0,
-    "lastCleanup": 1762252990287,
+    "lastCleanup": 1762259703038,
     "lastCleanupCount": 0
   }
 }
