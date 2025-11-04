@@ -16,12 +16,7 @@ on:
         required: false
         type: string
         default: '72'
-      metadata:
-        description: 'Metadata (JSON format)'
-        required: false
-        type: string
-        default: '{}'
-
+  
 jobs:
   store-mapping:
     runs-on: ubuntu-latest
@@ -62,7 +57,8 @@ jobs:
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
         LONG_URL="${{ github.event.inputs.longUrl }}"
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
-        METADATA='${{ github.event.inputs.metadata }}'
+        # Metadata removed from inputs to avoid size limits
+        METADATA='{}'
 
         echo "DEBUG: Parsed inputs safely"
         echo "SHORT_CODE: $SHORT_CODE"

@@ -1053,6 +1053,10 @@
                 try {
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
+                    // Store metadata locally (not sent to GitHub to avoid size limits)
+                    URLShortener.storeLocalMetadata(shortCode, metadata, longUrl, expirationHours);
+
+                    // Send only basic mapping info to GitHub (no metadata to avoid size limits)
                     const response = await fetch(workflowUrl, {
                         method: 'POST',
                         headers: {
@@ -1065,8 +1069,7 @@
                             inputs: {
                                 shortCode: shortCode,
                                 longUrl: longUrl,
-                                expirationHours: expirationHours.toString(),
-                                metadata: JSON.stringify(metadata)
+                                expirationHours: expirationHours.toString()
                             }
                         })
                     });
@@ -1087,8 +1090,58 @@
                 }
             }
 
-            // REMOVED: localStorage fallback functions - cross-device compatibility requires server-side storage only
-            // storeLocalMapping and getLocalMapping removed to prevent browser-specific data storage
+            // Metadata storage and retrieval functions (client-side only for large data)
+            static storeLocalMetadata(shortCode, metadata, longUrl, expirationHours) {
+                try {
+                    localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
+                        ...metadata,
+                        shortCode: shortCode,
+                        longUrl: longUrl,
+                        createdAt: Date.now(),
+                        expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                    }));
+                    console.log('📝 Metadata stored locally for:', shortCode);
+                } catch (error) {
+                    console.warn('Failed to store metadata locally:', error);
+                }
+            }
+
+            static getLocalMetadata(shortCode) {
+                try {
+                    const data = localStorage.getItem(`metadata_${shortCode}`);
+                    if (data) {
+                        const metadata = JSON.parse(data);
+                        // Check if metadata hasn't expired
+                        if (Date.now() < metadata.expiresAt) {
+                            return metadata;
+                        } else {
+                            // Clean up expired metadata
+                            localStorage.removeItem(`metadata_${shortCode}`);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to retrieve local metadata:', error);
+                }
+                return null;
+            }
+
+            static cleanupExpiredMetadata() {
+                try {
+                    const keys = Object.keys(localStorage).filter(key => key.startsWith('metadata_'));
+                    keys.forEach(key => {
+                        const data = localStorage.getItem(key);
+                        if (data) {
+                            const metadata = JSON.parse(data);
+                            if (Date.now() > metadata.expiresAt) {
+                                localStorage.removeItem(key);
+                                console.log('🧹 Cleaned up expired metadata for:', key.replace('metadata_', ''));
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.warn('Failed to cleanup expired metadata:', error);
+                }
+            }
         }
 
         // Logo Storage Utility (existing)
