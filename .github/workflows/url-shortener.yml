@@ -26,7 +26,7 @@ on:
         required: false
         type: string
         default: 'jpg'
-  
+
 jobs:
   store-mapping:
     runs-on: ubuntu-latest
@@ -78,7 +78,7 @@ jobs:
           echo "DEBUG: No logo data provided, skipping upload"
         fi
 
-  - name: Store URL mapping with proper handling
+    - name: Store URL mapping with proper handling
       run: |
         echo "DEBUG: Starting URL mapping storage"
 
