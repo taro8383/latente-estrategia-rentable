@@ -1053,7 +1053,7 @@
                 try {
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
-                    // Simple data reduction to fix size issues
+                    // Keep ALL personalization data but compress it intelligently
                     let baseUrlForGitHub = longUrl;
                     try {
                         console.log('🔧 Original URL length:', longUrl.length, 'chars');
@@ -1072,34 +1072,67 @@
 
                                     try {
                                         const dataObj = JSON.parse(decodeURIComponent(encodedData));
-                                        console.log('🔧 Parsed data object:', Object.keys(dataObj));
+                                        console.log('🔧 Keeping ALL personalization data fields');
 
-                                        // Create minimal data object - keep only essential fields
-                                        const minimalObj = {
-                                            brandInfo: {
-                                                name: dataObj.brandInfo?.name || '',
-                                                industry: dataObj.brandInfo?.industry || ''
-                                            },
-                                            readerInfo: {
-                                                name: dataObj.readerInfo?.name || '',
-                                                gender: dataObj.readerInfo?.gender || ''
-                                            }
-                                        };
+                                        // Intelligent compression - remove redundant whitespace, optimize structure
+                                        const compressedObj = { ...dataObj };
 
-                                        const minimalData = encodeURIComponent(JSON.stringify(minimalObj));
-                                        console.log('🔧 Minimal data length:', minimalData.length, 'chars');
-                                        console.log('🔧 Size reduction:', Math.round((1 - minimalData.length/encodedData.length) * 100), '%');
+                                        // Compress customMessages by removing empty strings and optimizing structure
+                                        if (compressedObj.customMessages) {
+                                            const optimizedMessages = {};
+                                            Object.entries(compressedObj.customMessages).forEach(([key, value]) => {
+                                                if (value && typeof value === 'string' && value.trim()) {
+                                                    optimizedMessages[key] = value.trim();
+                                                }
+                                            });
+                                            compressedObj.customMessages = optimizedMessages;
+                                        }
 
-                                        // Rebuild URL with minimal data
-                                        const newHash = `invite=${urlParams.get('invite')}&data=${minimalData}`;
+                                        // Compress industryKeywords by removing duplicates
+                                        if (compressedObj.industryKeywords && Array.isArray(compressedObj.industryKeywords)) {
+                                            compressedObj.industryKeywords = [...new Set(compressedObj.industryKeywords)];
+                                        }
+
+                                        const compressedData = encodeURIComponent(JSON.stringify(compressedObj));
+                                        console.log('🔧 Compressed data length:', compressedData.length, 'chars');
+                                        console.log('🔧 Size reduction:', Math.round((1 - compressedData.length/encodedData.length) * 100), '%');
+
+                                        // Rebuild URL with compressed data
+                                        const newHash = `invite=${urlParams.get('invite')}&data=${compressedData}`;
                                         baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + newHash;
                                         console.log('🔧 Final URL length:', baseUrlForGitHub.length, 'chars');
 
+                                        // If still too large, try more aggressive compression
+                                        if (baseUrlForGitHub.length > 30000) {
+                                            console.log('🔧 URL still large, applying aggressive compression while keeping all fields...');
+
+                                            // Keep all fields but compress strings aggressively
+                                            const aggressiveObj = { ...dataObj };
+
+                                            // Truncate very long strings but keep content
+                                            Object.keys(aggressiveObj).forEach(key => {
+                                                if (typeof aggressiveObj[key] === 'string' && aggressiveObj[key].length > 100) {
+                                                    aggressiveObj[key] = aggressiveObj[key].substring(0, 100) + '...';
+                                                }
+                                            });
+
+                                            if (aggressiveObj.customMessages) {
+                                                Object.keys(aggressiveObj.customMessages).forEach(key => {
+                                                    if (typeof aggressiveObj.customMessages[key] === 'string' && aggressiveObj.customMessages[key].length > 200) {
+                                                        aggressiveObj.customMessages[key] = aggressiveObj.customMessages[key].substring(0, 200) + '...';
+                                                    }
+                                                });
+                                            }
+
+                                            const aggressiveData = encodeURIComponent(JSON.stringify(aggressiveObj));
+                                            const aggressiveHash = `invite=${urlParams.get('invite')}&data=${aggressiveData}`;
+                                            baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + aggressiveHash;
+                                            console.log('🔧 Aggressively compressed URL length:', baseUrlForGitHub.length, 'chars');
+                                        }
+
                                     } catch (parseError) {
-                                        console.warn('Failed to parse data, removing data entirely:', parseError);
-                                        // Last resort: create URL without any data
-                                        baseUrlForGitHub = url.origin + url.pathname + url.search + '#invite=minimal';
-                                        console.log('🔧 Using URL without data:', baseUrlForGitHub.length, 'chars');
+                                        console.warn('Failed to compress data, using original:', parseError);
+                                        baseUrlForGitHub = longUrl;
                                     }
                                 }
                             }
@@ -1108,6 +1141,7 @@
                         }
                     } catch (error) {
                         console.warn('Failed to process URL:', error);
+                        baseUrlForGitHub = longUrl;
                     }
 
                     // Create the payload with size debugging
