@@ -978,8 +978,34 @@
             const filePath = `public/assets/logos/${logoId}.${fileExtension}`;
             const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
 
-            // Convert base64 to binary
-            const binaryData = atob(base64Data);
+            // Clean and validate base64 data
+            let cleanBase64Data = base64Data;
+
+            // Remove data URL prefix if present (e.g., "data:image/png;base64,")
+            if (cleanBase64Data.startsWith('data:')) {
+                const base64Prefix = 'base64,';
+                const prefixIndex = cleanBase64Data.indexOf(base64Prefix);
+                if (prefixIndex !== -1) {
+                    cleanBase64Data = cleanBase64Data.substring(prefixIndex + base64Prefix.length);
+                }
+            }
+
+            // Remove whitespace and newlines
+            cleanBase64Data = cleanBase64Data.replace(/\s/g, '');
+
+            // Validate base64 format (only contains valid base64 characters)
+            if (!/^[A-Za-z0-9+/]*={0,2}$/.test(cleanBase64Data)) {
+                throw new Error('Invalid base64 data format');
+            }
+
+            // Convert base64 to binary with error handling
+            let binaryData;
+            try {
+                binaryData = atob(cleanBase64Data);
+            } catch (error) {
+                throw new Error(`Failed to decode base64 data: ${error.message}`);
+            }
+
             const bytes = new Uint8Array(binaryData.length);
             for (let i = 0; i < binaryData.length; i++) {
                 bytes[i] = binaryData.charCodeAt(i);
