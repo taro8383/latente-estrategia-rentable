@@ -996,19 +996,8 @@
                    Math.random().toString(36).substring(2, 15);
         }
 
-        // Function to convert file to base64 for GitHub Actions input (minimal conversion for workflow only)
-        async function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const result = reader.result;
-                    const base64 = result.split(',')[1]; // Remove data URL prefix
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
+              // fileToBase64 function removed - no longer needed with Cloudflare Worker approach
+        // Logo files are uploaded directly to Cloudflare R2 without base64 conversion
 
         // GitHub Actions URL Shortener (CORS-free)
         class GitHubActionsURLShortener {
@@ -1118,16 +1107,16 @@
                     const metadataPayload = JSON.stringify(cleanMetadata);
                     console.log('📏 Clean metadata payload size:', metadataPayload.length, 'chars');
 
-                    // NEW APPROACH: Upload logo file as artifact first, then trigger workflow
+                    // NEW APPROACH: Upload logo file to Cloudflare R2 via Worker, then trigger workflow
                 let artifactUrl = '';
                 let logoFileExtension = '';
 
                 if (companyLogoFile) {
-                    // Upload logo file as GitHub artifact first
+                    // Upload logo file to Cloudflare R2 via Worker
                     logoFileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
                     artifactUrl = await this.uploadLogoAsArtifact(companyLogoFile, shortCode, logoFileExtension, owner, repo, token);
-                    console.log('📧 Logo file uploaded as artifact:', artifactUrl);
-                    console.log('🚫 NO BASE64 - Artifact approach per GitHub best practices');
+                    console.log('📧 Logo file uploaded to Cloudflare R2:', artifactUrl);
+                    console.log('🚫 NO BASE64 - Cloudflare Worker approach with direct R2 storage');
                 }
 
                 const payload = {
@@ -1137,8 +1126,8 @@
                         longUrl: baseUrlForGitHub, // Much smaller URL without embedded logo
                         expirationHours: expirationHours.toString(),
                         metadata: metadataPayload, // Send personalization data as metadata
-                        logoArtifactUrl: artifactUrl, // Send artifact URL for workflow to download
-                        logoExtension: logoFileExtension // Send file extension
+                        logoFileUrl: artifactUrl, // Send R2 URL from Cloudflare Worker
+                        logoExtension: logoFileExtension // Send file extension for workflow
                     }
                 };
 
@@ -1183,67 +1172,86 @@
                 }
             }
 
-            // Upload logo file as GitHub release asset using proper API approach
+            // Upload logo file using Cloudflare Worker with FormData and retry logic
             static async uploadLogoAsArtifact(file, shortCode, fileExtension, owner, repo, token) {
-                try {
-                    // Create artifact name with shortCode and timestamp
-                    const artifactName = `logo_${shortCode}_${Date.now()}`;
+                const maxRetries = 3;
+                const retryDelay = 1000; // 1 second between retries
 
-                    // GitHub API endpoint for creating releases
-                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
+                for (let attempt = 1; attempt <= maxRetries; attempt++) {
+                    try {
+                        console.log(`🚀 Cloudflare Worker upload attempt ${attempt}/${maxRetries} for ${shortCode}.${fileExtension}`);
 
-                    // First, create a draft release
-                    const releaseResponse = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
-                            tag_name: `artifacts/${artifactName}`,
-                            name: `Logo for ${shortCode}`,
-                            body: 'Logo file uploaded for URL shortening',
-                            draft: true
-                        })
-                    });
+                        // Cloudflare Worker endpoint
+                        const workerUrl = 'https://logo-upload-worker.latente.workers.dev/upload';
 
-                    if (!releaseResponse.ok) {
-                        throw new Error(`Failed to create release: ${releaseResponse.statusText} (${releaseResponse.status})`);
+                        // Create FormData for multipart/form-data upload
+                        const formData = new FormData();
+                        formData.append('file', file);
+                        formData.append('shortCode', shortCode);
+                        formData.append('fileExtension', fileExtension);
+
+                        // Add metadata for tracking
+                        formData.append('owner', owner);
+                        formData.append('repo', repo);
+                        formData.append('timestamp', Date.now().toString());
+                        formData.append('attempt', attempt.toString());
+
+                        console.log('📤 Uploading to Cloudflare Worker:', workerUrl);
+                        console.log('📁 File details:', {
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            shortCode: shortCode,
+                            extension: fileExtension
+                        });
+
+                        // Upload to Cloudflare Worker
+                        const uploadResponse = await fetch(workerUrl, {
+                            method: 'POST',
+                            body: formData,
+                            // Don't set Content-Type header - let browser set it with boundary for FormData
+                        });
+
+                        if (!uploadResponse.ok) {
+                            const errorText = await uploadResponse.text();
+                            const errorMessage = `Cloudflare Worker upload failed: ${uploadResponse.statusText} (${uploadResponse.status}) - ${errorText}`;
+
+                            if (attempt === maxRetries) {
+                                console.error('❌ All upload attempts failed:', errorMessage);
+                                throw new Error(errorMessage);
+                            } else {
+                                console.warn(`⚠️ Upload attempt ${attempt} failed, retrying... ${errorMessage}`);
+                                await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+                                continue;
+                            }
+                        }
+
+                        const uploadData = await uploadResponse.json();
+
+                        // Validate response structure
+                        if (!uploadData.success || !uploadData.url) {
+                            const errorMessage = `Invalid Cloudflare Worker response: ${JSON.stringify(uploadData)}`;
+                            console.error('❌', errorMessage);
+                            throw new Error(errorMessage);
+                        }
+
+                        const r2Url = uploadData.url;
+                        console.log('✅ Logo file uploaded successfully to Cloudflare R2:', r2Url);
+                        console.log('🔗 R2 URL ready for GitHub Actions workflow');
+
+                        return r2Url;
+
+                    } catch (error) {
+                        console.error(`❌ Upload attempt ${attempt} failed:`, error.message);
+
+                        if (attempt === maxRetries) {
+                            console.error('❌ All Cloudflare Worker upload attempts failed');
+                            throw new Error(`Failed to upload logo to Cloudflare Worker after ${maxRetries} attempts: ${error.message}`);
+                        } else {
+                            console.warn(`⚠️ Upload attempt ${attempt} failed, retrying in ${retryDelay * attempt}ms...`);
+                            await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+                        }
                     }
-
-                    const releaseData = await releaseResponse.json();
-                    console.log('✅ Release created:', releaseData.id);
-
-                    // Use the upload_url from the release response (points to uploads.github.com)
-                    const uploadUrl = `${releaseData.upload_url}?name=${shortCode}.${fileExtension}`;
-                    console.log('📤 Upload URL:', uploadUrl);
-
-                    // Upload the file directly as binary data
-                    const uploadResponse = await fetch(uploadUrl, {
-                        method: 'POST',
-                        headers: {
-                            'Authorization': `token ${token}`,
-                            'Accept': 'application/vnd.github.v3+json',
-                            'Content-Type': 'application/octet-stream'
-                        },
-                        body: file
-                    });
-
-                    if (!uploadResponse.ok) {
-                        const errorText = await uploadResponse.text();
-                        throw new Error(`Failed to upload logo file: ${uploadResponse.statusText} (${uploadResponse.status}) - ${errorText}`);
-                    }
-
-                    const uploadData = await uploadResponse.json();
-                    const assetUrl = uploadData.browser_download_url;
-
-                    console.log('✅ Logo file uploaded successfully:', assetUrl);
-                    return assetUrl;
-
-                } catch (error) {
-                    console.error('❌ Failed to upload logo as artifact:', error);
-                    throw error;
                 }
             }
 
@@ -1367,7 +1375,9 @@
             }
 
             static getLogoFileExtension(base64Data) {
-                // Extract file extension from base64 data
+                // LEGACY: Extract file extension from base64 data
+                // This function is no longer used with Cloudflare Worker approach
+                // File extension is now extracted from the actual file object
                 try {
                     const dataPrefix = base64Data.substring(0, 30).toLowerCase();
                     if (dataPrefix.includes('png')) return 'png';
@@ -2113,8 +2123,8 @@
             document.getElementById('logoPreview').style.display = 'none';
         }
 
-        // NO BASE64 CONVERSION FOR LOGOS - Removed fileToBase64 function per logoplan.md
-        // Logo files are uploaded directly to GitHub Actions without base64 conversion
+        // NO BASE64 CONVERSION FOR LOGOS - Cloudflare Worker approach
+        // Logo files are uploaded directly to Cloudflare R2 without base64 conversion
 
         function copyToClipboard(elementId) {
             const urlText = document.getElementById(elementId).textContent;

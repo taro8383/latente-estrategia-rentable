@@ -16,8 +16,8 @@ on:
         required: false
         type: string
         default: '72'
-      logoArtifactUrl:
-        description: 'GitHub release asset URL for logo file download'
+      logoFileUrl:
+        description: 'R2 file URL for logo download'
         required: false
         type: string
       logoExtension:
@@ -69,33 +69,109 @@ jobs:
         mkdir -p public/assets/logos
         echo "DEBUG: Logo directory created: public/assets/logos"
 
-    - name: Download logo file from artifact URL (if provided)
-      if: ${{ github.event.inputs.logoArtifactUrl != '' }}
+    - name: Download logo file from R2
+      if: ${{ github.event.inputs.logoFileUrl != '' }}
       run: |
-        echo "DEBUG: Starting logo file download from artifact"
-        LOGO_ARTIFACT_URL="${{ github.event.inputs.logoArtifactUrl }}"
+        echo "DEBUG: Downloading logo from R2"
+        LOGO_FILE_URL="${{ github.event.inputs.logoFileUrl }}"
         LOGO_EXTENSION="${{ github.event.inputs.logoExtension }}"
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
 
-        if [ -n "$LOGO_ARTIFACT_URL" ] && [ -n "$LOGO_EXTENSION" ] && [ -n "$SHORT_CODE" ]; then
-          echo "DEBUG: Downloading logo from: $LOGO_ARTIFACT_URL"
+        if [ -n "$LOGO_FILE_URL" ] && [ -n "$LOGO_EXTENSION" ] && [ -n "$SHORT_CODE" ]; then
+          echo "DEBUG: Logo file URL: $LOGO_FILE_URL"
           echo "DEBUG: Logo extension: $LOGO_EXTENSION"
           echo "DEBUG: Short code: $SHORT_CODE"
 
-          # Download the logo file using curl
-          LOGO_FILE_PATH="public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
-          curl -L -o "$LOGO_FILE_PATH" "$LOGO_ARTIFACT_URL"
+          # Create logo directory
+          mkdir -p public/assets/logos
 
-          if [ -f "$LOGO_FILE_PATH" ]; then
-            FILE_SIZE=$(stat -c%s "$LOGO_FILE_PATH" 2>/dev/null || stat -f%z "$LOGO_FILE_PATH" 2>/dev/null || echo "unknown")
-            echo "DEBUG: Logo file downloaded successfully: $LOGO_FILE_PATH"
-            echo "DEBUG: File size: $FILE_SIZE bytes"
-          else
-            echo "ERROR: Failed to download logo file"
+          # Download file from R2
+          LOGO_FILE_PATH="public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
+
+          echo "DEBUG: Starting download with retry logic"
+          # Download with retry logic, timeout, and proper error handling
+          MAX_RETRIES=3
+          TIMEOUT=30
+          RETRY_COUNT=0
+          DOWNLOAD_SUCCESS=false
+
+          while [ $RETRY_COUNT -lt $MAX_RETRIES ] && [ "$DOWNLOAD_SUCCESS" = false ]; do
+            echo "DEBUG: Download attempt $((RETRY_COUNT + 1)) of $MAX_RETRIES"
+
+            # Use curl with timeout, follow redirects, and show progress
+            if curl -L --fail --silent --show-error --max-time $TIMEOUT \
+                   --retry 2 --retry-delay 5 \
+                   -o "$LOGO_FILE_PATH" \
+                   "$LOGO_FILE_URL" 2>&1; then
+
+              # Verify file exists and has content
+              if [ -f "$LOGO_FILE_PATH" ]; then
+                FILE_SIZE=$(stat -c%s "$LOGO_FILE_PATH" 2>/dev/null || stat -f%z "$LOGO_FILE_PATH" 2>/dev/null || echo "unknown")
+                echo "DEBUG: Logo file downloaded successfully: $LOGO_FILE_PATH"
+                echo "DEBUG: File size: $FILE_SIZE bytes"
+
+                # Validate file is not empty
+                if [ "$FILE_SIZE" -gt 0 ]; then
+                  # Basic image file validation (check magic bytes)
+                  if file "$LOGO_FILE_PATH" | grep -q "image"; then
+                    echo "DEBUG: File type validation passed - confirmed as image file"
+                    DOWNLOAD_SUCCESS=true
+                  else
+                    echo "WARNING: Downloaded file does not appear to be a valid image"
+                    rm -f "$LOGO_FILE_PATH"
+                  fi
+                else
+                  echo "ERROR: Downloaded file is empty"
+                  rm -f "$LOGO_FILE_PATH"
+                fi
+              else
+                echo "ERROR: Download completed but file not found at expected location"
+              fi
+            else
+              echo "ERROR: Download failed with curl exit code: $?"
+              RETRY_COUNT=$((RETRY_COUNT + 1))
+
+              if [ $RETRY_COUNT -lt $MAX_RETRIES ]; then
+                echo "DEBUG: Waiting before retry..."
+                sleep 10
+              fi
+            fi
+          done
+
+          if [ "$DOWNLOAD_SUCCESS" = false ]; then
+            echo "ERROR: Failed to download logo file after $MAX_RETRIES attempts"
+            echo "ERROR: Logo file URL was: $LOGO_FILE_URL"
+            echo "ERROR: This may indicate an issue with the R2 storage or network connectivity"
+            # Exit with error to fail the workflow, as logo download is critical
             exit 1
           fi
+
+          # Set proper file permissions
+          chmod 644 "$LOGO_FILE_PATH"
+          echo "DEBUG: File permissions set to 644"
+
+          # Final verification
+          if [ -f "$LOGO_FILE_PATH" ] && [ -s "$LOGO_FILE_PATH" ]; then
+            FINAL_SIZE=$(stat -c%s "$LOGO_FILE_PATH" 2>/dev/null || stat -f%z "$LOGO_FILE_PATH" 2>/dev/null || echo "unknown")
+            echo "✅ Logo file successfully downloaded and verified: $LOGO_FILE_PATH"
+            echo "✅ Final file size: $FINAL_SIZE bytes"
+            echo "✅ File ready for deployment"
+          else
+            echo "ERROR: Final verification failed - file is missing or empty"
+            exit 1
+          fi
+
         else
-          echo "DEBUG: No logo artifact URL provided, skipping logo download"
+          echo "DEBUG: No logo file URL provided, skipping logo download"
+          if [ -z "$LOGO_FILE_URL" ]; then
+            echo "DEBUG: logoFileUrl input is empty"
+          fi
+          if [ -z "$LOGO_EXTENSION" ]; then
+            echo "DEBUG: logoExtension input is empty"
+          fi
+          if [ -z "$SHORT_CODE" ]; then
+            echo "DEBUG: shortCode input is empty"
+          fi
         fi
 
     - name: Store URL mapping with proper handling

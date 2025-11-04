@@ -25,7 +25,9 @@
       "Bash(npm run build:*)",
       "Bash(python:*)",
       "Bash(dos2unix:*)",
-      "Bash(npx js-yaml:*)"
+      "Bash(npx js-yaml:*)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ],
     "deny": [],
     "ask": []
