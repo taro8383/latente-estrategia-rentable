@@ -458,6 +458,7 @@ jobs:
         git config --local user.name "GitHub Action"
 
         git add public/url-mappings.json
+        git add public/assets/logos/
         git status
 
         if git diff --staged --quiet; then
