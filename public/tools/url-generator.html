@@ -1305,6 +1305,33 @@
                     logoId = LogoStorage.generateLogoId();
                     const fileExtension = LogoStorage.getLogoFileExtension(companyLogoData);
 
+                    // Get GitHub credentials for logo upload
+                    let token = localStorage.getItem('github_token');
+                    if (!token) {
+                        token = prompt('Enter GitHub Personal Access Token:\n\nCreate one at: https://github.com/settings/tokens\n\nRequired scopes: repo (full control), workflow');
+                        if (token) {
+                            localStorage.setItem('github_token', token);
+                        }
+                    }
+
+                    // Get repo info
+                    let owner, repo;
+                    const hostname = window.location.hostname;
+                    if (hostname.includes('github.io')) {
+                        owner = hostname.replace('.github.io', '');
+                        const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
+                        repo = pathSegments.length > 0 ? pathSegments[0] : owner;
+                    } else {
+                        owner = localStorage.getItem('github_owner') || 'your-username';
+                        repo = localStorage.getItem('github_repo') || 'your-repo';
+                        if (owner === 'your-username' || repo === 'your-repo') {
+                            owner = prompt('Enter GitHub username:') || owner;
+                            repo = prompt('Enter repository name:') || repo;
+                            localStorage.setItem('github_owner', owner);
+                            localStorage.setItem('github_repo', repo);
+                        }
+                    }
+
                     // Upload logo file directly to GitHub repository via Contents API
                     try {
                         await GitHubActionsURLShortener.uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, companyLogoData);
