@@ -228,15 +228,22 @@
       "createdAt": 1762293157806,
       "expiresAt": 1762552357752,
       "metadata": "{\"brandInfo\":{\"name\":\"bcxb\",\"industry\":\"bcxb\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Juan\",\"company\":\"Luxury Holdings\",\"position\":\"CEO\",\"location\":\"Nueva York\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"male\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"bcxb\",\"historia\":\"cxb\",\"brandName\":\"bcxb\",\"tuMarca\":\"bcxb\",\"inovacion\":\"bxcb\",\"malPosicionamiento\":\"xcb\",\"rollsRoyce\":\"cxb\",\"fraseDescriptiva\":\"bcxb\",\"avatar\":\"bxc\",\"propuestaPobre\":\"bcxb\",\"propuestaBuena\":\"cxb\",\"automatizacion\":\"cxbxc\",\"trabajoDeValor\":\"cbxb\",\"proveedor\":\"cxbcx\",\"infrautilizado\":\"bcxb\",\"membresia\":\"cxbxc\",\"metodo\":\"bcxb\"},\"expiration\":{\"createdAt\":\"2025-11-04T21:53:33.930Z\",\"expiresAt\":\"2025-11-07T21:53:33.930Z\",\"uniqueCode\":\"vy547gzwsifhkeesf4qtz\",\"validHours\":72},\"companyLogo\":null,\"companyLogoId\":\"logo_1762293213931_ncjg0hk\",\"companyLogoUrl\":\"https://taro8383.github.io/latente-estrategia-rentable/assets/logos/vy547gzwsifhkeesf4qtz.jpg\",\"logoFileExtension\":\"jpg\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"bcxb\",\"hasCustomContent\":true,\"company\":\"Luxury Holdings\",\"readerName\":\"Juan\"}}"
+    },
+    "LuB5oP": {
+      "shortCode": "LuB5oP",
+      "longUrl": "https://latente.net/#/invite/fit2220n2cwsnr179lta",
+      "createdAt": 1762295299825,
+      "expiresAt": 1762554499771,
+      "metadata": "{\"brandInfo\":{\"name\":\"bcxb\",\"industry\":\"bcxb\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Juan\",\"company\":\"Luxury Holdings\",\"position\":\"CEO\",\"location\":\"Nueva York\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"male\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"bcxb\",\"historia\":\"cxb\",\"brandName\":\"bcxb\",\"tuMarca\":\"bcxb\",\"inovacion\":\"bxcb\",\"malPosicionamiento\":\"xcb\",\"rollsRoyce\":\"cxb\",\"fraseDescriptiva\":\"bcxb\",\"avatar\":\"bxc\",\"propuestaPobre\":\"bcxb\",\"propuestaBuena\":\"cxb\",\"automatizacion\":\"cxbxc\",\"trabajoDeValor\":\"cbxb\",\"proveedor\":\"cxbcx\",\"infrautilizado\":\"bcxb\",\"membresia\":\"cxbxc\",\"metodo\":\"bcxb\"},\"expiration\":{\"createdAt\":\"2025-11-04T22:29:17.315Z\",\"expiresAt\":\"2025-11-07T22:29:17.315Z\",\"uniqueCode\":\"fit2220n2cwsnr179lta\",\"validHours\":72},\"companyLogo\":null,\"companyLogoId\":\"logo_1762295357315_recmmxh\",\"companyLogoUrl\":\"https://taro8383.github.io/latente-estrategia-rentable/assets/logos/fit2220n2cwsnr179lta.png\",\"logoFileExtension\":\"png\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"bcxb\",\"hasCustomContent\":true,\"company\":\"Luxury Holdings\",\"readerName\":\"Juan\"}}"
     }
   },
-  "lastUpdated": 1762293157806,
+  "lastUpdated": 1762295299825,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 19,
-    "activeMappings": 19,
+    "totalMappings": 20,
+    "activeMappings": 20,
     "expiredMappings": 0,
-    "lastCleanup": 1762293157805,
+    "lastCleanup": 1762295299825,
     "lastCleanupCount": 0
   }
 }
