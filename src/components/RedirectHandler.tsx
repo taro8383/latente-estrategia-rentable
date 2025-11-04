@@ -48,17 +48,27 @@ export const RedirectHandler: React.FC = () => {
           }
           // Method 2: Try to recreate URL from metadata (cross-device fallback)
           else if (metadata) {
+            console.log('🔍 DEBUG: Found metadata, attempting to recreate URL');
+            console.log('🔍 DEBUG: Metadata length:', metadata.length);
+            console.log('🔍 DEBUG: Metadata preview:', metadata.substring(0, 200) + '...');
             try {
               const personalizationData = JSON.parse(metadata);
+              console.log('🔍 DEBUG: Successfully parsed metadata, keys:', Object.keys(personalizationData));
               const jsonData = JSON.stringify(personalizationData);
+              console.log('🔍 DEBUG: JSON data length:', jsonData.length);
               encodedData = btoa(unescape(encodeURIComponent(jsonData)));
+              console.log('🔍 DEBUG: Encoded data length:', encodedData.length);
 
               // Recreate the full URL with embedded data
               urlToProcess = `${longUrl}#/invite/${shortCode}?data=${encodedData}`;
               console.log('✅ Recreated URL from metadata (cross-device)');
+              console.log('🔍 DEBUG: Final URL length:', urlToProcess.length);
             } catch (error) {
               console.error('❌ Failed to recreate URL from metadata:', error);
+              console.error('❌ Error details:', error.message);
             }
+          } else {
+            console.log('🔍 DEBUG: No metadata found for shortCode:', shortCode);
           }
 
           // Extract encoded data from URL and store in localStorage for PersonalizationProvider
@@ -72,17 +82,21 @@ export const RedirectHandler: React.FC = () => {
 
             if (encodedData) {
               // Store the encoded data in localStorage for PersonalizationProvider
-              localStorage.setItem('incoming_personalization_writer', JSON.stringify({
+              const writerData = JSON.stringify({
                 timestamp: Date.now(),
                 shortCode: shortCode,
                 url: urlToProcess
-              }));
+              });
+              localStorage.setItem('incoming_personalization_writer', writerData);
               localStorage.setItem('incoming_personalization_payload', encodedData);
               localStorage.setItem('incoming_personalization_payload_ts', Date.now().toString());
               console.log('📝 RedirectHandler: Stored encoded data in localStorage for', shortCode);
+              console.log('📝 DEBUG: Writer data stored:', writerData);
+              console.log('📝 DEBUG: Payload length stored:', encodedData.length);
               console.log('✅ Personalization data extracted successfully');
             } else {
               console.warn('⚠️ RedirectHandler: No encoded data found, redirecting without personalization');
+              console.log('🔍 DEBUG: urlToProcess being checked:', urlToProcess.substring(0, 200) + '...');
             }
           } catch (error) {
             console.error('❌ RedirectHandler: Failed to extract/store URL data:', error);
