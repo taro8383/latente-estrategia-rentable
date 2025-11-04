@@ -242,15 +242,22 @@
       "createdAt": 1762295738627,
       "expiresAt": 1762554938574,
       "metadata": "{\"brandInfo\":{\"name\":\"bcxb\",\"industry\":\"bcxb\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Juan\",\"company\":\"Luxury Holdings\",\"position\":\"CEO\",\"location\":\"Nueva York\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"male\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"bcxb\",\"historia\":\"cxb\",\"brandName\":\"bcxb\",\"tuMarca\":\"bcxb\",\"inovacion\":\"bxcb\",\"malPosicionamiento\":\"xcb\",\"rollsRoyce\":\"cxb\",\"fraseDescriptiva\":\"bcxb\",\"avatar\":\"bxc\",\"propuestaPobre\":\"bcxb\",\"propuestaBuena\":\"cxb\",\"automatizacion\":\"cxbxc\",\"trabajoDeValor\":\"cbxb\",\"proveedor\":\"cxbcx\",\"infrautilizado\":\"bcxb\",\"membresia\":\"cxbxc\",\"metodo\":\"bcxb\"},\"expiration\":{\"createdAt\":\"2025-11-04T22:36:36.852Z\",\"expiresAt\":\"2025-11-07T22:36:36.852Z\",\"uniqueCode\":\"85kpyyi54oms5xhu53xzo\",\"validHours\":72},\"companyLogo\":null,\"companyLogoId\":\"logo_1762295796852_mm0jdu5\",\"companyLogoUrl\":\"https://taro8383.github.io/latente-estrategia-rentable/assets/logos/85kpyyi54oms5xhu53xzo.png\",\"logoFileExtension\":\"png\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"bcxb\",\"hasCustomContent\":true,\"company\":\"Luxury Holdings\",\"readerName\":\"Juan\"}}"
+    },
+    "36CViO": {
+      "shortCode": "36CViO",
+      "longUrl": "https://latente.net/#/invite/hrpavh9z1apyxo218qkm8",
+      "createdAt": 1762297237297,
+      "expiresAt": 1762556437234,
+      "metadata": "{\"brandInfo\":{\"name\":\"Bombilla de cuero\",\"industry\":\"Cuero Premium\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Marina\",\"company\":\"Bombilla de Cuero\",\"position\":\"CEO\",\"location\":\"Palermo\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"female\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"marcas de cuero\",\"historia\":\"Imagina esto: tu hijo, en 2045, entra a una reunión en Nueva York. Alguien ve su portafolio y dice, en voz baja: \\\"¿Eso es de Bombilla de cuero? Mi abuelo tenía uno igual...lo enterraron con él.\\\" Eso no es un producto. Es un legado. Y el legado se construye ahora mismo.\",\"brandName\":\"Bombilla de cuero\",\"tuMarca\":\"Bombilla de cuero\",\"inovacion\":\"cuero reciclado\",\"malPosicionamiento\":\"Calidad y artesanal\",\"rollsRoyce\":\"el Rolls-Royce del cuero sudamericano\",\"fraseDescriptiva\":\"cuero premium en Argentina\",\"avatar\":\"Tu cliente ideal ya no es 'hombre de 40 años con ingresos altos'. Es Francisco de Barrio Norte que no compra un portafolio. Compra el derecho a sacarlo en la reunión donde decide el futuro de su empresa�?y que todos sepan: este hombre no pide permiso. Lo concede\",\"propuestaPobre\":\"artesanal\",\"propuestaBuena\":\"Ellos venden cueros. Nosotros vendemos la última pieza que tu abuelo hubiera usado...y tu nieto heredará.\",\"automatizacion\":\"diseñar tu próximo lanzamiento icónico.\",\"trabajoDeValor\":\"tu maestro curtidor ya no empaca cajas...entrena a jóvenes artesanos bajo tu sello.\",\"proveedor\":\"el 20% mejor cuero del lote\",\"infrautilizado\":\"Generan $5,000,000/mes alquiladas a startups de moda sostenible que necesitan capacidad...pero no quieren invertir.\",\"membresia\":\"Entran en tu Círculo de Legado: pagan una membresía anual y reciben piezas exclusivas\",\"metodo\":\"ese método tuyo para curtir sin químicos? Lo vendes como 'Sistema Argento' a talleres en Chile y Uruguay...con tu logo en cada pieza que hagan.\"},\"expiration\":{\"createdAt\":\"2025-11-04T23:01:34.157Z\",\"expiresAt\":\"2025-11-07T23:01:34.157Z\",\"uniqueCode\":\"hrpavh9z1apyxo218qkm8\",\"validHours\":72},\"companyLogo\":null,\"companyLogoId\":\"logo_1762297294158_a8hdupf\",\"companyLogoUrl\":\"https://taro8383.github.io/latente-estrategia-rentable/assets/logos/hrpavh9z1apyxo218qkm8.png\",\"logoFileExtension\":\"png\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"Cuero Premium\",\"hasCustomContent\":true,\"company\":\"Bombilla de Cuero\",\"readerName\":\"Marina\"}}"
     }
   },
-  "lastUpdated": 1762295738627,
+  "lastUpdated": 1762297237297,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 21,
-    "activeMappings": 21,
+    "totalMappings": 22,
+    "activeMappings": 22,
     "expiredMappings": 0,
-    "lastCleanup": 1762295738626,
+    "lastCleanup": 1762297237296,
     "lastCleanupCount": 0
   }
 }
