@@ -1213,21 +1213,19 @@
                     }
 
                     const releaseData = await releaseResponse.json();
-                    const uploadUrl = releaseData.upload_url;
 
-                    // Upload the file as release asset
-                    const formData = new FormData();
-                    formData.append('file', file, `${shortCode}.${fileExtension}`);
-                    formData.append('name', `${shortCode}.${fileExtension}`);
-                    formData.append('label', `Logo file`);
+                    // Construct upload URL using API endpoint (browser-compatible)
+                    const uploadUrl = `https://api.github.com/repos/${owner}/${repo}/releases/${releaseData.id}/assets?name=${shortCode}.${fileExtension}`;
 
+                    // Upload the file as release asset using browser-compatible API
                     const uploadResponse = await fetch(uploadUrl, {
                         method: 'POST',
                         headers: {
                             'Authorization': `token ${token}`,
-                            'Accept': 'application/vnd.github.v3+json'
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/octet-stream'
                         },
-                        body: formData
+                        body: file  // Direct file upload, not FormData for API compatibility
                     });
 
                     if (!uploadResponse.ok) {
