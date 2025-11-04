@@ -1063,9 +1063,18 @@
                     // Store the full URL in localStorage for cross-device use
                     localStorage.setItem(`full_url_${shortCode}`, longUrl);
 
-                    // Create the payload with metadata (personalization data) but without large embedded data
-                    const metadataPayload = JSON.stringify(metadata);
-                    console.log('📏 Metadata payload size:', metadataPayload.length, 'chars');
+                    // Clean up metadata to remove very long values that cause issues
+                    const cleanMetadata = JSON.parse(JSON.stringify(metadata, (key, value) => {
+                        // Truncate very long strings to prevent issues
+                        if (typeof value === 'string' && value.length > 1000) {
+                            console.log('🔧 Truncating long field:', key, 'from', value.length, 'to 1000 chars');
+                            return value.substring(0, 1000) + '...[truncated]';
+                        }
+                        return value;
+                    }));
+
+                    const metadataPayload = JSON.stringify(cleanMetadata);
+                    console.log('📏 Clean metadata payload size:', metadataPayload.length, 'chars');
 
                     const payload = {
                         ref: 'main',
