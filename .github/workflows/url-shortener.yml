@@ -16,6 +16,14 @@ on:
         required: false
         type: string
         default: '72'
+      logoFile:
+        description: 'Logo file data (base64 encoded for workflow input)'
+        required: false
+        type: string
+      logoExtension:
+        description: 'Logo file extension (png, jpg, gif, webp)'
+        required: false
+        type: string
       metadata:
         description: 'Personalization metadata for cross-device use'
         required: false
@@ -53,6 +61,37 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'
+
+    - name: Upload logo file if provided
+      if: github.event.inputs.logoFile != ''
+      run: |
+        echo "DEBUG: Processing logo file upload"
+        LOGO_FILE="${{ github.event.inputs.logoFile }}"
+        LOGO_EXTENSION="${{ github.event.inputs.logoExtension }}"
+        SHORT_CODE="${{ github.event.inputs.shortCode }}"
+
+        echo "Logo extension: $LOGO_EXTENSION"
+        echo "Short code: $SHORT_CODE"
+        echo "Logo file size: ${#LOGO_FILE} characters"
+
+        # Create assets/logos directory if it doesn't exist
+        mkdir -p public/assets/logos
+
+        # Decode base64 and save as file
+        if [ -n "$LOGO_FILE" ] && [ -n "$LOGO_EXTENSION" ]; then
+          echo "$LOGO_FILE" | base64 -d > "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
+          echo "DEBUG: Logo file saved as public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
+
+          # Verify file was created
+          if [ -f "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}" ]; then
+            FILE_SIZE=$(stat -c%s "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}")
+            echo "DEBUG: Logo file size: $FILE_SIZE bytes"
+          else
+            echo "ERROR: Failed to create logo file"
+          fi
+        else
+          echo "DEBUG: No logo file provided"
+        fi
 
     - name: Store URL mapping with proper handling
       run: |
