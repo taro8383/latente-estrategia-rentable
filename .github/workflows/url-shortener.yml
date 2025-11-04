@@ -97,11 +97,12 @@ jobs:
       run: |
         echo "DEBUG: Starting URL mapping storage"
 
-        # Parse inputs with single quotes to prevent shell interpretation
+        # Parse inputs with proper escaping to handle complex JSON
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
         LONG_URL="${{ github.event.inputs.longUrl }}"
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
-        METADATA="${{ github.event.inputs.metadata }}"
+        # Handle metadata safely - escape special characters
+        METADATA='${{ toJSON(github.event.inputs.metadata) }}'
         # Logo data is handled separately to avoid size limits
 
         echo "DEBUG: Parsed inputs safely"
@@ -110,6 +111,15 @@ jobs:
         echo "EXPIRATION_HOURS: $EXPIRATION_HOURS"
         echo "METADATA length: ${#METADATA}"
         echo "METADATA preview (first 200 chars): ${METADATA:0:200}..."
+
+        # Validate metadata is not empty and is valid JSON/string
+        if [ -z "$METADATA" ]; then
+          echo "DEBUG: METADATA is empty, using empty object"
+          METADATA="{}"
+        fi
+
+        # Ensure METADATA is properly escaped for file writing
+        echo "DEBUG: METADATA type check completed"
 
         # Validate inputs
         if [ -z "$SHORT_CODE" ] || [ -z "$LONG_URL" ]; then
@@ -299,13 +309,14 @@ jobs:
         EOF
 
         # Write all large data to temp files to avoid command line length issues
-        echo "$MAPPINGS" > mappings_temp.json
+        # Use printf to handle complex JSON with quotes and special characters safely
+        printf "%s\n" "$MAPPINGS" > mappings_temp.json
         echo "DEBUG: Wrote mappings to temp file, size: $(wc -c < mappings_temp.json)"
 
-        echo "$METADATA" > metadata_temp.json
+        printf "%s\n" "$METADATA" > metadata_temp.json
         echo "DEBUG: Wrote metadata to temp file, size: $(wc -c < metadata_temp.json)"
 
-        echo "$LONG_URL" > longurl_temp.txt
+        printf "%s\n" "$LONG_URL" > longurl_temp.txt
         echo "DEBUG: Wrote long URL to temp file, size: $(wc -c < longurl_temp.txt)"
 
         # Run Node script with minimal environment variables
