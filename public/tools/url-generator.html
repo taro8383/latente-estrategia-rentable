@@ -1288,7 +1288,7 @@
 
                 const now = new Date();
                 const expiresAt = new Date(now.getTime() + (hoursValid * 60 * 60 * 1000));
-                const uniqueCode = this.urlShortener.generateUniqueCode();
+                const uniqueCode = GitHubActionsURLShortener.generateUniqueCode();
 
                 // Handle logo storage (still using localStorage for now, but inline data as fallback)
                 let logoId = null;
@@ -1300,7 +1300,7 @@
 
                     // Upload logo file directly to GitHub repository via Contents API
                     try {
-                        await this.urlShortener.uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, companyLogoData);
+                        await GitHubActionsURLShortener.uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, companyLogoData);
                         console.log('Logo uploaded to GitHub repository, logoId:', logoId);
                     } catch (error) {
                         console.error('Failed to upload logo to GitHub:', error);
