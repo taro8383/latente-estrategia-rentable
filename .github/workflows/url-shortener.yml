@@ -178,6 +178,29 @@ jobs:
         console.log('DEBUG: Expires at:', new Date(expiresAt).toISOString());
         console.log('DEBUG: Metadata:', JSON.stringify(metadata));
 
+        // Automatic cleanup: Remove mappings older than 96 hours (345600000 ms)
+        // This keeps 72-hour expiration message visible for 24 hours after expiration
+        const now = Date.now();
+        const cleanupThreshold = 96 * 60 * 60 * 1000; // 96 hours in milliseconds
+        let cleanupCount = 0;
+
+        console.log('DEBUG: Starting automatic cleanup of old mappings...');
+        console.log('DEBUG: Current time:', new Date(now).toISOString());
+        console.log('DEBUG: Cleanup threshold (96 hours):', new Date(now - cleanupThreshold).toISOString());
+
+        Object.keys(mappings.mappings).forEach(code => {
+          const mapping = mappings.mappings[code];
+          const age = now - mapping.createdAt;
+
+          if (age > cleanupThreshold) {
+            console.log('DEBUG: Removing old mapping:', code, 'Age:', Math.round(age / (1000 * 60 * 60)), 'hours');
+            delete mappings.mappings[code];
+            cleanupCount++;
+          }
+        });
+
+        console.log('DEBUG: Cleanup completed. Removed', cleanupCount, 'old mappings');
+
         // Add new mapping
         mappings.mappings[shortCode] = {
           shortCode: shortCode,
@@ -189,7 +212,6 @@ jobs:
         mappings.lastUpdated = Date.now();
 
         // Update statistics
-        const now = Date.now();
         let activeCount = 0;
         let expiredCount = 0;
 
@@ -204,7 +226,9 @@ jobs:
         mappings.statistics = {
           totalMappings: Object.keys(mappings.mappings).length,
           activeMappings: activeCount,
-          expiredMappings: expiredCount
+          expiredMappings: expiredCount,
+          lastCleanup: now,
+          lastCleanupCount: cleanupCount
         };
 
         // Write updated mappings
@@ -214,6 +238,9 @@ jobs:
         console.log('Short code:', shortCode);
         console.log('Total mappings:', Object.keys(mappings.mappings).length);
         console.log('Active mappings:', activeCount);
+        console.log('Expired mappings:', expiredCount);
+        console.log('Cleaned up old mappings:', cleanupCount);
+        console.log('Cleanup retention: 96 hours (shows 72h expired for 24h)');
         EOF
 
         # Write all large data to temp files to avoid command line length issues
