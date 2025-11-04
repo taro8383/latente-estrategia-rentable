@@ -27,7 +27,10 @@
       "Bash(dos2unix:*)",
       "Bash(npx js-yaml:*)",
       "mcp__context7__resolve-library-id",
-      "mcp__context7__get-library-docs"
+      "mcp__context7__get-library-docs",
+      "Bash(wrangler --help:*)",
+      "Bash(wrangler pages --help:*)",
+      "Bash(curl:*)"
     ],
     "deny": [],
     "ask": []
