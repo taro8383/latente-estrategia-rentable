@@ -1118,28 +1118,29 @@
                     const metadataPayload = JSON.stringify(cleanMetadata);
                     console.log('📏 Clean metadata payload size:', metadataPayload.length, 'chars');
 
-                    // Handle logo file for GitHub Actions
-                    let logoFileBase64 = '';
-                    let logoFileExtension = '';
+                    // NEW APPROACH: Upload logo file as artifact first, then trigger workflow
+                let artifactUrl = '';
+                let logoFileExtension = '';
 
-                    if (companyLogoFile) {
-                        // Convert logo file to base64 for GitHub Actions input
-                        logoFileBase64 = await fileToBase64(companyLogoFile);
-                        logoFileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
-                        console.log('📧 Sending logo file to GitHub Actions:', logoFileExtension, 'size:', logoFileBase64.length, 'chars');
+                if (companyLogoFile) {
+                    // Upload logo file as GitHub artifact first
+                    logoFileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
+                    artifactUrl = await this.uploadLogoAsArtifact(companyLogoFile, shortCode, logoFileExtension, owner, repo, token);
+                    console.log('📧 Logo file uploaded as artifact:', artifactUrl);
+                    console.log('🚫 NO BASE64 - Artifact approach per GitHub best practices');
+                }
+
+                const payload = {
+                    ref: 'main',
+                    inputs: {
+                        shortCode: shortCode,
+                        longUrl: baseUrlForGitHub, // Much smaller URL without embedded logo
+                        expirationHours: expirationHours.toString(),
+                        metadata: metadataPayload, // Send personalization data as metadata
+                        logoArtifactUrl: artifactUrl, // Send artifact URL for workflow to download
+                        logoExtension: logoFileExtension // Send file extension
                     }
-
-                    const payload = {
-                        ref: 'main',
-                        inputs: {
-                            shortCode: shortCode,
-                            longUrl: baseUrlForGitHub, // Much smaller URL without embedded logo
-                            expirationHours: expirationHours.toString(),
-                            metadata: metadataPayload, // Send personalization data as metadata
-                            logoFile: logoFileBase64, // Send logo file as base64
-                            logoExtension: logoFileExtension // Send file extension
-                        }
-                    };
+                };
 
                     const payloadString = JSON.stringify(payload);
                     const payloadSize = new Blob([payloadString]).size;
@@ -1179,6 +1180,70 @@
 
                     // CRITICAL: No localStorage fallback - this is server-side only for cross-device compatibility
                     throw new Error(`Failed to store URL mapping: ${error.message}. The URL was NOT created and will NOT work across devices. Please check your GitHub token and repository settings.`);
+                }
+            }
+
+            // Upload logo file as GitHub artifact (2GB limit, no base64 conversion)
+            static async uploadLogoAsArtifact(file, shortCode, fileExtension, owner, repo, token) {
+                try {
+                    // Create artifact name with shortCode and timestamp
+                    const artifactName = `logo_${shortCode}_${Date.now()}`;
+
+                    // GitHub API endpoint for creating release artifacts
+                    const apiUrl = `https://api.github.com/repos/${owner}/${repo}/releases`;
+
+                    // First, create a draft release (or find existing one)
+                    const releaseResponse = await fetch(apiUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json',
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            tag_name: `artifacts/${artifactName}`,
+                            name: `Logo for ${shortCode}`,
+                            body: 'Logo file uploaded for URL shortening',
+                            draft: true
+                        })
+                    });
+
+                    if (!releaseResponse.ok) {
+                        throw new Error(`Failed to create release: ${releaseResponse.statusText}`);
+                    }
+
+                    const releaseData = await releaseResponse.json();
+                    const uploadUrl = releaseData.upload_url;
+
+                    // Upload the file as release asset
+                    const formData = new FormData();
+                    formData.append('file', file, `${shortCode}.${fileExtension}`);
+                    formData.append('name', `${shortCode}.${fileExtension}`);
+                    formData.append('label', `Logo file`);
+
+                    const uploadResponse = await fetch(uploadUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `token ${token}`,
+                            'Accept': 'application/vnd.github.v3+json'
+                        },
+                        body: formData
+                    });
+
+                    if (!uploadResponse.ok) {
+                        throw new Error(`Failed to upload logo file: ${uploadResponse.statusText}`);
+                    }
+
+                    const uploadData = await uploadResponse.json();
+                    const assetUrl = uploadData.browser_download_url;
+
+                    // Return the asset URL
+                    console.log('✅ Logo file uploaded successfully:', assetUrl);
+                    return assetUrl;
+
+                } catch (error) {
+                    console.error('❌ Failed to upload logo as artifact:', error);
+                    throw error;
                 }
             }
 
@@ -2048,19 +2113,8 @@
             document.getElementById('logoPreview').style.display = 'none';
         }
 
-        // Convert file to base64 for GitHub Actions input
-        async function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = () => {
-                    const result = reader.result;
-                    const base64 = result.split(',')[1]; // Remove data URL prefix
-                    resolve(base64);
-                };
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        }
+        // NO BASE64 CONVERSION FOR LOGOS - Removed fileToBase64 function per logoplan.md
+        // Logo files are uploaded directly to GitHub Actions without base64 conversion
 
         function copyToClipboard(elementId) {
             const urlText = document.getElementById(elementId).textContent;

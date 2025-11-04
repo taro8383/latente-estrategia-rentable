@@ -16,8 +16,8 @@ on:
         required: false
         type: string
         default: '72'
-      logoFile:
-        description: 'Logo file data (base64 encoded for workflow input)'
+      logoArtifactUrl:
+        description: 'GitHub release asset URL for logo file download'
         required: false
         type: string
       logoExtension:
@@ -62,35 +62,40 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Upload logo file if provided
-      if: github.event.inputs.logoFile != ''
+    - name: Create logo directory structure
       run: |
-        echo "DEBUG: Processing logo file upload"
-        LOGO_FILE="${{ github.event.inputs.logoFile }}"
+        echo "DEBUG: Creating logo directory structure"
+        # Create assets/logos directory if it doesn't exist
+        mkdir -p public/assets/logos
+        echo "DEBUG: Logo directory created: public/assets/logos"
+
+    - name: Download logo file from artifact URL (if provided)
+      if: ${{ github.event.inputs.logoArtifactUrl != '' }}
+      run: |
+        echo "DEBUG: Starting logo file download from artifact"
+        LOGO_ARTIFACT_URL="${{ github.event.inputs.logoArtifactUrl }}"
         LOGO_EXTENSION="${{ github.event.inputs.logoExtension }}"
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
 
-        echo "Logo extension: $LOGO_EXTENSION"
-        echo "Short code: $SHORT_CODE"
-        echo "Logo file size: ${#LOGO_FILE} characters"
+        if [ -n "$LOGO_ARTIFACT_URL" ] && [ -n "$LOGO_EXTENSION" ] && [ -n "$SHORT_CODE" ]; then
+          echo "DEBUG: Downloading logo from: $LOGO_ARTIFACT_URL"
+          echo "DEBUG: Logo extension: $LOGO_EXTENSION"
+          echo "DEBUG: Short code: $SHORT_CODE"
 
-        # Create assets/logos directory if it doesn't exist
-        mkdir -p public/assets/logos
+          # Download the logo file using curl
+          LOGO_FILE_PATH="public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
+          curl -L -o "$LOGO_FILE_PATH" "$LOGO_ARTIFACT_URL"
 
-        # Decode base64 and save as file
-        if [ -n "$LOGO_FILE" ] && [ -n "$LOGO_EXTENSION" ]; then
-          echo "$LOGO_FILE" | base64 -d > "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
-          echo "DEBUG: Logo file saved as public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
-
-          # Verify file was created
-          if [ -f "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}" ]; then
-            FILE_SIZE=$(stat -c%s "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}")
-            echo "DEBUG: Logo file size: $FILE_SIZE bytes"
+          if [ -f "$LOGO_FILE_PATH" ]; then
+            FILE_SIZE=$(stat -c%s "$LOGO_FILE_PATH" 2>/dev/null || stat -f%z "$LOGO_FILE_PATH" 2>/dev/null || echo "unknown")
+            echo "DEBUG: Logo file downloaded successfully: $LOGO_FILE_PATH"
+            echo "DEBUG: File size: $FILE_SIZE bytes"
           else
-            echo "ERROR: Failed to create logo file"
+            echo "ERROR: Failed to download logo file"
+            exit 1
           fi
         else
-          echo "DEBUG: No logo file provided"
+          echo "DEBUG: No logo artifact URL provided, skipping logo download"
         fi
 
     - name: Store URL mapping with proper handling
