@@ -1053,108 +1053,61 @@
                 try {
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
-                    // Compress and optimize URL data to reduce size while keeping cross-device functionality
+                    // Simple data reduction to fix size issues
                     let baseUrlForGitHub = longUrl;
                     try {
                         console.log('🔧 Original URL length:', longUrl.length, 'chars');
-                        console.log('🔧 Original URL preview:', longUrl.substring(0, 100) + '...');
 
-                        const url = new URL(longUrl);
-                        console.log('🔧 URL object created:', url);
-                        console.log('🔧 URL hash:', url.hash);
+                        if (longUrl.length > 10000) { // Only process if URL is too large
+                            const url = new URL(longUrl);
+                            const hashFragment = url.hash.substring(1);
 
-                        const hashFragment = url.hash.substring(1);
-                        console.log('🔧 Hash fragment:', hashFragment);
+                            if (hashFragment.includes('data=')) {
+                                const queryParams = hashFragment.split('?')[1];
+                                const urlParams = new URLSearchParams(queryParams);
+                                const encodedData = urlParams.get('data');
 
-                        // Extract the query part from the hash fragment
-                        // Hash format: /invite/code?data=...  or just ?data=...
-                        let queryParams = '';
-                        if (hashFragment.includes('?')) {
-                            queryParams = hashFragment.split('?')[1];
-                        } else {
-                            queryParams = hashFragment;
-                        }
+                                if (encodedData) {
+                                    console.log('🔧 Original data length:', encodedData.length, 'chars');
 
-                        console.log('🔧 Extracted query params:', queryParams);
+                                    try {
+                                        const dataObj = JSON.parse(decodeURIComponent(encodedData));
+                                        console.log('🔧 Parsed data object:', Object.keys(dataObj));
 
-                        const urlParams = new URLSearchParams(queryParams);
-                        console.log('🔧 URL params object created');
+                                        // Create minimal data object - keep only essential fields
+                                        const minimalObj = {
+                                            brandInfo: {
+                                                name: dataObj.brandInfo?.name || '',
+                                                industry: dataObj.brandInfo?.industry || ''
+                                            },
+                                            readerInfo: {
+                                                name: dataObj.readerInfo?.name || '',
+                                                gender: dataObj.readerInfo?.gender || ''
+                                            }
+                                        };
 
-                        const encodedData = urlParams.get('data');
-                        console.log('🔧 Encoded data found:', encodedData ? 'YES (' + encodedData.length + ' chars)' : 'NO');
+                                        const minimalData = encodeURIComponent(JSON.stringify(minimalObj));
+                                        console.log('🔧 Minimal data length:', minimalData.length, 'chars');
+                                        console.log('🔧 Size reduction:', Math.round((1 - minimalData.length/encodedData.length) * 100), '%');
 
-                        if (encodedData) {
-                            console.log('🔧 Original data length:', encodedData.length, 'chars');
+                                        // Rebuild URL with minimal data
+                                        const newHash = `invite=${urlParams.get('invite')}&data=${minimalData}`;
+                                        baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + newHash;
+                                        console.log('🔧 Final URL length:', baseUrlForGitHub.length, 'chars');
 
-                            // Try to compress the data to reduce URL size
-                            let compressedData = encodedData;
-
-                            // Simple compression: Remove unnecessary whitespace and common patterns
-                            try {
-                                const dataObj = JSON.parse(decodeURIComponent(encodedData));
-
-                                // Remove optional fields that can be reconstructed
-                                const compressedObj = {
-                                    brandInfo: dataObj.brandInfo,
-                                    readerInfo: dataObj.readerInfo,
-                                    // Remove bulky customMessages if not essential
-                                    ...(dataObj.customMessages && {
-                                        brandName: dataObj.customMessages.brandName,
-                                        calificador: dataObj.customMessages.calificador
-                                    })
-                                };
-
-                                compressedData = encodeURIComponent(JSON.stringify(compressedObj));
-                                console.log('🔧 Compressed data length:', compressedData.length, 'chars');
-                                console.log('🔧 Size reduction:', Math.round((1 - compressedData.length/encodedData.length) * 100), '%');
-
-                                // Rebuild URL with compressed data
-                                const newHash = urlParams.toString().replace(/data=[^&]*/, `data=${compressedData}`);
-                                baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + newHash;
-
-                                console.log('🔧 Optimized URL length:', baseUrlForGitHub.length, 'chars');
-
-                            } catch (compressionError) {
-                                console.warn('Failed to compress data, using original:', compressionError);
-                                baseUrlForGitHub = longUrl;
-                            }
-
-                            // If URL is still too large (>30KB), try more aggressive compression
-                            if (baseUrlForGitHub.length > 30000) {
-                                console.log('🔧 URL still large, applying aggressive compression...');
-
-                                try {
-                                    const dataObj = JSON.parse(decodeURIComponent(encodedData));
-
-                                    // Keep only essential data for personalization
-                                    const essentialObj = {
-                                        brandInfo: {
-                                            name: dataObj.brandInfo?.name || '',
-                                            industry: dataObj.brandInfo?.industry || ''
-                                        },
-                                        readerInfo: {
-                                            name: dataObj.readerInfo?.name || '',
-                                            gender: dataObj.readerInfo?.gender || ''
-                                        }
-                                    };
-
-                                    const essentialData = encodeURIComponent(JSON.stringify(essentialObj));
-                                    const essentialHash = `invite=abc&data=${essentialData}`;
-                                    baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + essentialHash;
-
-                                    console.log('🔧 Aggressively compressed URL length:', baseUrlForGitHub.length, 'chars');
-
-                                } catch (aggressiveError) {
-                                    console.warn('Aggressive compression failed:', aggressiveError);
-                                    // As last resort, use minimal URL
-                                    baseUrlForGitHub = url.origin + url.pathname + url.search + '#invite=abc';
-                                    console.log('🔧 Using minimal URL:', baseUrlForGitHub);
+                                    } catch (parseError) {
+                                        console.warn('Failed to parse data, removing data entirely:', parseError);
+                                        // Last resort: create URL without any data
+                                        baseUrlForGitHub = url.origin + url.pathname + url.search + '#invite=minimal';
+                                        console.log('🔧 Using URL without data:', baseUrlForGitHub.length, 'chars');
+                                    }
                                 }
                             }
+                        } else {
+                            console.log('🔧 URL size acceptable, no processing needed');
                         }
                     } catch (error) {
-                        console.warn('Failed to optimize URL:', error);
-                        baseUrlForGitHub = longUrl;
+                        console.warn('Failed to process URL:', error);
                     }
 
                     // Create the payload with size debugging
