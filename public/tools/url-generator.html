@@ -1053,47 +1053,89 @@
                 try {
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
-                    // Extract base URL without data to reduce size
+                    // Compress and optimize URL data to reduce size while keeping cross-device functionality
                     let baseUrlForGitHub = longUrl;
                     try {
                         console.log('🔧 Original URL length:', longUrl.length, 'chars');
                         console.log('🔧 Original URL preview:', longUrl.substring(0, 100) + '...');
 
                         const url = new URL(longUrl);
-
-                        // Remove the hash fragment completely to get the smallest possible URL
-                        baseUrlForGitHub = url.origin + url.pathname + url.search;
-
-                        console.log('🔧 Base URL after stripping hash:', baseUrlForGitHub);
-                        console.log('🔧 Base URL length:', baseUrlForGitHub.length, 'chars');
-
-                        // If the original URL had data in hash, store full URL locally
                         const hashFragment = url.hash.substring(1);
-                        if (hashFragment && hashFragment.includes('data=')) {
-                            console.log('📝 Detected large data in URL hash, storing full URL locally');
+                        const urlParams = new URLSearchParams(hashFragment);
+                        const encodedData = urlParams.get('data');
 
-                            // Store the full URL with data locally
-                            localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
-                                ...metadata,
-                                shortCode: shortCode,
-                                fullUrl: longUrl, // Store full URL with data
-                                baseUrl: baseUrlForGitHub, // Store base URL
-                                createdAt: Date.now(),
-                                expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
-                            }));
-                            console.log('📝 Full URL with data stored locally for:', shortCode);
+                        if (encodedData) {
+                            console.log('🔧 Original data length:', encodedData.length, 'chars');
+
+                            // Try to compress the data to reduce URL size
+                            let compressedData = encodedData;
+
+                            // Simple compression: Remove unnecessary whitespace and common patterns
+                            try {
+                                const dataObj = JSON.parse(decodeURIComponent(encodedData));
+
+                                // Remove optional fields that can be reconstructed
+                                const compressedObj = {
+                                    brandInfo: dataObj.brandInfo,
+                                    readerInfo: dataObj.readerInfo,
+                                    // Remove bulky customMessages if not essential
+                                    ...(dataObj.customMessages && {
+                                        brandName: dataObj.customMessages.brandName,
+                                        calificador: dataObj.customMessages.calificador
+                                    })
+                                };
+
+                                compressedData = encodeURIComponent(JSON.stringify(compressedObj));
+                                console.log('🔧 Compressed data length:', compressedData.length, 'chars');
+                                console.log('🔧 Size reduction:', Math.round((1 - compressedData.length/encodedData.length) * 100), '%');
+
+                                // Rebuild URL with compressed data
+                                const newHash = urlParams.toString().replace(/data=[^&]*/, `data=${compressedData}`);
+                                baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + newHash;
+
+                                console.log('🔧 Optimized URL length:', baseUrlForGitHub.length, 'chars');
+
+                            } catch (compressionError) {
+                                console.warn('Failed to compress data, using original:', compressionError);
+                                baseUrlForGitHub = longUrl;
+                            }
+
+                            // If URL is still too large (>30KB), try more aggressive compression
+                            if (baseUrlForGitHub.length > 30000) {
+                                console.log('🔧 URL still large, applying aggressive compression...');
+
+                                try {
+                                    const dataObj = JSON.parse(decodeURIComponent(encodedData));
+
+                                    // Keep only essential data for personalization
+                                    const essentialObj = {
+                                        brandInfo: {
+                                            name: dataObj.brandInfo?.name || '',
+                                            industry: dataObj.brandInfo?.industry || ''
+                                        },
+                                        readerInfo: {
+                                            name: dataObj.readerInfo?.name || '',
+                                            gender: dataObj.readerInfo?.gender || ''
+                                        }
+                                    };
+
+                                    const essentialData = encodeURIComponent(JSON.stringify(essentialObj));
+                                    const essentialHash = `invite=abc&data=${essentialData}`;
+                                    baseUrlForGitHub = url.origin + url.pathname + url.search + '#' + essentialHash;
+
+                                    console.log('🔧 Aggressively compressed URL length:', baseUrlForGitHub.length, 'chars');
+
+                                } catch (aggressiveError) {
+                                    console.warn('Aggressive compression failed:', aggressiveError);
+                                    // As last resort, use minimal URL
+                                    baseUrlForGitHub = url.origin + url.pathname + url.search + '#invite=abc';
+                                    console.log('🔧 Using minimal URL:', baseUrlForGitHub);
+                                }
+                            }
                         }
                     } catch (error) {
-                        console.warn('Failed to parse URL for size optimization:', error);
-                        // Store metadata locally anyway
-                        localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
-                            ...metadata,
-                            shortCode: shortCode,
-                            fullUrl: longUrl,
-                            baseUrl: longUrl,
-                            createdAt: Date.now(),
-                            expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
-                        }));
+                        console.warn('Failed to optimize URL:', error);
+                        baseUrlForGitHub = longUrl;
                     }
 
                     // Create the payload with size debugging

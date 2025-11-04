@@ -23,41 +23,8 @@ export const RedirectHandler: React.FC = () => {
       try {
         setRedirectStatus('Buscando enlace...');
 
-        // Check for locally stored full URL first (for URLs with large data)
-        const localMetadata = localStorage.getItem(`metadata_${shortCode}`);
-        let longUrl = null;
-
-        console.log('🔍 RedirectHandler Debug for shortCode:', shortCode);
-        console.log('🔍 Looking for local metadata key: metadata_' + shortCode);
-        console.log('🔍 Local metadata found:', localMetadata ? 'YES' : 'NO');
-
-        if (localMetadata) {
-          try {
-            const metadata = JSON.parse(localMetadata);
-            console.log('🔍 Parsed metadata:', metadata);
-            console.log('🔍 Current time:', Date.now());
-            console.log('🔍 Expires at:', metadata.expiresAt);
-            console.log('🔍 Is expired:', Date.now() > metadata.expiresAt);
-            console.log('🔍 Has fullUrl:', !!metadata.fullUrl);
-
-            if (Date.now() < metadata.expiresAt && metadata.fullUrl) {
-              longUrl = metadata.fullUrl;
-              console.log('📝 RedirectHandler: Using locally stored full URL for', shortCode);
-              console.log('📝 Full URL length:', longUrl.length, 'chars');
-            } else {
-              // Clean up expired metadata
-              localStorage.removeItem(`metadata_${shortCode}`);
-              console.log('🧹 Cleaned up expired metadata for', shortCode);
-            }
-          } catch (error) {
-            console.warn('Failed to parse local metadata:', error);
-          }
-        }
-
-        // If no local URL found, fetch from GitHub Pages
-        if (!longUrl) {
-          longUrl = await URLShortener.getLongUrl(shortCode);
-        }
+        // Get the URL from GitHub Pages (cross-device compatible)
+        const longUrl = await URLShortener.getLongUrl(shortCode);
 
         if (longUrl) {
           setRedirectStatus('Redirigiendo...');
