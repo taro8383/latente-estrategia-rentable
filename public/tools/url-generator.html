@@ -1056,26 +1056,32 @@
                     // Extract base URL without data to reduce size
                     let baseUrlForGitHub = longUrl;
                     try {
-                        const url = new URL(longUrl);
-                        const hashFragment = url.hash.substring(1);
-                        const urlParams = new URLSearchParams(hashFragment);
-                        const encodedData = urlParams.get('data');
+                        console.log('🔧 Original URL length:', longUrl.length, 'chars');
+                        console.log('🔧 Original URL preview:', longUrl.substring(0, 100) + '...');
 
-                        if (encodedData) {
+                        const url = new URL(longUrl);
+
+                        // Remove the hash fragment completely to get the smallest possible URL
+                        baseUrlForGitHub = url.origin + url.pathname + url.search;
+
+                        console.log('🔧 Base URL after stripping hash:', baseUrlForGitHub);
+                        console.log('🔧 Base URL length:', baseUrlForGitHub.length, 'chars');
+
+                        // If the original URL had data in hash, store full URL locally
+                        const hashFragment = url.hash.substring(1);
+                        if (hashFragment && hashFragment.includes('data=')) {
+                            console.log('📝 Detected large data in URL hash, storing full URL locally');
+
                             // Store the full URL with data locally
                             localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
                                 ...metadata,
                                 shortCode: shortCode,
                                 fullUrl: longUrl, // Store full URL with data
-                                baseUrl: url.origin + url.pathname, // Store base URL
+                                baseUrl: baseUrlForGitHub, // Store base URL
                                 createdAt: Date.now(),
                                 expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
                             }));
                             console.log('📝 Full URL with data stored locally for:', shortCode);
-
-                            // Send only base URL without data to GitHub (much smaller)
-                            baseUrlForGitHub = url.origin + url.pathname + url.search;
-                            console.log('🔗 Sending base URL to GitHub:', baseUrlForGitHub);
                         }
                     } catch (error) {
                         console.warn('Failed to parse URL for size optimization:', error);
