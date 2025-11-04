@@ -157,7 +157,8 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
                   // Try to get logo file information from metadata
                   const logoFileExtension = (parsedData as any).logoFileExtension;
                   const currentUrl = window.location.href;
-                  const shortCodeMatch = currentUrl.match(/\/r\/([a-zA-Z0-9]+)/);
+                  // Match URL pattern: ...#/invite/shortCode
+                  const shortCodeMatch = currentUrl.match(/#\/invite\/([a-zA-Z0-9]+)/);
 
                   if (shortCodeMatch && logoFileExtension) {
                       const shortCode = shortCodeMatch[1];
