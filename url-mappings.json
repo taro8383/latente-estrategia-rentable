@@ -207,15 +207,22 @@
       "createdAt": 1762260220708,
       "expiresAt": 1762519420644,
       "metadata": {}
+    },
+    "UaiW4P": {
+      "shortCode": "UaiW4P",
+      "longUrl": "https://latente.net/#/invite/p6xorhmj22p2za5rkl2il",
+      "createdAt": 1762275656264,
+      "expiresAt": 1762534856196,
+      "metadata": "{\"brandInfo\":{\"name\":\"bcxb\",\"industry\":\"bcxb\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Juan\",\"company\":\"Luxury Holdings\",\"position\":\"CEO\",\"location\":\"Nueva York\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"male\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"bcxb\",\"historia\":\"cxb\",\"brandName\":\"bcxb\",\"tuMarca\":\"bcxb\",\"inovacion\":\"bxcb\",\"malPosicionamiento\":\"xcb\",\"rollsRoyce\":\"cxb\",\"fraseDescriptiva\":\"bcxb\",\"avatar\":\"bxc\",\"propuestaPobre\":\"bcxb\",\"propuestaBuena\":\"cxb\",\"automatizacion\":\"cxbxc\",\"trabajoDeValor\":\"cbxb\",\"proveedor\":\"cxbcx\",\"infrautilizado\":\"bcxb\",\"membresia\":\"cxbxc\",\"metodo\":\"bcxb\"},\"expiration\":{\"createdAt\":\"2025-11-04T17:01:52.365Z\",\"expiresAt\":\"2025-11-07T17:01:52.365Z\",\"uniqueCode\":\"p6xorhmj22p2za5rkl2il\",\"validHours\":72},\"companyLogo\":null,\"companyLogoId\":\"logo_1762275712368_rrqo840\",\"companyLogoUrl\":\"https://taro8383.github.io/latente-estrategia-rentable/assets/logos/logo_1762275712368_rrqo840.jpg\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"bcxb\",\"hasCustomContent\":true,\"company\":\"Luxury Holdings\",\"readerName\":\"Juan\"}}"
     }
   },
-  "lastUpdated": 1762260220708,
+  "lastUpdated": 1762275656264,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 16,
-    "activeMappings": 16,
+    "totalMappings": 17,
+    "activeMappings": 17,
     "expiredMappings": 0,
-    "lastCleanup": 1762260220708,
+    "lastCleanup": 1762275656263,
     "lastCleanupCount": 0
   }
 }
