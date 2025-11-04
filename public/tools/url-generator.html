@@ -1229,13 +1229,13 @@
                         const uploadData = await uploadResponse.json();
 
                         // Validate response structure
-                        if (!uploadData.success || !uploadData.url) {
+                        if (!uploadData.success || !uploadData.data || !uploadData.data.url) {
                             const errorMessage = `Invalid Cloudflare Worker response: ${JSON.stringify(uploadData)}`;
                             console.error('❌', errorMessage);
                             throw new Error(errorMessage);
                         }
 
-                        const r2Url = uploadData.url;
+                        const r2Url = uploadData.data.url;
                         console.log('✅ Logo file uploaded successfully to Cloudflare R2:', r2Url);
                         console.log('🔗 R2 URL ready for GitHub Actions workflow');
 
