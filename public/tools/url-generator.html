@@ -1066,7 +1066,18 @@
                         const hashFragment = url.hash.substring(1);
                         console.log('🔧 Hash fragment:', hashFragment);
 
-                        const urlParams = new URLSearchParams(hashFragment);
+                        // Extract the query part from the hash fragment
+                        // Hash format: /invite/code?data=...  or just ?data=...
+                        let queryParams = '';
+                        if (hashFragment.includes('?')) {
+                            queryParams = hashFragment.split('?')[1];
+                        } else {
+                            queryParams = hashFragment;
+                        }
+
+                        console.log('🔧 Extracted query params:', queryParams);
+
+                        const urlParams = new URLSearchParams(queryParams);
                         console.log('🔧 URL params object created');
 
                         const encodedData = urlParams.get('data');
