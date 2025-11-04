@@ -1281,7 +1281,7 @@
                     logoId = this.logoStorage.generateLogoId();
                     try {
                         // Store logo in localStorage for GitHub Actions to access
-                        const fileExtension = URLShortener.getLogoFileExtension(companyLogoData);
+                        const fileExtension = this.getLogoFileExtension(companyLogoData);
                         localStorage.setItem(`logo_${logoId}`, companyLogoData);
                         localStorage.setItem(`logo_extension_${logoId}`, fileExtension);
 

@@ -3,7 +3,6 @@ name: URL Shortener Final
 on:
   workflow_dispatch:
     inputs:
-    inputs:
       shortCode:
         description: 'Short code'
         required: true
@@ -17,12 +16,12 @@ on:
         required: false
         type: string
         default: '72'
-    logoBase64:
+      logoBase64:
         description: 'Logo base64 data'
         required: false
         type: string
         default: ''
-    logoExtension:
+      logoExtension:
         description: 'Logo file extension'
         required: false
         type: string
