@@ -1060,9 +1060,17 @@
                         console.log('🔧 Original URL preview:', longUrl.substring(0, 100) + '...');
 
                         const url = new URL(longUrl);
+                        console.log('🔧 URL object created:', url);
+                        console.log('🔧 URL hash:', url.hash);
+
                         const hashFragment = url.hash.substring(1);
+                        console.log('🔧 Hash fragment:', hashFragment);
+
                         const urlParams = new URLSearchParams(hashFragment);
+                        console.log('🔧 URL params object created');
+
                         const encodedData = urlParams.get('data');
+                        console.log('🔧 Encoded data found:', encodedData ? 'YES (' + encodedData.length + ' chars)' : 'NO');
 
                         if (encodedData) {
                             console.log('🔧 Original data length:', encodedData.length, 'chars');
