@@ -29,6 +29,28 @@ export const RedirectHandler: React.FC = () => {
         if (longUrl) {
           setRedirectStatus('Redirigiendo...');
 
+          // Extract encoded data from URL and store in localStorage for PersonalizationProvider
+          try {
+            const url = new URL(longUrl);
+            const hashFragment = url.hash.substring(1); // Remove the # symbol
+            const urlParams = new URLSearchParams(hashFragment);
+            const encodedData = urlParams.get('data');
+
+            if (encodedData) {
+              // Store the encoded data in localStorage for PersonalizationProvider
+              localStorage.setItem('incoming_personalization_writer', JSON.stringify({
+                timestamp: Date.now(),
+                shortCode: shortCode,
+                url: longUrl
+              }));
+              localStorage.setItem('incoming_personalization_payload', encodedData);
+              localStorage.setItem('incoming_personalization_payload_ts', Date.now().toString());
+              console.log('📝 RedirectHandler: Stored encoded data in localStorage for', shortCode);
+            }
+          } catch (error) {
+            console.error('❌ RedirectHandler: Failed to extract/store URL data:', error);
+          }
+
           // Simple direct redirect to avoid URL malformation
           setTimeout(() => {
             window.location.replace(longUrl);
