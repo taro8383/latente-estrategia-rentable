@@ -23,8 +23,29 @@ export const RedirectHandler: React.FC = () => {
       try {
         setRedirectStatus('Buscando enlace...');
 
-        // Use the async getLongUrl method to fetch from GitHub Pages
-        const longUrl = await URLShortener.getLongUrl(shortCode);
+        // Check for locally stored full URL first (for URLs with large data)
+        const localMetadata = localStorage.getItem(`metadata_${shortCode}`);
+        let longUrl = null;
+
+        if (localMetadata) {
+          try {
+            const metadata = JSON.parse(localMetadata);
+            if (Date.now() < metadata.expiresAt && metadata.fullUrl) {
+              longUrl = metadata.fullUrl;
+              console.log('📝 RedirectHandler: Using locally stored full URL for', shortCode);
+            } else {
+              // Clean up expired metadata
+              localStorage.removeItem(`metadata_${shortCode}`);
+            }
+          } catch (error) {
+            console.warn('Failed to parse local metadata:', error);
+          }
+        }
+
+        // If no local URL found, fetch from GitHub Pages
+        if (!longUrl) {
+          longUrl = await URLShortener.getLongUrl(shortCode);
+        }
 
         if (longUrl) {
           setRedirectStatus('Redirigiendo...');
