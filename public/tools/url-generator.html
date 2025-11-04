@@ -1053,9 +1053,15 @@
                 try {
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
-                    // For now, don't compress - we're handling logos separately
-                    let baseUrlForGitHub = longUrl;
-                    console.log('🔧 Using original URL (logo handling is separate now)');
+                    // Create minimal URL for GitHub Actions (remove embedded data to avoid size limits)
+                    const urlWithoutData = longUrl.split('?')[0];
+                    let baseUrlForGitHub = urlWithoutData;
+                    console.log('🔧 Using URL without embedded data for GitHub Actions');
+                    console.log('📏 Original URL length:', longUrl.length, 'chars');
+                    console.log('📏 Minimal URL length:', baseUrlForGitHub.length, 'chars');
+
+                    // Store the full URL in localStorage for cross-device use
+                    localStorage.setItem(`full_url_${shortCode}`, longUrl);
 
                     // Create the payload WITHOUT logo data (logos stored separately via file upload)
                     const payload = {
