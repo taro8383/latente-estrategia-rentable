@@ -29,9 +29,19 @@ export const RedirectHandler: React.FC = () => {
         if (longUrl) {
           setRedirectStatus('Redirigiendo...');
 
+          // First, try to get the full URL with embedded data from localStorage
+          // This contains the personalization data that we removed from GitHub Action inputs
+          const fullUrlWithEmbeddedData = localStorage.getItem(`full_url_${shortCode}`);
+          const urlToProcess = fullUrlWithEmbeddedData || longUrl;
+
+          console.log('🔍 RedirectHandler: Using URL for data extraction');
+          console.log('📏 Full URL from localStorage:', fullUrlWithEmbeddedData ? 'YES' : 'NO');
+          console.log('📏 Minimal URL from GitHub API:', longUrl.length, 'chars');
+          console.log('📏 Processing URL length:', urlToProcess.length, 'chars');
+
           // Extract encoded data from URL and store in localStorage for PersonalizationProvider
           try {
-            const url = new URL(longUrl);
+            const url = new URL(urlToProcess);
             const hashFragment = url.hash.substring(1); // Remove the # symbol
             const urlParams = new URLSearchParams(hashFragment);
             const encodedData = urlParams.get('data');
@@ -41,19 +51,24 @@ export const RedirectHandler: React.FC = () => {
               localStorage.setItem('incoming_personalization_writer', JSON.stringify({
                 timestamp: Date.now(),
                 shortCode: shortCode,
-                url: longUrl
+                url: urlToProcess
               }));
               localStorage.setItem('incoming_personalization_payload', encodedData);
               localStorage.setItem('incoming_personalization_payload_ts', Date.now().toString());
               console.log('📝 RedirectHandler: Stored encoded data in localStorage for', shortCode);
+              console.log('✅ Personalization data extracted successfully');
+            } else {
+              console.warn('⚠️ RedirectHandler: No encoded data found in URL, redirecting without personalization');
             }
           } catch (error) {
             console.error('❌ RedirectHandler: Failed to extract/store URL data:', error);
           }
 
-          // Simple direct redirect to avoid URL malformation
+          // Redirect to the full URL with embedded data for personalization
           setTimeout(() => {
-            window.location.replace(longUrl);
+            const redirectUrl = urlToProcess; // Use the URL with embedded data
+            console.log('🔄 Redirecting to:', redirectUrl.substring(0, 100) + '...');
+            window.location.replace(redirectUrl);
           }, 1000);
         } else {
           setError('Enlace no encontrado o expirado');
