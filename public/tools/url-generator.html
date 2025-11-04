@@ -974,6 +974,62 @@
                    Math.random().toString(36).substring(2, 15);
         }
 
+        async function uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, base64Data) {
+            const filePath = `public/assets/logos/${logoId}.${fileExtension}`;
+            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
+
+            // Convert base64 to binary
+            const binaryData = atob(base64Data);
+            const bytes = new Uint8Array(binaryData.length);
+            for (let i = 0; i < binaryData.length; i++) {
+                bytes[i] = binaryData.charCodeAt(i);
+            }
+
+            // Check if file already exists
+            let sha = null;
+            try {
+                const checkResponse = await fetch(apiUrl, {
+                    headers: {
+                        'Authorization': `token ${token}`,
+                        'Accept': 'application/vnd.github.v3+json'
+                    }
+                });
+                if (checkResponse.ok) {
+                    const fileData = await checkResponse.json();
+                    sha = fileData.sha;
+                }
+            } catch (error) {
+                // File doesn't exist, that's ok
+            }
+
+            // Upload or update file
+            const payload = {
+                message: `Add logo file: ${logoId}.${fileExtension}`,
+                content: btoa(String.fromCharCode(...bytes)),
+                branch: 'main'
+            };
+            if (sha) {
+                payload.sha = sha;
+            }
+
+            const response = await fetch(apiUrl, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `token ${token}`,
+                    'Accept': 'application/vnd.github.v3+json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(`Failed to upload logo: ${errorData.message}`);
+            }
+
+            return response.json();
+        }
+
         // GitHub Actions URL Shortener (CORS-free)
         class GitHubActionsURLShortener {
             static DEFAULT_LENGTH = 6;
@@ -1297,13 +1353,41 @@
                 // Generate unique code using standalone function
                 const uniqueCode = generateUniqueCode();
 
-                // Handle logo storage (still using localStorage for now, but inline data as fallback)
+                // Handle logo storage and GitHub credentials (moved outside conditional block)
                 let logoId = null;
                 let logoData = null;
+                let fileExtension = null;
+                let owner, repo, token;
+
+                // Get GitHub credentials and repo info (needed regardless of logo upload)
+                token = localStorage.getItem('github_token');
+                if (!token) {
+                    token = prompt('Enter GitHub Personal Access Token:\n\nCreate one at: https://github.com/settings/tokens\n\nRequired scopes: repo (full control), workflow)');
+                    if (token) {
+                        localStorage.setItem('github_token', token);
+                    }
+                }
+
+                // Get repo info
+                const hostname = window.location.hostname;
+                if (hostname.includes('github.io')) {
+                    owner = hostname.replace('.github.io', '');
+                    const pathSegments = window.location.pathname.split('/').filter(segment => segment.length > 0);
+                    repo = pathSegments.length > 0 ? pathSegments[0] : owner;
+                } else {
+                    owner = localStorage.getItem('github_owner') || 'your-username';
+                    repo = localStorage.getItem('github_repo') || 'your-repo';
+                    if (owner === 'your-username' || repo === 'your-repo') {
+                        owner = prompt('Enter GitHub username:') || owner;
+                        repo = prompt('Enter repository name:') || repo;
+                        localStorage.setItem('github_owner', owner);
+                        localStorage.setItem('github_repo', repo);
+                    }
+                }
 
                 if (companyLogoData) {
                     logoId = LogoStorage.generateLogoId();
-                    const fileExtension = LogoStorage.getLogoFileExtension(companyLogoData);
+                    fileExtension = LogoStorage.getLogoFileExtension(companyLogoData);
 
                     // Get GitHub credentials for logo upload
                     let token = localStorage.getItem('github_token');
@@ -1334,7 +1418,7 @@
 
                     // Upload logo file directly to GitHub repository via Contents API
                     try {
-                        await GitHubActionsURLShortener.uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, companyLogoData);
+                        await uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, companyLogoData);
                         console.log('Logo uploaded to GitHub repository, logoId:', logoId);
                     } catch (error) {
                         console.error('Failed to upload logo to GitHub:', error);
@@ -1535,62 +1619,6 @@
                 );
             }
 
-  
-            static async uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, base64Data) {
-            const filePath = `public/assets/logos/${logoId}.${fileExtension}`;
-            const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${filePath}`;
-
-            // Convert base64 to binary
-            const binaryData = atob(base64Data);
-            const bytes = new Uint8Array(binaryData.length);
-            for (let i = 0; i < binaryData.length; i++) {
-                bytes[i] = binaryData.charCodeAt(i);
-            }
-
-            // Check if file already exists
-            let sha = null;
-            try {
-                const checkResponse = await fetch(apiUrl, {
-                    headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
-                });
-                if (checkResponse.ok) {
-                    const fileData = await checkResponse.json();
-                    sha = fileData.sha;
-                }
-            } catch (error) {
-                // File doesn't exist, that's ok
-            }
-
-            // Upload or update file
-            const payload = {
-                message: `Add logo file: ${logoId}.${fileExtension}`,
-                content: btoa(String.fromCharCode(...bytes)),
-                branch: 'main'
-            };
-            if (sha) {
-                payload.sha = sha;
-            }
-
-            const response = await fetch(apiUrl, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `token ${token}`,
-                    'Accept': 'application/vnd.github.v3+json',
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(payload)
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(`Failed to upload logo: ${errorData.message}`);
-            }
-
-            return response.json();
-        }
         }
 
         // Validation Engine Class (NO CHARACTER LIMITS)
