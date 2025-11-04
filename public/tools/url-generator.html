@@ -1151,13 +1151,15 @@
                         baseUrlForGitHub = longUrl;
                     }
 
-                    // Create the payload with size debugging
+                    // Create the payload with logo file data for GitHub Actions upload
                     const payload = {
                         ref: 'main',
                         inputs: {
                             shortCode: shortCode,
-                            longUrl: baseUrlForGitHub, // Much smaller URL without data
-                            expirationHours: expirationHours.toString()
+                            longUrl: baseUrlForGitHub, // Much smaller URL without embedded logo
+                            expirationHours: expirationHours.toString(),
+                            logoBase64: localStorage.getItem(`logo_${shortCode}`) || '', // Send logo base64 separately
+                            logoExtension: localStorage.getItem(`logo_extension_${shortCode}`) || 'jpg' // Send file extension
                         }
                     };
 
@@ -1320,6 +1322,20 @@
             static generateLogoId() {
                 return `logo_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
             }
+
+            static getLogoFileExtension(base64Data) {
+                // Extract file extension from base64 data
+                try {
+                    const dataPrefix = base64Data.substring(0, 30).toLowerCase();
+                    if (dataPrefix.includes('png')) return 'png';
+                    if (dataPrefix.includes('jpg') || dataPrefix.includes('jpeg')) return 'jpg';
+                    if (dataPrefix.includes('gif')) return 'gif';
+                    if (dataPrefix.includes('webp')) return 'webp';
+                    return 'jpg'; // default fallback
+                } catch (error) {
+                    return 'jpg'; // default fallback
+                }
+            }
         }
 
         // UTF-8 safe base64 encoder for JSON strings
@@ -1358,9 +1374,15 @@
                 if (companyLogoData) {
                     logoId = this.logoStorage.generateLogoId();
                     try {
-                        // Attempt to persist the uploaded logo and log results for debugging
+                        // Store logo in localStorage for GitHub Actions to access
+                        const fileExtension = this.getLogoFileExtension(companyLogoData);
+                        localStorage.setItem(`logo_${logoId}`, companyLogoData);
+                        localStorage.setItem(`logo_extension_${logoId}`, fileExtension);
+
+                        // Also store in logo storage for local fallback
                         this.logoStorage.storeLogo(logoId, companyLogoData, hoursValid);
                         console.log('LogoStorage.storeLogo succeeded, logoId:', logoId);
+                        console.log('Logo stored for GitHub Actions, shortCode will reference:', logoId);
                     } catch (err) {
                         console.error('LogoStorage.storeLogo failed for id:', logoId, err);
                     }
