@@ -1312,14 +1312,8 @@
                 // Generate unique code using standalone function
                 const uniqueCode = generateUniqueCode();
 
-                // Handle logo storage and GitHub credentials (moved outside conditional block)
-                let logoId = null;
-                let logoData = null;
-                let fileExtension = null;
-                let owner, repo, token;
-
-                // Get GitHub credentials and repo info (needed regardless of logo upload)
-                token = localStorage.getItem('github_token');
+                // Get GitHub credentials and repo info (needed for workflow trigger)
+                let token = localStorage.getItem('github_token');
                 if (!token) {
                     token = prompt('Enter GitHub Personal Access Token:\n\nCreate one at: https://github.com/settings/tokens\n\nRequired scopes: repo (full control), workflow)');
                     if (token) {
@@ -1327,7 +1321,8 @@
                     }
                 }
 
-                // Get repo info
+                // Get repo info for metadata URLs
+                let owner, repo;
                 const hostname = window.location.hostname;
                 if (hostname.includes('github.io')) {
                     owner = hostname.replace('.github.io', '');
@@ -1344,9 +1339,20 @@
                     }
                 }
 
-                if (companyLogoData) {
+                // Handle logo storage (simplified - file goes to GitHub Actions)
+                let logoId = null;
+                let logoFileBase64 = null;
+                let fileExtension = null;
+
+                // Generate logo ID and get file extension if logo file exists
+                if (companyLogoFile) {
                     logoId = LogoStorage.generateLogoId();
-                    fileExtension = LogoStorage.getLogoFileExtension(companyLogoData);
+                    fileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
+                }
+
+                if (companyLogoFile) {
+                    logoId = LogoStorage.generateLogoId();
+                    fileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
 
                     // Get GitHub credentials for logo upload
                     let token = localStorage.getItem('github_token');
@@ -1375,15 +1381,8 @@
                         }
                     }
 
-                    // Upload logo file directly to GitHub repository via Contents API
-                    try {
-                        await uploadLogoToGitHub(owner, repo, token, logoId, fileExtension, companyLogoData);
-                        console.log('Logo uploaded to GitHub repository, logoId:', logoId);
-                    } catch (error) {
-                        console.error('Failed to upload logo to GitHub:', error);
-                        // Keep inline data as fallback
-                        logoData = companyLogoData;
-                    }
+                    // Logo file will be processed by GitHub Actions workflow
+                    console.log('Logo file will be sent to GitHub Actions, logoId:', logoId, 'extension:', fileExtension);
                 }
 
                 // Prepare metadata for GitHub API
