@@ -24,7 +24,8 @@
       "Bash(git pull:*)",
       "Bash(npm run build:*)",
       "Bash(python:*)",
-      "Bash(dos2unix:*)"
+      "Bash(dos2unix:*)",
+      "Bash(npx js-yaml:*)"
     ],
     "deny": [],
     "ask": []
