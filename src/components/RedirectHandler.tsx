@@ -12,6 +12,9 @@ export const RedirectHandler: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    console.log('🔄 RedirectHandler useEffect triggered - shortCode:', shortCode);
+    console.log('🔄 CRITICAL DEBUG: Current URL:', window.location.href);
+
     // Check if shortCode is available
     if (!shortCode) {
       setError('Código de redirección no proporcionado');
