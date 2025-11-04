@@ -1069,10 +1069,17 @@
 
                                 if (encodedData) {
                                     console.log('🔧 Original data length:', encodedData.length, 'chars');
+                                    console.log('🔧 Encoded data preview (first 100 chars):', encodedData.substring(0, 100) + '...');
 
                                     try {
-                                        const dataObj = JSON.parse(decodeURIComponent(encodedData));
+                                        // First decode the URI component
+                                        const decodedData = decodeURIComponent(encodedData);
+                                        console.log('🔧 Decoded data preview (first 100 chars):', decodedData.substring(0, 100) + '...');
+
+                                        // Then parse as JSON
+                                        const dataObj = JSON.parse(decodedData);
                                         console.log('🔧 Keeping ALL personalization data fields');
+                                        console.log('🔧 Data object keys:', Object.keys(dataObj));
 
                                         // Intelligent compression - remove redundant whitespace, optimize structure
                                         const compressedObj = { ...dataObj };
