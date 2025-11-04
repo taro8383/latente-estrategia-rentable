@@ -1090,6 +1090,30 @@
                         }));
                     }
 
+                    // Create the payload with size debugging
+                    const payload = {
+                        ref: 'main',
+                        inputs: {
+                            shortCode: shortCode,
+                            longUrl: baseUrlForGitHub, // Much smaller URL without data
+                            expirationHours: expirationHours.toString()
+                        }
+                    };
+
+                    const payloadString = JSON.stringify(payload);
+                    const payloadSize = new Blob([payloadString]).size;
+
+                    console.log('🔍 GitHub API Payload Debug:');
+                    console.log('  Payload size:', payloadSize, 'bytes');
+                    console.log('  Short code length:', shortCode.length, 'chars');
+                    console.log('  Base URL length:', baseUrlForGitHub.length, 'chars');
+                    console.log('  Expiration hours length:', expirationHours.length, 'chars');
+                    console.log('  Total payload preview:', payloadString.substring(0, 200) + '...');
+
+                    if (payloadSize > 50000) { // 50KB warning
+                        console.warn('⚠️ Payload is very large, may exceed GitHub limits');
+                    }
+
                     // Send only basic mapping info to GitHub (base URL only, no large data)
                     const response = await fetch(workflowUrl, {
                         method: 'POST',
@@ -1098,14 +1122,7 @@
                             'Accept': 'application/vnd.github.v3+json',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            ref: 'main',
-                            inputs: {
-                                shortCode: shortCode,
-                                longUrl: baseUrlForGitHub, // Much smaller URL without data
-                                expirationHours: expirationHours.toString()
-                            }
-                        })
+                        body: payloadString
                     });
 
                     if (!response.ok) {
