@@ -1054,7 +1054,18 @@
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
                     // Store metadata locally (not sent to GitHub to avoid size limits)
-                    URLShortener.storeLocalMetadata(shortCode, metadata, longUrl, expirationHours);
+                    try {
+                        localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
+                            ...metadata,
+                            shortCode: shortCode,
+                            longUrl: longUrl,
+                            createdAt: Date.now(),
+                            expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                        }));
+                        console.log('📝 Metadata stored locally for short code:', shortCode);
+                    } catch (error) {
+                        console.warn('Failed to store metadata locally:', error);
+                    }
 
                     // Send only basic mapping info to GitHub (no metadata to avoid size limits)
                     const response = await fetch(workflowUrl, {
