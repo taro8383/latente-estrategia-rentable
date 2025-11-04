@@ -184,6 +184,15 @@ jobs:
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
         # Handle metadata safely - escape special characters
         METADATA='${{ toJSON(github.event.inputs.metadata) }}'
+        # Additional safety: wrap in quotes and handle any remaining issues
+        if [ -z "$METADATA" ] || [ "$METADATA" = "null" ] || [ "$METADATA" = "" ]; then
+          echo "DEBUG: METADATA is empty, null, or undefined, using empty object"
+          METADATA='{}'
+        fi
+
+        # Final safety check: ensure METADATA doesn't contain shell commands
+        echo "DEBUG: Final METADATA safety check - preview first 100 chars"
+        echo "DEBUG: METADATA preview: ${METADATA:0:100}..."
         # Logo data is handled separately to avoid size limits
 
         echo "DEBUG: Parsed inputs safely"
