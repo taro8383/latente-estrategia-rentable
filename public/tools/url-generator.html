@@ -1063,15 +1063,17 @@
                     // Store the full URL in localStorage for cross-device use
                     localStorage.setItem(`full_url_${shortCode}`, longUrl);
 
-                    // Create the payload WITHOUT logo data (logos stored separately via file upload)
+                    // Create the payload with metadata (personalization data) but without large embedded data
+                    const metadataPayload = JSON.stringify(enhancedData);
+                    console.log('📏 Metadata payload size:', metadataPayload.length, 'chars');
+
                     const payload = {
                         ref: 'main',
                         inputs: {
                             shortCode: shortCode,
                             longUrl: baseUrlForGitHub, // Much smaller URL without embedded logo
-                            expirationHours: expirationHours.toString()
-                            // Logo data is stored in localStorage and will be uploaded via file system
-                            // NOT sent as input to avoid size limits
+                            expirationHours: expirationHours.toString(),
+                            metadata: metadataPayload // Send personalization data as metadata
                         }
                     };
 

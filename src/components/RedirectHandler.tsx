@@ -23,28 +23,52 @@ export const RedirectHandler: React.FC = () => {
       try {
         setRedirectStatus('Buscando enlace...');
 
-        // Get the URL from GitHub Pages (cross-device compatible)
-        const longUrl = await URLShortener.getLongUrl(shortCode);
+        // Get the URL and metadata from GitHub Pages (cross-device compatible)
+        const urlResult = await URLShortener.getLongUrl(shortCode);
 
-        if (longUrl) {
+        if (urlResult) {
           setRedirectStatus('Redirigiendo...');
+          const { url: longUrl, metadata } = urlResult;
 
-          // First, try to get the full URL with embedded data from localStorage
-          // This contains the personalization data that we removed from GitHub Action inputs
+          console.log('🔍 RedirectHandler: Retrieved URL and metadata');
+          console.log('📏 URL from GitHub API:', longUrl.length, 'chars');
+          console.log('📏 Metadata available:', metadata ? 'YES' : 'NO');
+          if (metadata) {
+            console.log('📏 Metadata size:', metadata.length, 'chars');
+          }
+
+          let urlToProcess = longUrl;
+          let encodedData = null;
+
+          // Method 1: Try to get the full URL from localStorage (same browser/device)
           const fullUrlWithEmbeddedData = localStorage.getItem(`full_url_${shortCode}`);
-          const urlToProcess = fullUrlWithEmbeddedData || longUrl;
+          if (fullUrlWithEmbeddedData) {
+            urlToProcess = fullUrlWithEmbeddedData;
+            console.log('✅ Using full URL from localStorage (same device)');
+          }
+          // Method 2: Try to recreate URL from metadata (cross-device fallback)
+          else if (metadata) {
+            try {
+              const personalizationData = JSON.parse(metadata);
+              const jsonData = JSON.stringify(personalizationData);
+              encodedData = btoa(unescape(encodeURIComponent(jsonData)));
 
-          console.log('🔍 RedirectHandler: Using URL for data extraction');
-          console.log('📏 Full URL from localStorage:', fullUrlWithEmbeddedData ? 'YES' : 'NO');
-          console.log('📏 Minimal URL from GitHub API:', longUrl.length, 'chars');
-          console.log('📏 Processing URL length:', urlToProcess.length, 'chars');
+              // Recreate the full URL with embedded data
+              urlToProcess = `${longUrl}#/invite/${shortCode}?data=${encodedData}`;
+              console.log('✅ Recreated URL from metadata (cross-device)');
+            } catch (error) {
+              console.error('❌ Failed to recreate URL from metadata:', error);
+            }
+          }
 
           // Extract encoded data from URL and store in localStorage for PersonalizationProvider
           try {
-            const url = new URL(urlToProcess);
-            const hashFragment = url.hash.substring(1); // Remove the # symbol
-            const urlParams = new URLSearchParams(hashFragment);
-            const encodedData = urlParams.get('data');
+            if (!encodedData) {
+              const url = new URL(urlToProcess);
+              const hashFragment = url.hash.substring(1); // Remove the # symbol
+              const urlParams = new URLSearchParams(hashFragment);
+              encodedData = urlParams.get('data');
+            }
 
             if (encodedData) {
               // Store the encoded data in localStorage for PersonalizationProvider
@@ -58,17 +82,16 @@ export const RedirectHandler: React.FC = () => {
               console.log('📝 RedirectHandler: Stored encoded data in localStorage for', shortCode);
               console.log('✅ Personalization data extracted successfully');
             } else {
-              console.warn('⚠️ RedirectHandler: No encoded data found in URL, redirecting without personalization');
+              console.warn('⚠️ RedirectHandler: No encoded data found, redirecting without personalization');
             }
           } catch (error) {
             console.error('❌ RedirectHandler: Failed to extract/store URL data:', error);
           }
 
-          // Redirect to the full URL with embedded data for personalization
+          // Redirect to the URL with personalization data
           setTimeout(() => {
-            const redirectUrl = urlToProcess; // Use the URL with embedded data
-            console.log('🔄 Redirecting to:', redirectUrl.substring(0, 100) + '...');
-            window.location.replace(redirectUrl);
+            console.log('🔄 Redirecting to:', urlToProcess.substring(0, 100) + '...');
+            window.location.replace(urlToProcess);
           }, 1000);
         } else {
           setError('Enlace no encontrado o expirado');

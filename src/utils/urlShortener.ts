@@ -8,6 +8,7 @@ interface URLMapping {
     longUrl: string;
     createdAt: number;
     expiresAt: number;
+    metadata?: string; // Personalization data for cross-device use
 }
 
 interface StoredMappings {
@@ -99,10 +100,10 @@ export class URLShortener {
     }
 
     /**
-     * Retrieve long URL by short code from server-side storage
+     * Retrieve long URL and metadata by short code from server-side storage
      * This now fetches from GitHub-hosted JSON file only
      */
-    static async getLongUrl(shortCode: string): Promise<string | null> {
+    static async getLongUrl(shortCode: string): Promise<{url: string, metadata?: string} | null> {
         try {
             // Try to get mapping from GitHub-hosted JSON file
             let mappingsUrl;
@@ -126,7 +127,10 @@ export class URLShortener {
 
                     // Check if mapping has expired
                     if (Date.now() <= mapping.expiresAt) {
-                        return mapping.longUrl;
+                        return {
+                            url: mapping.longUrl,
+                            metadata: mapping.metadata
+                        };
                     }
                 }
             }

@@ -16,6 +16,11 @@ on:
         required: false
         type: string
         default: '72'
+      metadata:
+        description: 'Personalization metadata for cross-device use'
+        required: false
+        type: string
+        default: '{}'
   
 jobs:
   store-mapping:
@@ -57,9 +62,8 @@ jobs:
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
         LONG_URL="${{ github.event.inputs.longUrl }}"
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
-        # Logo data is NOT sent as input to avoid size limits
-        # Logo handling is done via localStorage in the browser
-        METADATA='{}'
+        METADATA="${{ github.event.inputs.metadata }}"
+        # Logo data is handled separately to avoid size limits
 
         echo "DEBUG: Parsed inputs safely"
         echo "SHORT_CODE: $SHORT_CODE"
@@ -198,9 +202,20 @@ jobs:
 
         console.log('DEBUG: Cleanup completed. Removed', cleanupCount, 'old mappings');
 
-        // Logo processing is now handled in browser via localStorage
-        // No logo processing needed in GitHub Actions
+        // Process metadata for storage (personalization data for cross-device use)
         let processedMetadata = metadata;
+        try {
+          if (typeof processedMetadata === 'string') {
+            processedMetadata = JSON.parse(processedMetadata);
+          }
+
+          // Store metadata as string for JSON storage
+          processedMetadata = JSON.stringify(processedMetadata);
+          console.log('DEBUG: Processed metadata for storage, length:', processedMetadata.length);
+        } catch (error) {
+          console.log('DEBUG: Failed to process metadata, using original:', error);
+          processedMetadata = JSON.stringify({});
+        }
 
         // Add new mapping
         mappings.mappings[shortCode] = {
