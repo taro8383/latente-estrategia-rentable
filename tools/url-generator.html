@@ -1053,6 +1053,74 @@
                 try {
                     const workflowUrl = `https://api.github.com/repos/${owner}/${repo}/actions/workflows/url-shortener.yml/dispatches`;
 
+                    // Extract base URL without data to reduce size
+                    let baseUrlForGitHub = longUrl;
+                    try {
+                        console.log('🔧 Original URL length:', longUrl.length, 'chars');
+                        console.log('🔧 Original URL preview:', longUrl.substring(0, 100) + '...');
+
+                        const url = new URL(longUrl);
+
+                        // Remove the hash fragment completely to get the smallest possible URL
+                        baseUrlForGitHub = url.origin + url.pathname + url.search;
+
+                        console.log('🔧 Base URL after stripping hash:', baseUrlForGitHub);
+                        console.log('🔧 Base URL length:', baseUrlForGitHub.length, 'chars');
+
+                        // If the original URL had data in hash, store full URL locally
+                        const hashFragment = url.hash.substring(1);
+                        if (hashFragment && hashFragment.includes('data=')) {
+                            console.log('📝 Detected large data in URL hash, storing full URL locally');
+
+                            // Store the full URL with data locally
+                            localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
+                                ...metadata,
+                                shortCode: shortCode,
+                                fullUrl: longUrl, // Store full URL with data
+                                baseUrl: baseUrlForGitHub, // Store base URL
+                                createdAt: Date.now(),
+                                expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                            }));
+                            console.log('📝 Full URL with data stored locally for:', shortCode);
+                        }
+                    } catch (error) {
+                        console.warn('Failed to parse URL for size optimization:', error);
+                        // Store metadata locally anyway
+                        localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
+                            ...metadata,
+                            shortCode: shortCode,
+                            fullUrl: longUrl,
+                            baseUrl: longUrl,
+                            createdAt: Date.now(),
+                            expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                        }));
+                    }
+
+                    // Create the payload with size debugging
+                    const payload = {
+                        ref: 'main',
+                        inputs: {
+                            shortCode: shortCode,
+                            longUrl: baseUrlForGitHub, // Much smaller URL without data
+                            expirationHours: expirationHours.toString()
+                        }
+                    };
+
+                    const payloadString = JSON.stringify(payload);
+                    const payloadSize = new Blob([payloadString]).size;
+
+                    console.log('🔍 GitHub API Payload Debug:');
+                    console.log('  Payload size:', payloadSize, 'bytes');
+                    console.log('  Short code length:', shortCode.length, 'chars');
+                    console.log('  Base URL length:', baseUrlForGitHub.length, 'chars');
+                    console.log('  Expiration hours length:', expirationHours.length, 'chars');
+                    console.log('  Total payload preview:', payloadString.substring(0, 200) + '...');
+
+                    if (payloadSize > 50000) { // 50KB warning
+                        console.warn('⚠️ Payload is very large, may exceed GitHub limits');
+                    }
+
+                    // Send only basic mapping info to GitHub (base URL only, no large data)
                     const response = await fetch(workflowUrl, {
                         method: 'POST',
                         headers: {
@@ -1060,15 +1128,7 @@
                             'Accept': 'application/vnd.github.v3+json',
                             'Content-Type': 'application/json'
                         },
-                        body: JSON.stringify({
-                            ref: 'main',
-                            inputs: {
-                                shortCode: shortCode,
-                                longUrl: longUrl,
-                                expirationHours: expirationHours.toString(),
-                                metadata: JSON.stringify(metadata)
-                            }
-                        })
+                        body: payloadString
                     });
 
                     if (!response.ok) {
@@ -1087,8 +1147,58 @@
                 }
             }
 
-            // REMOVED: localStorage fallback functions - cross-device compatibility requires server-side storage only
-            // storeLocalMapping and getLocalMapping removed to prevent browser-specific data storage
+            // Metadata storage and retrieval functions (client-side only for large data)
+            static storeLocalMetadata(shortCode, metadata, longUrl, expirationHours) {
+                try {
+                    localStorage.setItem(`metadata_${shortCode}`, JSON.stringify({
+                        ...metadata,
+                        shortCode: shortCode,
+                        longUrl: longUrl,
+                        createdAt: Date.now(),
+                        expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                    }));
+                    console.log('📝 Metadata stored locally for:', shortCode);
+                } catch (error) {
+                    console.warn('Failed to store metadata locally:', error);
+                }
+            }
+
+            static getLocalMetadata(shortCode) {
+                try {
+                    const data = localStorage.getItem(`metadata_${shortCode}`);
+                    if (data) {
+                        const metadata = JSON.parse(data);
+                        // Check if metadata hasn't expired
+                        if (Date.now() < metadata.expiresAt) {
+                            return metadata;
+                        } else {
+                            // Clean up expired metadata
+                            localStorage.removeItem(`metadata_${shortCode}`);
+                        }
+                    }
+                } catch (error) {
+                    console.warn('Failed to retrieve local metadata:', error);
+                }
+                return null;
+            }
+
+            static cleanupExpiredMetadata() {
+                try {
+                    const keys = Object.keys(localStorage).filter(key => key.startsWith('metadata_'));
+                    keys.forEach(key => {
+                        const data = localStorage.getItem(key);
+                        if (data) {
+                            const metadata = JSON.parse(data);
+                            if (Date.now() > metadata.expiresAt) {
+                                localStorage.removeItem(key);
+                                console.log('🧹 Cleaned up expired metadata for:', key.replace('metadata_', ''));
+                            }
+                        }
+                    });
+                } catch (error) {
+                    console.warn('Failed to cleanup expired metadata:', error);
+                }
+            }
         }
 
         // Logo Storage Utility (existing)

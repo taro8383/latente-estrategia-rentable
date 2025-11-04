@@ -179,15 +179,22 @@
         "company": "Luxury Holdings",
         "readerName": "Juan"
       }
+    },
+    "9F83Y5": {
+      "shortCode": "9F83Y5",
+      "longUrl": "https://latente.net/",
+      "createdAt": 1762252619549,
+      "expiresAt": 1762511819495,
+      "metadata": {}
     }
   },
-  "lastUpdated": 1762251601498,
+  "lastUpdated": 1762252619549,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 12,
-    "activeMappings": 12,
+    "totalMappings": 13,
+    "activeMappings": 13,
     "expiredMappings": 0,
-    "lastCleanup": 1762251601497,
+    "lastCleanup": 1762252619549,
     "lastCleanupCount": 0
   }
 }
