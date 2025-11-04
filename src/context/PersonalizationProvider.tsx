@@ -149,18 +149,39 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
               setReplacer(newReplacer);
               setIsPersonalized(true);
 
-              // Optimized: Use object URLs for instant rendering instead of base64 decoding
+              // NEW ARCHITECTURE: Logo files are stored in repository as /assets/logos/{shortCode}.{ext}
+              // Check metadata for logo file information first
               if (typeof deferredLogoCandidate === 'string' && deferredLogoCandidate) {
-                  // Try to get object URL first for instant rendering
-                  const objectUrl = LogoStorage.getLogo(deferredLogoCandidate as string);
-                  if (objectUrl && objectUrl.startsWith('blob:')) {
-                    setData(prev => ({ ...(prev as any), companyLogo: objectUrl, companyLogoId: deferredLogoCandidate }));
-                  } else if (objectUrl && objectUrl.startsWith('data:')) {
-                    // Object URL not available, but we have base64 - use it directly
-                    setData(prev => ({ ...(prev as any), companyLogo: objectUrl, companyLogoId: deferredLogoCandidate }));
+                  let logoUrl = null;
+
+                  // Try to get logo file information from metadata
+                  const logoFileExtension = (parsedData as any).logoFileExtension;
+                  const currentUrl = window.location.href;
+                  const shortCodeMatch = currentUrl.match(/\/r\/([a-zA-Z0-9]+)/);
+
+                  if (shortCodeMatch && logoFileExtension) {
+                      const shortCode = shortCodeMatch[1];
+                      logoUrl = `/assets/logos/${shortCode}.${logoFileExtension}`;
+                      setData(prev => ({ ...(prev as any), companyLogo: logoUrl, companyLogoId: deferredLogoCandidate }));
+                      console.log('✅ Using logo file URL from metadata:', logoUrl);
+                  } else if (shortCodeMatch) {
+                      // Fallback: try common extensions if metadata doesn't have file extension
+                      const shortCode = shortCodeMatch[1];
+                      const extensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+                      // Default to first extension (will show broken image if wrong, but better than nothing)
+                      logoUrl = `/assets/logos/${shortCode}.png`;
+                      setData(prev => ({ ...(prev as any), companyLogo: logoUrl, companyLogoId: deferredLogoCandidate }));
+                      console.log('✅ Using default logo file URL:', logoUrl);
                   } else {
-                    // No logo data available at all
-                    console.warn('No logo data found for:', deferredLogoCandidate);
+                      // Fallback to old LogoStorage system
+                      const objectUrl = LogoStorage.getLogo(deferredLogoCandidate as string);
+                      if (objectUrl && (objectUrl.startsWith('blob:') || objectUrl.startsWith('data:'))) {
+                        setData(prev => ({ ...(prev as any), companyLogo: objectUrl, companyLogoId: deferredLogoCandidate }));
+                        console.log('✅ Using LogoStorage fallback for:', deferredLogoCandidate);
+                      } else {
+                        // No logo data available at all
+                        console.warn('No logo data found for:', deferredLogoCandidate);
+                      }
                   }
                 }
 
