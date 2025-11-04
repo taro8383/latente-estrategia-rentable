@@ -1057,15 +1057,15 @@
                     let baseUrlForGitHub = longUrl;
                     console.log('🔧 Using original URL (logo handling is separate now)');
 
-                    // Create the payload with logo file data for GitHub Actions upload
+                    // Create the payload WITHOUT logo data (logos stored separately via file upload)
                     const payload = {
                         ref: 'main',
                         inputs: {
                             shortCode: shortCode,
                             longUrl: baseUrlForGitHub, // Much smaller URL without embedded logo
-                            expirationHours: expirationHours.toString(),
-                            logoBase64: localStorage.getItem(`logo_${shortCode}`) || '', // Send logo base64 separately
-                            logoExtension: localStorage.getItem(`logo_extension_${shortCode}`) || 'jpg' // Send file extension
+                            expirationHours: expirationHours.toString()
+                            // Logo data is stored in localStorage and will be uploaded via file system
+                            // NOT sent as input to avoid size limits
                         }
                     };
 
@@ -1281,7 +1281,7 @@
                     logoId = LogoStorage.generateLogoId();
                     try {
                         // Store logo in localStorage for GitHub Actions to access
-                        const fileExtension = GitHubActionsURLShortener.getLogoFileExtension(companyLogoData);
+                        const fileExtension = LogoStorage.getLogoFileExtension(companyLogoData);
                         localStorage.setItem(`logo_${logoId}`, companyLogoData);
                         localStorage.setItem(`logo_extension_${logoId}`, fileExtension);
 

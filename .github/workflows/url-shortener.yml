@@ -16,17 +16,7 @@ on:
         required: false
         type: string
         default: '72'
-      logoBase64:
-        description: 'Logo base64 data'
-        required: false
-        type: string
-        default: ''
-      logoExtension:
-        description: 'Logo file extension'
-        required: false
-        type: string
-        default: 'jpg'
-
+  
 jobs:
   store-mapping:
     runs-on: ubuntu-latest
@@ -59,25 +49,6 @@ jobs:
       with:
         node-version: '18'
 
-    - name: Upload logo file to repository
-      if: ${{ github.event.inputs.logoBase64 != '' }}
-      run: |
-        echo "DEBUG: Uploading logo file for $SHORT_CODE"
-        echo "DEBUG: Logo extension: $LOGO_EXTENSION"
-        echo "DEBUG: Logo data length: ${#LOGO_BASE64}"
-
-        # Create assets directory if it doesn't exist
-        mkdir -p public/assets/logos
-
-        # Decode and create logo file
-        if [ -n "$LOGO_BASE64" ]; then
-          echo "$LOGO_BASE64" | base64 -d > "public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
-          echo "DEBUG: Logo file created: public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}"
-          echo "DEBUG: File size: $(wc -c < public/assets/logos/${SHORT_CODE}.${LOGO_EXTENSION}) bytes"
-        else
-          echo "DEBUG: No logo data provided, skipping upload"
-        fi
-
     - name: Store URL mapping with proper handling
       run: |
         echo "DEBUG: Starting URL mapping storage"
@@ -86,9 +57,8 @@ jobs:
         SHORT_CODE="${{ github.event.inputs.shortCode }}"
         LONG_URL="${{ github.event.inputs.longUrl }}"
         EXPIRATION_HOURS="${{ github.event.inputs.expirationHours }}"
-        LOGO_BASE64="${{ github.event.inputs.logoBase64 }}"
-        LOGO_EXTENSION="${{ github.event.inputs.logoExtension }}"
-        # Metadata removed from inputs to avoid size limits
+        # Logo data is NOT sent as input to avoid size limits
+        # Logo handling is done via localStorage in the browser
         METADATA='{}'
 
         echo "DEBUG: Parsed inputs safely"
@@ -228,28 +198,9 @@ jobs:
 
         console.log('DEBUG: Cleanup completed. Removed', cleanupCount, 'old mappings');
 
-        // Process metadata to replace embedded logo with file reference
+        // Logo processing is now handled in browser via localStorage
+        // No logo processing needed in GitHub Actions
         let processedMetadata = metadata;
-        try {
-          if (typeof processedMetadata === 'string') {
-            processedMetadata = JSON.parse(processedMetadata);
-          }
-
-          // Remove companyLogo field (embedded logo data) and replace with file reference
-          if (processedMetadata.companyLogo || processedMetadata.companyLogoId) {
-            const logoFileUrl = `/assets/logos/${shortCode}.${LOGO_EXTENSION}`;
-            processedMetadata.companyLogo = logoFileUrl;
-            processedMetadata.companyLogoId = undefined;
-            processedMetadata.companyLogoFileSize = null;
-
-            console.log('DEBUG: Replaced embedded logo with file reference:', logoFileUrl);
-          }
-
-          processedMetadata = JSON.stringify(processedMetadata);
-        } catch (error) {
-          console.log('DEBUG: Failed to process metadata, keeping original:', error);
-          processedMetadata = metadata;
-        }
 
         // Add new mapping
         mappings.mappings[shortCode] = {

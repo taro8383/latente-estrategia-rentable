@@ -22,7 +22,9 @@
       "Bash(find:*)",
       "Bash(git reset:*)",
       "Bash(git pull:*)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "Bash(python:*)",
+      "Bash(dos2unix:*)"
     ],
     "deny": [],
     "ask": []
