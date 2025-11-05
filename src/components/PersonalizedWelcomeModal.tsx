@@ -22,7 +22,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="
-          !left-0 !right-0 !mx-0 !my-0 !p-0 !overflow-hidden
+          !mx-0 !my-0 !p-0 !overflow-hidden
           !transform transition-all duration-500 ease-out
           data-[state=open]:animate-modal-fade-in
           data-[state=closed]:animate-modal-fade-out
@@ -33,6 +33,8 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           !max-w-[100vw] sm:!max-w-lg md:!max-w-xl
           !top-[50vh] !-translate-y-1/2
           !border-0 !bg-transparent
+          !left-0 !right-0
+          sm:!left-1/2 sm:!right-auto
         " style={{
           position: 'fixed',
           top: '50vh',

@@ -461,7 +461,7 @@ h3 {
   }
 }
 
-/* Force override Dialog component styles */
+/* Force override Dialog component styles - Mobile First Approach */
 [data-radix-dialog-content] {
   position: fixed !important;
   top: 50vh !important;
@@ -476,7 +476,7 @@ h3 {
   border-radius: 0 !important;
 }
 
-/* Desktop overrides - maintain centered modal on larger screens */
+/* Small tablets and up - start transitioning to centered modal */
 @media (min-width: 640px) {
   [data-radix-dialog-content] {
     left: 50% !important;
@@ -487,6 +487,7 @@ h3 {
   }
 }
 
+/* Desktop and larger - maintain proper centered modal */
 @media (min-width: 768px) {
   [data-radix-dialog-content] {
     max-width: 40rem !important;
