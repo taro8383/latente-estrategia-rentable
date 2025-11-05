@@ -1475,8 +1475,7 @@
                 const expiresAt = new Date(now.getTime() + (hoursValid * 60 * 60 * 1000));
                 // Generate unique code using standalone function
                 const uniqueCode = generateUniqueCode();
-                const shortCode = GitHubActionsURLShortener.generateShortCode();
-                console.log('DEBUG: Generated shortCode:', shortCode);
+                // shortCode is generated in triggerGitHubAction function
 
                 // Get GitHub credentials and repo info (needed for workflow trigger)
                 let token = localStorage.getItem('github_token');
@@ -1591,10 +1590,10 @@
                     },
 
                     // Logo information (file path reference, not base64)
-                    companyLogo: null, // No base64 fallback
-                    companyLogoId: logoId,
-                    companyLogoUrl: `https://${owner}.github.io/${repo}/assets/logos/${shortCode}.${fileExtension}`, // File path reference using shortCode
-                    logoFileExtension: fileExtension, // Add file extension for metadata use
+                    companyLogo: artifactUrl, // Cloudflare R2 URL from upload
+                    companyLogoId: null, // Not used with Cloudflare Worker approach
+                    companyLogoUrl: artifactUrl, // Use Cloudflare R2 URL
+                    logoFileExtension: logoFileExtension, // Use Cloudflare Worker extension
 
                     // Metadata for tracking and analytics
                     metadata: mappingMetadata
