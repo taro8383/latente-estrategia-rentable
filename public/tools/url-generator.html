@@ -1475,6 +1475,7 @@
                 const expiresAt = new Date(now.getTime() + (hoursValid * 60 * 60 * 1000));
                 // Generate unique code using standalone function
                 const uniqueCode = generateUniqueCode();
+                const shortCode = GitHubActionsURLShortener.generateShortCode();
 
                 // Get GitHub credentials and repo info (needed for workflow trigger)
                 let token = localStorage.getItem('github_token');
