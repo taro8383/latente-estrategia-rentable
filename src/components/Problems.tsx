@@ -11,7 +11,7 @@ const allProblems = [
     icon: Clock,
     title: "Padecés el 'Síndrome del Fundador Prisionero'", // This will be wrapped in PersonalizedText where it's rendered
     before: "Tu expertise operativa te convirtió en el mejor bombero, pero te mantiene como rehén de tu propia empresa. Sin un sistema de delegación estratégica (no operativa), cada nuevo éxito solo significa más incendios que apagar - te estás ahogando en tu propio crecimiento.",
-    after: "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos revisás el diseño de tu próxima colección en un café de [ubicacion].",
+    after: "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos disfrutas de tu exito en un café de [ubicacion].",
     result: "Ahora eres el estratega, no el bombero."
   },
   {
