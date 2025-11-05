@@ -464,19 +464,26 @@ h3 {
 /* Enhanced button sizing for better mobile readability */
 @media (max-width: 640px) {
   .enhanced-button-mobile {
-    font-size: 1.125rem !important; /* 18px */
-    line-height: 1.5rem !important;
+    font-size: 1rem !important; /* 16px */
+    line-height: 1.4rem !important;
   }
 }
 
 @media (min-width: 641px) and (max-width: 767px) {
   .enhanced-button-tablet {
-    font-size: 1.25rem !important; /* 20px */
-    line-height: 1.5rem !important;
+    font-size: 1.0625rem !important; /* 17px */
+    line-height: 1.4rem !important;
   }
 }
 
 @media (min-width: 768px) {
+  .enhanced-button-desktop {
+    font-size: 1.125rem !important; /* 18px */
+    line-height: 1.4rem !important;
+  }
+}
+
+@media (min-width: 1024px) {
   .enhanced-button-desktop {
     font-size: 1.25rem !important; /* 20px */
     line-height: 1.5rem !important;
