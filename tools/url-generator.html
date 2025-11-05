@@ -1475,6 +1475,7 @@
                 const expiresAt = new Date(now.getTime() + (hoursValid * 60 * 60 * 1000));
                 // Generate unique code using standalone function
                 const uniqueCode = generateUniqueCode();
+                const shortCode = GitHubActionsURLShortener.generateShortCode();
 
                 // Get GitHub credentials and repo info (needed for workflow trigger)
                 let token = localStorage.getItem('github_token');
@@ -1503,8 +1504,16 @@
                     }
                 }
 
-                // Logo information comes from Cloudflare Worker upload
-                // Variables already set: artifactUrl, logoFileExtension
+                // Handle logo storage (simplified - file goes to GitHub Actions)
+                let logoId = null;
+                let fileExtension = null;
+
+                // Generate logo ID and get file extension if logo file exists
+                if (companyLogoFile) {
+                    logoId = LogoStorage.generateLogoId();
+                    fileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
+                    console.log('Logo file ready for GitHub Actions, logoId:', logoId, 'extension:', fileExtension);
+                }
 
                 // Prepare metadata for GitHub API
                 const mappingMetadata = {
@@ -1579,10 +1588,10 @@
                     },
 
                     // Logo information (file path reference, not base64)
-                    companyLogo: artifactUrl, // Cloudflare R2 URL from upload
-                    companyLogoId: null, // No local logo ID needed
-                    companyLogoUrl: artifactUrl, // Use Cloudflare R2 URL
-                    logoFileExtension: logoFileExtension, // Use Cloudflare Worker extension
+                    companyLogo: null, // No base64 fallback
+                    companyLogoId: logoId,
+                    companyLogoUrl: `https://${owner}.github.io/${repo}/assets/logos/${shortCode}.${fileExtension}`, // File path reference using shortCode
+                    logoFileExtension: fileExtension, // Add file extension for metadata use
 
                     // Metadata for tracking and analytics
                     metadata: mappingMetadata
