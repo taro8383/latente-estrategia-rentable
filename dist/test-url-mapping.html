@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>URL Mapping Test</title>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            max-width: 1000px; 
+            margin: 0 auto; 
+            padding: 20px; 
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #ffffff;
+        }
+        .container { 
+            background: rgba(255, 255, 255, 0.1); 
+            border-radius: 12px; 
+            padding: 30px; 
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+        h1 { 
+            color: #ffffff; 
+            text-align: center; 
+            margin-bottom: 30px; 
+        }
+        button { 
+            background: linear-gradient(45deg, #ff6b35, #f72b1b); 
+            color: white; 
+            padding: 12px 24px; 
+            border: none; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            font-size: 16px; 
+            font-weight: 600;
+            margin: 10px;
+            transition: all 0.3s ease;
+        }
+        button:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 4px 12px rgba(255, 107, 53, 0.4);
+        }
+        .results { 
+            margin-top: 30px; 
+            padding: 20px; 
+            background: rgba(79, 70, 229, 0.1); 
+            border-radius: 8px; 
+            border: 1px solid #4f46e5;
+            word-break: break-all;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .results h3 {
+            color: #4f46e5;
+            margin-bottom: 15px;
+        }
+        .results pre {
+            background: #1a1a1a;
+            padding: 15px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            border: 1px solid #444;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            border: 1px solid #444;
+        }
+        .test-section h3 {
+            color: #4f46e5;
+            margin-bottom: 15px;
+        }
+        .status {
+            padding: 5px 10px;
+            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid #10b981;
+            color: #10b981;
+        }
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid #dc2626;
+            color: #dc2626;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔗 URL Mapping Storage Test</h1>
+        
+        <div class="test-section">
+            <h3>Test 1: Store URL Mapping</h3>
+            <button onclick="testStorage()">Test URL Mapping Storage</button>
+            <div id="storageStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 2: Retrieve URL Mapping</h3>
+            <button onclick="testRetrieval()">Test URL Mapping Retrieval</button>
+            <div id="retrievalStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 3: Clear All Mappings</h3>
+            <button onclick="clearMappings()">Clear All Mappings</button>
+            <div id="clearStatus" class="status"></div>
+        </div>
+        
+        <div class="test-section">
+            <h3>Test 4: Simulate Full Flow</h3>
+            <button onclick="simulateFullFlow()">Simulate Full Flow (Store → Retrieve → Extract Data)</button>
+            <div id="flowStatus" class="status"></div>
+        </div>
+        
+        <div id="results" class="results" style="display: none;">
+            <h3>📊 Test Results</h3>
+            <div id="resultsContent"></div>
+        </div>
+    </div>
+    
+    <script>
+        // Copy of URLShortener class from url-generator.html
+        class URLShortener {
+            static STORAGE_KEY = 'url_mappings';
+            static DEFAULT_LENGTH = 6;
+            static ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+
+            static generateShortCode(length = this.DEFAULT_LENGTH) {
+                let result = '';
+                for (let i = 0; i < length; i++) {
+                    result += this.ALPHABET.charAt(Math.floor(Math.random() * this.ALPHABET.length));
+                }
+                return result;
+            }
+
+            static getMappings() {
+                try {
+                    const stored = localStorage.getItem(this.STORAGE_KEY);
+                    console.log('🔍 URL SHORTENER DEBUG: Raw localStorage data:', stored);
+                    console.log('🔍 URL SHORTENER DEBUG: Storage key:', this.STORAGE_KEY);
+                    console.log('🔍 URL SHORTENER DEBUG: localStorage available:', typeof localStorage !== 'undefined');
+                    
+                    const parsed = stored ? JSON.parse(stored) : {};
+                    console.log('🔍 URL SHORTENER DEBUG: Parsed mappings:', parsed);
+                    return parsed;
+                } catch (error) {
+                    console.error('Failed to parse URL mappings:', error);
+                    return {};
+                }
+            }
+
+            static saveMappings(mappings) {
+                try {
+                    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(mappings));
+                    console.log('🔍 URL SHORTENER DEBUG: Saved mappings:', mappings);
+                } catch (error) {
+                    console.error('Failed to save URL mappings:', error);
+                }
+            }
+
+            static generateShortUrl(longUrl, expirationHours = 72) {
+                let shortCode = this.generateShortCode();
+                const mappings = this.getMappings();
+                
+                do {
+                    shortCode = this.generateShortCode();
+                } while (mappings[shortCode]);
+    
+                this.storeMapping(shortCode, longUrl, expirationHours);
+    
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                const shortUrl = `${baseUrl}#/r/${shortCode}`;
+                
+                console.log('🔍 URL SHORTENER DEBUG: Generated short URL:', shortUrl);
+                return shortUrl;
+            }
+
+            static storeMapping(shortCode, longUrl, expirationHours = 72) {
+                const mapping = {
+                    shortCode,
+                    longUrl,
+                    createdAt: Date.now(),
+                    expiresAt: Date.now() + (expirationHours * 60 * 60 * 1000)
+                };
+
+                const mappings = this.getMappings();
+                mappings[shortCode] = mapping;
+                this.saveMappings(mappings);
+            }
+
+            static getLongUrl(shortCode) {
+                const mappings = this.getMappings();
+                const mapping = mappings[shortCode];
+                console.log('🔍 URL SHORTENER DEBUG: Looking up shortCode:', shortCode, 'found mapping:', mapping);
+                return mapping ? mapping.longUrl : null;
+            }
+        }
+
+        function showStatus(elementId, message, isSuccess = true) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.className = `status ${isSuccess ? 'success' : 'error'}`;
+            }
+        }
+
+        function addResult(title, content) {
+            const resultsDiv = document.getElementById('results');
+            const resultsContent = document.getElementById('resultsContent');
+            
+            if (resultsDiv && resultsContent) {
+                resultsDiv.style.display = 'block';
+                resultsContent.innerHTML += `
+                    <h4>${title}</h4>
+                    <pre>${content}</pre>
+                    <hr>
+                `;
+            }
+        }
+
+        function testStorage() {
+            try {
+                // Create a test long URL with data parameter
+                const testData = {
+                    brandInfo: {
+                        name: "Test Brand",
+                        industry: "Cuero Premium"
+                    },
+                    readerInfo: {
+                        name: "Juan",
+                        company: "Test Company"
+                    },
+                    customMessages: {
+                        calificador: "marcas de cuero",
+                        historia: "Esta es una historia de prueba"
+                    }
+                };
+                
+                const jsonData = JSON.stringify(testData);
+                const encodedData = btoa(encodeURIComponent(jsonData));
+                const uniqueCode = Math.random().toString(36).substring(2, 15);
+                
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                const testLongUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
+                
+                const shortUrl = URLShortener.generateShortUrl(testLongUrl);
+                
+                showStatus('storageStatus', `✅ Successfully stored mapping for short code: ${shortUrl.split('/').pop()}`);
+                
+                addResult('URL Mapping Storage', `
+Long URL: ${testLongUrl}
+Short URL: ${shortUrl}
+Data Size: ${encodedData.length} characters
+                `);
+                
+            } catch (error) {
+                showStatus('storageStatus', `❌ Error: ${error.message}`, false);
+                addResult('URL Mapping Storage Error', error.toString());
+            }
+        }
+
+        function testRetrieval() {
+            try {
+                const mappings = URLShortener.getMappings();
+                const shortCodes = Object.keys(mappings);
+                
+                let retrievalResults = 'Current Mappings:\n';
+                retrievalResults += JSON.stringify(mappings, null, 2);
+                retrievalResults += '\n\nRetrieval Tests:\n';
+                
+                shortCodes.forEach(code => {
+                    const retrieved = URLShortener.getLongUrl(code);
+                    retrievalResults += `\nLookup ${code}: ${retrieved ? 'SUCCESS' : 'NOT FOUND'}`;
+                    if (retrieved) {
+                        retrievalResults += `\n  Long URL: ${retrieved}`;
+                        
+                        // Test data extraction
+                        const hashIndex = retrieved.indexOf('#');
+                        if (hashIndex !== -1) {
+                            const hashPart = retrieved.substring(hashIndex + 1);
+                            const qIndex = hashPart.indexOf('?');
+                            if (qIndex !== -1) {
+                                const queryString = hashPart.substring(qIndex + 1);
+                                const params = new URLSearchParams(queryString);
+                                const encodedData = params.get('data');
+                                if (encodedData) {
+                                    retrievalResults += `\n  Data extraction: SUCCESS (${encodedData.length} chars)`;
+                                } else {
+                                    retrievalResults += `\n  Data extraction: NO DATA PARAMETER`;
+                                }
+                            } else {
+                                retrievalResults += `\n  Data extraction: NO QUERY STRING`;
+                            }
+                        } else {
+                            retrievalResults += `\n  Data extraction: NO HASH`;
+                        }
+                    }
+                });
+                
+                showStatus('retrievalStatus', `✅ Tested ${shortCodes.length} mappings`);
+                addResult('URL Mapping Retrieval', retrievalResults);
+                
+            } catch (error) {
+                showStatus('retrievalStatus', `❌ Error: ${error.message}`, false);
+                addResult('URL Mapping Retrieval Error', error.toString());
+            }
+        }
+
+        function clearMappings() {
+            try {
+                localStorage.removeItem('url_mappings');
+                showStatus('clearStatus', '✅ Cleared all mappings');
+                addResult('Clear Mappings', 'All URL mappings have been cleared from localStorage');
+            } catch (error) {
+                showStatus('clearStatus', `❌ Error: ${error.message}`, false);
+                addResult('Clear Mappings Error', error.toString());
+            }
+        }
+
+        function simulateFullFlow() {
+            try {
+                // Step 1: Store a mapping
+                const testData = {
+                    brandInfo: {
+                        name: "Full Flow Test",
+                        industry: "Cuero Premium"
+                    },
+                    readerInfo: {
+                        name: "Maria",
+                        company: "Test Company"
+                    },
+                    customMessages: {
+                        calificador: "marcas de cuero",
+                        historia: "Esta es una historia de prueba completa"
+                    }
+                };
+                
+                const jsonData = JSON.stringify(testData);
+                const encodedData = btoa(encodeURIComponent(jsonData));
+                const uniqueCode = Math.random().toString(36).substring(2, 15);
+                
+                const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+                const baseUrl = window.location.origin + (isProduction ? '/' : '/');
+                const testLongUrl = `${baseUrl}#/invite/${uniqueCode}?data=${encodeURIComponent(encodedData)}`;
+                
+                const shortUrl = URLShortener.generateShortUrl(testLongUrl);
+                const shortCode = shortUrl.split('/').pop();
+                
+                // Step 2: Retrieve the mapping
+                const retrievedLongUrl = URLShortener.getLongUrl(shortCode);
+                
+                if (!retrievedLongUrl) {
+                    throw new Error(`Failed to retrieve long URL for short code: ${shortCode}`);
+                }
+                
+                // Step 3: Extract data
+                const hashIndex = retrievedLongUrl.indexOf('#');
+                if (hashIndex === -1) {
+                    throw new Error('No hash found in retrieved long URL');
+                }
+                
+                const hashPart = retrievedLongUrl.substring(hashIndex + 1);
+                const qIndex = hashPart.indexOf('?');
+                if (qIndex === -1) {
+                    throw new Error('No query string found in hash part');
+                }
+                
+                const queryString = hashPart.substring(qIndex + 1);
+                const params = new URLSearchParams(queryString);
+                const extractedData = params.get('data');
+                
+                if (!extractedData) {
+                    throw new Error('No data parameter found in query string');
+                }
+                
+                // Step 4: Store in localStorage (simulating RedirectHandler)
+                localStorage.setItem('incoming_personalization_payload', extractedData);
+                localStorage.setItem('incoming_personalization_payload_ts', String(Date.now()));
+                
+                // Step 5: Verify storage
+                const verifyData = localStorage.getItem('incoming_personalization_payload');
+                const verifyTimestamp = localStorage.getItem('incoming_personalization_payload_ts');
+                
+                const flowResults = `
+Full Flow Simulation Results:
+
+1. URL Generation:
+   - Long URL: ${testLongUrl}
+   - Short URL: ${shortUrl}
+   - Short Code: ${shortCode}
+
+2. URL Retrieval:
+   - Retrieved Long URL: ${retrievedLongUrl ? 'SUCCESS' : 'FAILED'}
+
+3. Data Extraction:
+   - Hash Part: ${hashPart}
+   - Query String: ${queryString}
+   - Extracted Data: ${extractedData ? 'SUCCESS' : 'FAILED'}
+   - Data Size: ${extractedData ? extractedData.length : 0} characters
+
+4. LocalStorage Storage:
+   - incoming_personalization_payload: ${verifyData ? 'STORED' : 'FAILED'}
+   - incoming_personalization_payload_ts: ${verifyTimestamp ? 'STORED' : 'FAILED'}
+   - Stored Data Size: ${verifyData ? verifyData.length : 0} characters
+
+5. Verification:
+   - Data Matches: ${verifyData === extractedData ? 'YES' : 'NO'}
+   - Flow Status: ${verifyData === extractedData ? 'COMPLETE SUCCESS' : 'FAILED'}
+                `;
+                
+                showStatus('flowStatus', '✅ Full flow simulation completed');
+                addResult('Full Flow Simulation', flowResults);
+                
+            } catch (error) {
+                showStatus('flowStatus', `❌ Error: ${error.message}`, false);
+                addResult('Full Flow Simulation Error', error.toString());
+            }
+        }
+
+        // Initialize with current state
+        window.addEventListener('DOMContentLoaded', function() {
+            const mappings = URLShortener.getMappings();
+            const count = Object.keys(mappings).length;
+            
+            if (count > 0) {
+                addResult('Initial State', `Found ${count} existing mappings in localStorage`);
+            } else {
+                addResult('Initial State', 'No existing mappings found in localStorage');
+            }
+        });
+    </script>
+</body>
+</html>

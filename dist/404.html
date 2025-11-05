@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Latente - Redirecting...</title>
+    <script>
+        // Modern GitHub Pages SPA redirect
+        // Redirect to index.html with the full path preserved
+        (function() {
+            var path = window.location.pathname;
+            var search = window.location.search;
+            var hash = window.location.hash;
+            
+            // For custom domain, redirect directly to index.html
+            window.location.replace(
+                window.location.origin + '/index.html' +
+                '#/' + path.replace(/^\//, '') + search + hash
+            );
+        })();
+    </script>
+</head>
+<body>
+    <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; text-align: center; padding: 50px; background: #1a1a1a; color: white; min-height: 100vh; display: flex; align-items: center; justify-content: center;">
+        <div>
+            <h1>🔄 Redirigiendo...</h1>
+            <p>Si no eres redirigido automáticamente, <a href="/" style="color: #4f46e5;">haz clic aquí</a>.</p>
+        </div>
+    </div>
+</body>
+</html>
