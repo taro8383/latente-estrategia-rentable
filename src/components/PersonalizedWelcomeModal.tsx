@@ -22,7 +22,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="
-          left-0 right-0 sm:left-1/2 sm:right-auto mx-0 p-0 overflow-hidden
+          left-0 right-0 sm:left-1/2 sm:right-auto mx-0 my-0 p-0 overflow-hidden
           transform transition-all duration-500 ease-out
           data-[state=open]:animate-modal-fade-in
           data-[state=closed]:animate-modal-fade-out
@@ -30,6 +30,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           data-[state=closed]:animate-modal-scale-out
           data-[state=open]:animate-modal-slide-in-from-top
           data-[state=closed]:animate-modal-slide-out-to-top
+          !max-w-[95vw] sm:!max-w-lg md:!max-w-xl
         ">
           <DialogHeader className="relative z-10 p-3 sm:p-4 md:p-6 pb-2 sm:pb-4">
             <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-white leading-tight text-center">
@@ -43,48 +44,50 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           <div className="absolute inset-0 hero-gradient opacity-95 modal-backdrop-blur"></div>
           
           {/* Content container */}
-          <div className="relative z-10 p-3 sm:p-4 md:p-6 text-center space-y-3 sm:space-y-4 max-h-[70vh] overflow-y-auto">
+          <div className="relative z-10 p-4 sm:p-6 md:p-8 text-center space-y-6 max-h-[80vh] overflow-y-auto">
             {/* Welcome message */}
-            <div className="space-y-2 sm:space-y-3">
-            <p className="text-white/90 text-sm sm:text-base leading-relaxed">
-              Tu oportunidad exclusiva de convertirte en <span className="text-accent font-semibold">{isFemale ? 'la #1 absoluta' : 'el #1 absoluto'}</span> está lista.
-            </p>
-          </div>
+            <div className="px-2 sm:px-4">
+              <p className="text-white/90 text-sm sm:text-base leading-relaxed">
+                Tu oportunidad exclusiva de convertirte en <span className="text-accent font-semibold">{isFemale ? 'la #1 absoluta' : 'el #1 absoluto'}</span> está lista.
+              </p>
+            </div>
 
-          {/* Company Logo */}
-          <div className="flex justify-center py-4 sm:py-6">
-            <CompanyLogo
-              logoData={data?.companyLogo}
-              brandName={data?.brandInfo?.name}
-              className="max-h-16 sm:max-h-20 md:max-h-24 w-auto object-contain"
-            />
-          </div>
+            {/* Company Logo */}
+            <div className="flex justify-center py-4 sm:py-6">
+              <CompanyLogo
+                logoData={data?.companyLogo}
+                brandName={data?.brandInfo?.name}
+                className="max-h-20 sm:max-h-24 md:max-h-32 w-auto object-contain"
+              />
+            </div>
 
-          {/* Enhanced Urgency Timer */}
-          <EnhancedUrgencyTimer />
+            {/* Enhanced Urgency Timer */}
+            <div className="flex justify-center py-2">
+              <EnhancedUrgencyTimer />
+            </div>
 
-          {/* Action Button */}
-          <div className="pt-2 sm:pt-3">
-            <Button
-              onClick={onClose}
-              size="lg"
-              className="w-full accent-gradient text-white hover:scale-105 transition-all duration-300 shadow-strong text-sm sm:text-base px-3 sm:px-4 md:px-6 py-2 sm:py-3 md:py-4 group touch-manipulation"
-            >
-              <span className="text-center">Comenzar mi experiencia #1</span>
-              <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform duration-200" />
-            </Button>
-          </div>
+            {/* Action Button */}
+            <div className="pt-4 px-2 sm:px-4">
+              <Button
+                onClick={onClose}
+                size="lg"
+                className="w-full accent-gradient text-white hover:scale-105 transition-all duration-300 shadow-strong text-sm sm:text-base px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 group touch-manipulation"
+              >
+                <span className="text-center">Comenzar mi experiencia #1</span>
+                <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform duration-200" />
+              </Button>
+            </div>
 
-          {/* Trust indicators */}
-          <div className="space-y-2 pt-2 border-t border-white/20">
-            <p className="text-xs text-white/70 text-center">
-              <span className="text-accent font-semibold">⚡ Invitación personalizada y única</span>
-            </p>
-            <p className="text-xs text-white/60 text-center">
-              Sin compromiso. Solo resultados extraordinarios.
-            </p>
+            {/* Trust indicators */}
+            <div className="space-y-3 pt-4 border-t border-white/20 px-2 sm:px-4">
+              <p className="text-xs text-white/70 text-center">
+                <span className="text-accent font-semibold">⚡ Invitación personalizada y única</span>
+              </p>
+              <p className="text-xs text-white/60 text-center">
+                Sin compromiso. Solo resultados extraordinarios.
+              </p>
+            </div>
           </div>
-        </div>
       </DialogContent>
     </Dialog>
   );
