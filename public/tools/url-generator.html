@@ -3,34 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de URLs Personalizadas - Latente (Enhanced)</title>
+    <title>Generador de URLs Personalizadas - Latente</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
     <style>
-        body { 
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
-            max-width: 1400px; 
-            margin: 0 auto; 
-            padding: 20px; 
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            color: #ffffff;
+        body {
+            font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Amazon Ember", "Liberation Sans", sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, hsl(220 70% 12%) 0%, hsl(240 65% 20%) 100%);
+            color: hsl(0 0% 98%);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: "liga" 1, "calt" 1;
+            text-rendering: optimizeLegibility;
+        }
+        .main-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
             min-height: 100vh;
         }
-        .container { 
-            background: rgba(255, 255, 255, 0.1); 
-            border-radius: 12px; 
-            padding: 30px; 
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        .container {
+            background: hsl(220 16% 10%);
+            border: 1px solid hsl(220 16% 20%);
+            border-radius: 12px;
+            padding: 40px;
+            box-shadow: 0 16px 48px -8px hsl(220 15% 15% / 0.2);
         }
-        h1 { 
-            color: #ffffff; 
-            text-align: center; 
-            margin-bottom: 30px; 
-            font-size: 2.5em;
+        h1 {
+            color: hsl(0 0% 98%);
+            text-align: center;
+            margin-bottom: 16px;
+            font-size: 3em;
             font-weight: 700;
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        .logo-container {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        .logo-container img {
+            height: 60px;
+            width: auto;
+            filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
         .enhanced-url-generator {
             display: grid;
             grid-template-columns: 2fr 1fr;
             gap: 30px;
+            align-items: start;
         }
         .progress-container {
             grid-column: 1 / -1;
@@ -38,7 +63,7 @@
         }
         .progress-bar {
             height: 4px;
-            background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 100%);
+            background: linear-gradient(90deg, hsl(25 95% 53%) 0%, hsl(15 90% 48%) 100%);
             border-radius: 2px;
             transition: width 0.3s ease;
             width: 0%;
@@ -58,21 +83,23 @@
         }
         .step.active {
             background: rgba(79, 70, 229, 0.3);
-            border-color: #4f46e5;
-            color: #4f46e5;
+            border-color: hsl(25 95% 53%);
+            color: hsl(25 95% 53%);
             font-weight: 600;
         }
-        .form-section { 
-            margin-bottom: 25px; 
-            background: rgba(255, 255, 255, 0.05); 
-            border-radius: 12px; 
-            padding: 25px; 
-            border: 1px solid rgba(79, 70, 229, 0.2);
-            transition: all 0.3s ease;
+        .form-section {
+            margin-bottom: 25px;
+            background: hsl(220 16% 10%);
+            border: 1px solid hsl(220 16% 20%);
+            border-radius: 12px;
+            padding: 25px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .form-section:hover {
-            border-color: rgba(79, 70, 229, 0.4);
-            background: rgba(255, 255, 255, 0.08);
+            border-color: hsl(25 95% 53% / 0.3);
+            background: hsl(220 16% 12%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 24px -4px hsl(220 15% 15% / 0.12);
         }
         .section-header {
             display: flex;
@@ -88,7 +115,7 @@
             width: 30px;
             height: 30px;
             border-radius: 50%;
-            background: linear-gradient(45deg, #4f46e5, #7c3aed);
+            background: linear-gradient(45deg, hsl(25 95% 53%), #7c3aed);
             color: white;
             font-weight: bold;
             font-size: 14px;
@@ -97,7 +124,7 @@
         .section-title {
             font-size: 1.2em;
             font-weight: 600;
-            color: #4f46e5;
+            color: hsl(25 95% 53%);
         }
         .section-description {
             font-size: 0.9em;
@@ -133,22 +160,23 @@
             color: #ef4444;
             margin-left: 4px;
         }
-        input, textarea, select { 
-            width: 100%; 
-            padding: 12px; 
-            border: 1px solid #444; 
-            border-radius: 6px; 
-            background: #2d2d2d; 
-            color: #ffffff; 
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid hsl(220 16% 20%);
+            border-radius: 8px;
+            background: hsl(220 16% 8%);
+            color: hsl(0 0% 98%);
             font-size: 14px;
             box-sizing: border-box;
-            transition: all 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
         }
         input:focus, textarea:focus, select:focus {
-            outline: none; 
-            border-color: #4f46e5; 
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.3);
-            background: rgba(45, 45, 45, 0.8);
+            outline: none;
+            border-color: hsl(25 95% 53%);
+            box-shadow: 0 0 0 3px hsl(25 95% 53% / 0.2);
+            background: hsl(220 16% 12%);
         }
         textarea {
             resize: vertical;
@@ -233,11 +261,11 @@
             padding: 20px; 
             background: rgba(79, 70, 229, 0.1); 
             border-radius: 8px; 
-            border: 1px solid #4f46e5;
+            border: 1px solid hsl(25 95% 53%);
             word-break: break-all;
         }
         .result h3 {
-            color: #4f46e5;
+            color: hsl(25 95% 53%);
             margin-bottom: 10px;
             font-size: 16px;
         }
@@ -251,7 +279,7 @@
             margin: 10px 0;
         }
         .copy-btn {
-            background: #4f46e5;
+            background: hsl(25 95% 53%);
             color: white;
             border: none;
             padding: 8px 16px;
@@ -269,22 +297,31 @@
             background: rgba(79, 70, 229, 0.1);
             border-radius: 12px;
             padding: 20px;
-            border: 1px solid #4f46e5;
-            max-height: 80vh;
-            overflow-y: auto;
+            border: 1px solid hsl(25 95% 53%);
+            height: calc(100vh - 40px);
+            max-height: calc(100vh - 40px);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         .preview-section {
             margin-bottom: 20px;
             padding-bottom: 15px;
             border-bottom: 1px solid rgba(79, 70, 229, 0.2);
+            flex-shrink: 0;
         }
         .preview-section:last-child {
             border-bottom: none;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
         }
         .preview-section h4 {
-            color: #4f46e5;
-            margin-bottom: 10px;
-            font-size: 14px;
+            color: hsl(25 95% 53%);
+            margin-bottom: 12px;
+            font-size: 16px;
+            flex-shrink: 0;
         }
         .preview-content {
             background: #1a1a1a;
@@ -293,9 +330,13 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             font-size: 14px;
             white-space: normal;
-            max-height: 300px;
             overflow-y: auto;
             line-height: 1.5;
+            flex: 1;
+            min-height: 0;
+        }
+        .preview-section:last-child .preview-content {
+            height: 100%;
         }
         .hero-preview, .problems-preview, .solution-preview {
             display: flex;
@@ -307,10 +348,10 @@
             padding: 8px;
             background: rgba(255, 255, 255, 0.02);
             border-radius: 4px;
-            border-left: 3px solid #4f46e5;
+            border-left: 3px solid hsl(25 95% 53%);
         }
         .hero-preview strong, .problems-preview strong, .solution-preview strong {
-            color: #4f46e5;
+            color: hsl(25 95% 53%);
             font-weight: 600;
         }
         .preview-section h4 {
@@ -374,10 +415,19 @@
             .enhanced-url-generator {
                 grid-template-columns: 1fr;
             }
-            
+
             .preview-panel {
                 position: relative;
                 top: 0;
+                height: 60vh;
+                max-height: 60vh;
+                overflow: hidden;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .preview-section:last-child .preview-content {
+                height: 100%;
             }
         }
         @media (max-width: 600px) {
@@ -416,12 +466,12 @@
         }
 
         .gender-selector input[type="radio"]:checked + span {
-            color: #4f46e5;
+            color: hsl(25 95% 53%);
             font-weight: 600;
         }
 
         .gender-selector input[type="radio"] {
-            accent-color: #4f46e5;
+            accent-color: hsl(25 95% 53%);
         }
 
         @media (max-width: 600px) {
@@ -444,8 +494,13 @@
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🔗 Generador de URLs Personalizadas (Enhanced)</h1>
+    <div class="main-container">
+        <div class="container">
+            <h1>🔗 Generador de URLs Personalizadas</h1>
+
+            <div class="logo-container">
+                <img src="/LoDi-logo.svg" alt="Latente - Socios Estratégicos en Rentabilidad" />
+            </div>
         
         <div class="enhanced-url-generator">
             <!-- Progress Indicator -->
@@ -1916,28 +1971,48 @@
             const readerName = formData.readerName || '[reader name]';
             const referenciaDeIndustria = formData.referenciaDeIndustria || '[referencia de industria]';
             const calificador = formData.calificador || '[calificador]';
-            
+
             // Apply gender-specific text
-            let greeting = gender === 'female' ? 'estimada empresaria' : 'estimado empresario';
-            let kingText = gender === 'female' ? 'quien se declara líder absoluta' : 'el que se declara rey';
-            let readyText = gender === 'female' ? 'está lista para tomar ese lugar' : 'está listo para tomar ese lugar';
-            
+            let isFemale = gender === 'female';
+            let kingText = isFemale ? 'a la que <strong>se declara líder absoluta</strong>' : 'a el que <strong>se declara rey</strong>';
+            let readyText = isFemale ? 'está lista para tomar ese lugar' : 'está listo para tomar ese lugar';
+
+            // Bold the user inputs - ONLY when filled
+            const boldHistoria = historia && historia.trim() !== '' ? `<strong>${historia}</strong>` : '[historia]';
+            const boldReaderName = readerName && readerName.trim() !== '' ? `<strong>${readerName}</strong>` : '[reader name]';
+            const boldReferencia = referenciaDeIndustria && referenciaDeIndustria.trim() !== '' ? `<strong>${referenciaDeIndustria}</strong>` : '[referencia de industria]';
+            const boldCalificador = calificador && calificador.trim() !== '' ? `<strong>${calificador}</strong>` : '[calificador]';
+
             return `
                 <div class="hero-preview">
-                    <p><strong>Invitación Exclusiva:</strong><br>
-                    "Menos del 0.01% de las ${calificador} reciben esta invitación"</p>
-                    
-                    <p><strong>Cita Principal:</strong><br>
-                    "${historia}"</p>
-                    
-                    <p><strong>Personalización:</strong><br>
-                    "Si estás leyendo esto, ${readerName}, es porque ves algo que el 99.7% de tus competidores todavía se niegan a ver, pero vos con tu instinto, <strong>lo sentiste incluso antes de abrir el email que te envié</strong>."</p>
-                    
-                    <p><strong>Mensaje de Mercado:</strong><br>
-                    "El mercado no recompensa la calidad. Recompensa al <strong>${kingText}</strong>, y ${readyText}."</p>
-                    
-                    <p><strong>Potencial:</strong><br>
-                    "Sospechas que tu empresa de ${referenciaDeIndustria} tiene lo necesario para ser la <strong>#1 absoluta</strong>. Tienes razón. El problema no es tu potencial... es el camino."</p>
+                    <p><strong>🎯 Complete Hero Section Copy:</strong></p>
+
+                    <p><em>Badge:</em><br>
+                    "Menos del 0.01% de las ${boldCalificador} reciben esta invitación"</p>
+
+                    <p><em>Main Headline:</em><br>
+                    "El segundo lugar es el primer perdedor<br>
+                    Bien. Estás aquí."</p>
+
+                    <p><em>Personalization:</em><br>
+                    "Si estás leyendo esto, ${boldReaderName}, es porque ves algo que el 99.7% de tus competidores todavía se niegan a ver, pero vos con tu instinto, <strong>lo sentiste incluso antes de abrir el email que te envié</strong>."</p>
+
+                    <p><em>Market Message:</em><br>
+                    "El mercado no recompensa la calidad. Recompensa ${kingText}, y ${readyText}."</p>
+
+                    <p><em>Hero Quote:</em><br>
+                    "${boldHistoria}"</p>
+
+                    <p><em>Potential Statement:</em><br>
+                    "Sospechas que tu empresa de ${boldReferencia} tiene lo necesario para ser la <strong>#1 absoluta</strong>. Tienes razón. El problema no es tu potencial... es el camino."</p>
+
+                    <p><em>Footer:</em><br>
+                    "⚠️ Esta conversación no está abierta al público.<br>
+                    Solo llegaste aquí por invitación directa.<br>
+                    Sin riesgo. Sin pagos. Solo compartimos los resultados."</p>
+
+                    <p><em>Button CTA:</em><br>
+                    "Quiero construir mi legado como el #1"</p>
                 </div>
             `;
         }
@@ -1950,33 +2025,45 @@
             const malPosicionamiento = formData.malPosicionamiento || '[malPosicionamiento]';
             const rollsRoyce = formData.rollsRoyce || '[Rolls-Royce]';
             const fraseDescriptiva = formData.fraseDescriptiva || '[frase descriptiva]';
-            
+
             // Apply gender-specific text
             let losersText = gender === 'female' ? 'son la moneda de cambio de quienes pierden' : 'son la moneda de cambio de los perdedores';
             let queenText = gender === 'female' ? "'¡La reina ha vuelto!'" : "'¡El rey ha vuelto!'";
-            
+
+            // Bold the user inputs - ONLY when filled
+            const boldUbicacion = ubicacion && ubicacion.trim() !== '' ? `<strong>${ubicacion}</strong>` : '[ubicacion]';
+            const boldBrandName = brandName && brandName.trim() !== '' ? `<strong>${brandName}</strong>` : '[brand name]';
+            const boldInovacion = inovacion && inovacion.trim() !== '' ? `<strong>${inovacion}</strong>` : '[inovacion]';
+            const boldMalPosicionamiento = malPosicionamiento && malPosicionamiento.trim() !== '' ? `<strong>${malPosicionamiento}</strong>` : '[malPosicionamiento]';
+            const boldRollsRoyce = rollsRoyce && rollsRoyce.trim() !== '' ? `<strong>${rollsRoyce}</strong>` : '[Rolls-Royce]';
+            const boldFraseDescriptiva = fraseDescriptiva && fraseDescriptiva.trim() !== '' ? `<strong>${fraseDescriptiva}</strong>` : '[frase descriptiva]';
+
             return `
                 <div class="problems-preview">
-                    <p><strong>Problema de Posicionamiento:</strong><br>
-                    "${malPosicionamiento} ${losersText}. Sin un framework de posicionamiento radical, sos solo otro producto caro en un mar de similares."</p>
-                    
-                    <p><strong>Solución de Posicionamiento:</strong><br>
-                    "Tus clientes te describen como '${rollsRoyce}'...y cuando alguien pregunta '¿dónde lo compraste?', no necesitan esperar realmente la respuesta, ya lo intuyen."</p>
-                    
+                    <p><strong>Título de la Sección:</strong><br>
+                    "Entonces… ¿Por qué seguís atrapado en el segundo pelotón?"<br>
+                    "No es suerte. Es que estás jugando con las reglas equivocadas."</p>
+
+                    <p><strong>Problema Principal - Posicionamiento:</strong><br>
+                    "${boldMalPosicionamiento} ${losersText}. Sin un framework de posicionamiento radical, sos solo otro producto caro en un mar de similares."</p>
+
                     <p><strong>Problema de Innovación:</strong><br>
-                    "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando ${inovacion}�?y ya tiene un prototipo en tu escritorio."</p>
-                    
+                    "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando ${boldInovacion}… y ya tiene un prototipo en tu escritorio."</p>
+
                     <p><strong>Problema de Ubicación:</strong><br>
-                    "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos revisás el diseño de tu próxima colección en un café de ${ubicacion}."</p>
-                    
+                    "Tus martes y jueves están libres... mientras vos revisás el diseño de tu próxima colección en un café de ${boldUbicacion}."</p>
+
                     <p><strong>Problema de Marca:</strong><br>
-                    "Tu último lanzamiento se agotó en 9 minutos, y ahora tu competidor vende una imitación en Mercado Libre�?con tus clientes dejando reseñas: 'No es lo mismo que ${brandName}'."</p>
-                    
+                    "Tu último lanzamiento se agotó en 9 minutos, y ahora tu competidor vende una imitación en Mercado Libre con tus clientes dejando reseñas: 'No es lo mismo que ${boldBrandName}'."</p>
+
+                    <p><strong>Solución de Posicionamiento:</strong><br>
+                    "Tus clientes te describen como '${boldRollsRoyce}'... y cuando alguien pregunta '¿dónde lo compraste?', no necesitan esperar realmente la respuesta, ya lo intuyen."</p>
+
                     <p><strong>Resultado Final:</strong><br>
-                    "Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '${fraseDescriptiva}', tu nombre es el primero—y el único—que suena."</p>
-                    
-                    <p><strong>Resultado Final:</strong><br>
-                    "Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '${fraseDescriptiva}', tu nombre es el primero—y el único—que suena. ${queenText}"</p>
+                    "Rompiste la jaula. Y el mercado ya tiene un nuevo rey: cuando alguien menciona '${boldFraseDescriptiva}', tu nombre es el primero—y el único—que suena. ${queenText}"</p>
+
+                    <p><strong>Botón de Expansión:</strong><br>
+                    "¿Más problemas? Más soluciones"</p>
                 </div>
             `;
         }
@@ -1992,35 +2079,52 @@
             const infrautilizado = formData.infrautilizado || '[infrautilizado]';
             const membresia = formData.membresia || '[membresia]';
             const metodo = formData.metodo || '[metodo]';
-            
+
             // Apply gender-specific text
-            let strategistText = gender === 'female' ? 'sos la estratega, no la bombera' : 'eres el estratega, no el bombero';
-            let championText = gender === 'female' ? 'sos campeona' : 'eres campeón';
             let kingText = gender === 'female' ? 'esa reina sos vos' : 'ese rey sos vos';
-            let queenText = gender === 'female' ? 'La próxima reina será decidida' : 'El próximo rey será decidido';
-            
+
+            // Bold the user inputs - ONLY when filled
+            const boldAvatar = avatar && avatar.trim() !== '' ? `<strong>${avatar}</strong>` : '[avatar]';
+            const boldPropuestaPobre = propuestaPobre && propuestaPobre.trim() !== '' ? `<strong>${propuestaPobre}</strong>` : '[propuesta pobre]';
+            const boldPropuestaBuena = propuestaBuena && propuestaBuena.trim() !== '' ? `<strong>${propuestaBuena}</strong>` : '[propuesta buena]';
+            const boldAutomatizacion = automatizacion && automatizacion.trim() !== '' ? `<strong>${automatizacion}</strong>` : '[automatizacion]';
+            const boldTrabajoDeValor = trabajoDeValor && trabajoDeValor.trim() !== '' ? `<strong>${trabajoDeValor}</strong>` : '[trabajo de valor]';
+            const boldProveedor = proveedor && proveedor.trim() !== '' ? `<strong>${proveedor}</strong>` : '[proveedor]';
+            const boldInfrautilizado = infrautilizado && infrautilizado.trim() !== '' ? `<strong>${infrautilizado}</strong>` : '[infrautilizado]';
+            const boldMembresia = membresia && membresia.trim() !== '' ? `<strong>${membresia}</strong>` : '[membresia]';
+            const boldMetodo = metodo && metodo.trim() !== '' ? `<strong>${metodo}</strong>` : '[metodo]';
+
             return `
                 <div class="solution-preview">
+                    <p><strong>Título de la Sección:</strong><br>
+                    "Durante 15 años no estuvimos en salas de conferencias. Estuvimos en talleres, fábricas y salas de guerra ejecutivas."</p>
+
+                    <p><strong>Introducción:</strong><br>
+                    "Allí descubrimos algo brutal: El #1 no gana por tener mejores productos. Gana por operar con tres sistemas que el resto ni imagina."</p>
+
                     <p><strong>Sistema 01 - Protocolo de la Elección Obvia:</strong><br>
-                    ✅ ${avatar}<br>
-                    ✅ Tu propuesta de valor ya no dice '${propuestaPobre}'. Expone la mentira de tu competidor: '${propuestaBuena}'<br>
-                    ✅ Tus alianzas ya no son 'colaboraciones con influencers'...Son alianzas con bancos privados que regalan tu billetera a sus clientes premium...porque tú les das estatus, no cuero.</p>
-                    
+                    ✅ ${boldAvatar}<br>
+                    ✅ Tu propuesta de valor ya no dice '${boldPropuestaPobre}'. Expone la mentira de tu competidor: '${boldPropuestaBuena}'<br>
+                    ✅ Tus alianzas ya no son 'colaboraciones con influencers'...Son alianzas con bancos privados que regalan tu billetera a sus clientes premium...porque tú les das estatus.</p>
+
                     <p><strong>Sistema 02 - Hidratación Rentable:</strong><br>
-                    ✅ Automatizas no para ahorrar, sino para liberar tu mente de lo trivial —así puedes enfocarte en '${automatizacion}'.<br>
-                    ✅ Tu equipo no 'trabaja más', trabaja en lo que solo ellos pueden hacer: '${trabajoDeValor}'.<br>
-                    ✅ Tus proveedores no 'bajan precios'...Firman acuerdos de lealtad: te reservan '${proveedor}'...a cambio de volumen garantizado por 3 años.</p>
-                    
+                    ✅ Automatizas no para ahorrar, sino para liberar tu mente de lo trivial —así puedes enfocarte en '${boldAutomatizacion}'.<br>
+                    ✅ Tu equipo no 'trabaja más', trabaja en lo que solo ellos pueden hacer: '${boldTrabajoDeValor}'.<br>
+                    ✅ Tus proveedores no 'bajan precios'...Firman acuerdos de lealtad: te reservan '${boldProveedor}'...a cambio de volumen garantizado por 3 años.</p>
+
                     <p><strong>Sistema 03 - Matriz de Ingresos Ocultos:</strong><br>
-                    ✅ Tus máquinas infrautilizadas no 'cuestan'...'${infrautilizado}'.<br>
-                    ✅ Tus clientes no 'compran una vez'...'${membresia}'...y el 10% de lo que generan al referir a otros.<br>
-                    ✅ Tus procesos internos no son 'secretos'...Son licenciables: '${metodo}'.</p>
-                    
+                    ✅ Tus máquinas infrautilizadas no 'cuestan'...'${boldInfrautilizado}'.<br>
+                    ✅ Tus clientes no 'compran una vez'...'${boldMembresia}'...y el 10% de lo que generan al referir a otros.<br>
+                    ✅ Tus procesos internos no son 'secretos'...Son licenciables: '${boldMetodo}'.</p>
+
+                    <p><strong>Conclusión:</strong><br>
+                    "¿Podrías construir esto solo? Sí. Con 10-15 años de errores que cuestan millones...y la suerte de sobrevivir. O podríamos implantarlo juntos en 12 meses usando sistemas que ya crearon +150% en joyería, -35% en costos en salud, y dominio absoluto en manufactura."</p>
+
                     <p><strong>Resultado Final:</strong><br>
-                    "¿Podrías construir esto solo? Sí. Con 10-15 años de errores que cuestan millones...y la suerte de sobrevivir. O podríamos implantarlo juntos en 12 meses."</p>
-                    
-                    <p><strong>Resultado Final:</strong><br>
-                    "No estás quemado - estás estratégicamente hambriento. Hay un rey en vos esperando salir. Y el mercado ya tiene un nuevo rey: ${kingText}."</p>
+                    "Y ese número 1 no está disponible para cualquiera. Es el acceso a optimizaciones avanzadas que solo conocen quienes ya llegaron ahí. No estás quemado - estás estratégicamente hambriento. Hay un rey en vos esperando salir. Y el mercado ya tiene un nuevo rey: ${kingText}."</p>
+
+                    <p><strong>Botón de Acción:</strong><br>
+                    "Quiero ser el #1 en mi mercado"</p>
                 </div>
             `;
         }
@@ -2159,9 +2263,9 @@
                 // Display results - EMPHASIZE SHORT URL WITH VISUAL INDICATORS
                 document.getElementById('shortUrl').textContent = result.shortUrl;
                 document.getElementById('shortUrl').style.fontWeight = 'bold';
-                document.getElementById('shortUrl').style.color = '#4f46e5';
+                document.getElementById('shortUrl').style.color = 'hsl(25 95% 53%)';
                 document.getElementById('shortUrl').style.fontSize = '18px';
-                document.getElementById('shortUrl').style.border = '3px solid #4f46e5';
+                document.getElementById('shortUrl').style.border = '3px solid hsl(25 95% 53%)';
                 document.getElementById('shortUrl').style.padding = '20px';
                 document.getElementById('shortUrl').style.background = 'rgba(79, 70, 229, 0.3)';
                 document.getElementById('shortUrl').style.boxShadow = '0 0 10px rgba(79, 70, 229, 0.5)';
@@ -2193,7 +2297,7 @@
                 document.getElementById('result').style.display = 'block';
                 
                 // Show enhanced statistics
-                document.getElementById('urlStats').innerHTML = '<h4 style="color: #4f46e5; margin-bottom: 10px;">📊 Estadísticas Avanzadas</h4><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div><p><strong>Variables personalizadas:</strong> ' + result.variableCount + '/20</p><p><strong>Complejidad:</strong> ' + result.complexity + '/10</p><p><strong>Contenido personalizado:</strong> ' + (result.hasCustomContent ? '✅ Sí' : 'No') + '</p></div><div><p><strong>URL Corta:</strong> ' + result.shortUrl.length + ' caracteres</p><p><strong>URL Larga:</strong> ' + result.longUrl.length + ' caracteres</p><p><strong>Reducción:</strong> ' + Math.round((1 - result.shortUrl.length/result.longUrl.length) * 100) + '%</p></div></div>';
+                document.getElementById('urlStats').innerHTML = '<h4 style="color: hsl(25 95% 53%); margin-bottom: 10px;">📊 Estadísticas Avanzadas</h4><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;"><div><p><strong>Variables personalizadas:</strong> ' + result.variableCount + '/20</p><p><strong>Complejidad:</strong> ' + result.complexity + '/10</p><p><strong>Contenido personalizado:</strong> ' + (result.hasCustomContent ? '✅ Sí' : 'No') + '</p></div><div><p><strong>URL Corta:</strong> ' + result.shortUrl.length + ' caracteres</p><p><strong>URL Larga:</strong> ' + result.longUrl.length + ' caracteres</p><p><strong>Reducción:</strong> ' + Math.round((1 - result.shortUrl.length/result.longUrl.length) * 100) + '%</p></div></div>';
                 
                 // Show data preview
                 const previewData = {
@@ -2241,5 +2345,7 @@
             updateProgress();
         });
     </script>
+</div>
+</div>
 </body>
 </html>
