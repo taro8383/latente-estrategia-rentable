@@ -147,7 +147,7 @@ export const Pricing = () => {
               <Button
                 onClick={() => document.getElementById('section-1')?.scrollIntoView({ behavior: 'smooth' })}
                 size="lg"
-                className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 whitespace-normal break-words text-center group mobile-center-block"
+                className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 whitespace-normal break-words text-center group mobile-center-block enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop"
               >
                 <span className="block sm:inline">Evaluar si tengo lo necesario para dominar mi mercado</span>
                 <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />
