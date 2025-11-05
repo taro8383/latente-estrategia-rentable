@@ -22,8 +22,8 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
         <DialogContent className="
-          left-0 right-0 sm:left-1/2 sm:right-auto mx-0 my-0 p-0 overflow-hidden
-          transform transition-all duration-500 ease-out
+          !left-0 !right-0 sm:!left-1/2 sm:!right-auto !mx-0 !my-0 !p-0 !overflow-hidden
+          !transform transition-all duration-500 ease-out
           data-[state=open]:animate-modal-fade-in
           data-[state=closed]:animate-modal-fade-out
           data-[state=open]:animate-modal-scale-in
@@ -31,7 +31,17 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
           data-[state=open]:animate-modal-slide-in-from-top
           data-[state=closed]:animate-modal-slide-out-to-top
           !max-w-[95vw] sm:!max-w-lg md:!max-w-xl
-        ">
+          !top-[50vh] !-translate-y-1/2
+          !border-0 !bg-transparent
+        " style={{
+          position: 'fixed',
+          top: '50vh',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          width: '95vw',
+          maxWidth: '32rem',
+          margin: '0'
+        }}>
           <DialogHeader className="relative z-10 p-3 sm:p-4 md:p-6 pb-2 sm:pb-4">
             <DialogTitle className="text-lg sm:text-xl md:text-2xl font-bold text-white leading-tight text-center">
               <PersonalizedText>
