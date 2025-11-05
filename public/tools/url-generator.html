@@ -1506,18 +1506,16 @@
 
                 // Handle logo storage (simplified - file goes to GitHub Actions)
                 let logoId = null;
-                let logoFileBase64 = null;
                 let fileExtension = null;
 
                 // Generate logo ID and get file extension if logo file exists
-                if (companyLogoFile) {
+                console.log('DEBUG: companyLogoFile check:', companyLogoFile ? companyLogoFile.name : 'null');
+                if (companyLogoFile && companyLogoFile.name) {
                     logoId = LogoStorage.generateLogoId();
                     fileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
-                }
-
-                // Logo file will be processed by GitHub Actions workflow
-                if (companyLogoFile) {
                     console.log('Logo file ready for GitHub Actions, logoId:', logoId, 'extension:', fileExtension);
+                } else {
+                    console.log('No logo file found or file has no name');
                 }
 
                 // Prepare metadata for GitHub API
@@ -1595,8 +1593,8 @@
                     // Logo information (file path reference, not base64)
                     companyLogo: null, // No base64 fallback
                     companyLogoId: logoId,
-                    companyLogoUrl: `https://${owner}.github.io/${repo}/assets/logos/${shortCode}.${fileExtension}`, // File path reference using shortCode
-                    logoFileExtension: fileExtension, // Add file extension for metadata use
+                    companyLogoUrl: `https://${owner}.github.io/${repo}/assets/logos/${shortCode}.${fileExtension || 'png'}`, // File path reference using shortCode with fallback
+                    logoFileExtension: fileExtension || 'png', // Add file extension for metadata use with fallback
 
                     // Metadata for tracking and analytics
                     metadata: mappingMetadata
