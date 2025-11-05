@@ -461,6 +461,28 @@ h3 {
   }
 }
 
+/* Enhanced button sizing for better mobile readability */
+@media (max-width: 640px) {
+  .enhanced-button-mobile {
+    font-size: 1.125rem !important; /* 18px */
+    line-height: 1.5rem !important;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 767px) {
+  .enhanced-button-tablet {
+    font-size: 1.25rem !important; /* 20px */
+    line-height: 1.5rem !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .enhanced-button-desktop {
+    font-size: 1.25rem !important; /* 20px */
+    line-height: 1.5rem !important;
+  }
+}
+
 /* Force override Dialog component styles - Mobile First Approach */
 [data-radix-dialog-content] {
   position: fixed !important;
