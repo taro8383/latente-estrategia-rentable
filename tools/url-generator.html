@@ -1589,7 +1589,9 @@
                     // Logo information (file path reference, not base64)
                     companyLogo: null, // No base64 fallback
                     companyLogoId: logoId,
-                    companyLogoUrl: `https://${owner}.github.io/${repo}/assets/logos/${logoId}.${fileExtension}`, // File path reference using logoId
+                    // Safety check: prevent undefined reference errors
+                    // CRITICAL: Use logoId here, NOT shortCode - shortCode is undefined in this context
+                    companyLogoUrl: logoId && fileExtension ? `https://${owner}.github.io/${repo}/assets/logos/${logoId}.${fileExtension}` : null, // Safe URL reference
                     logoFileExtension: fileExtension, // Add file extension for metadata use
 
                     // Metadata for tracking and analytics
