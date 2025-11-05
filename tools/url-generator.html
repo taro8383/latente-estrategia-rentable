@@ -1503,16 +1503,8 @@
                     }
                 }
 
-                // Handle logo storage (simplified - file goes to GitHub Actions)
-                let logoId = null;
-                let fileExtension = null;
-
-                // Generate logo ID and get file extension if logo file exists
-                if (companyLogoFile) {
-                    logoId = LogoStorage.generateLogoId();
-                    fileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
-                    console.log('Logo file ready for GitHub Actions, logoId:', logoId, 'extension:', fileExtension);
-                }
+                // Logo information comes from Cloudflare Worker upload
+                // Variables already set: artifactUrl, logoFileExtension
 
                 // Prepare metadata for GitHub API
                 const mappingMetadata = {
@@ -1587,12 +1579,10 @@
                     },
 
                     // Logo information (file path reference, not base64)
-                    companyLogo: null, // No base64 fallback
-                    companyLogoId: logoId,
-                    // Safety check: prevent undefined reference errors
-                    // CRITICAL: Use logoId here, NOT shortCode - shortCode is undefined in this context
-                    companyLogoUrl: logoId && fileExtension ? `https://${owner}.github.io/${repo}/assets/logos/${logoId}.${fileExtension}` : null, // Safe URL reference
-                    logoFileExtension: fileExtension, // Add file extension for metadata use
+                    companyLogo: artifactUrl, // Cloudflare R2 URL from upload
+                    companyLogoId: null, // No local logo ID needed
+                    companyLogoUrl: artifactUrl, // Use Cloudflare R2 URL
+                    logoFileExtension: logoFileExtension, // Use Cloudflare Worker extension
 
                     // Metadata for tracking and analytics
                     metadata: mappingMetadata
