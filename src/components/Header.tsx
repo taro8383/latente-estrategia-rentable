@@ -51,7 +51,7 @@ export const Header = () => {
                 <Button
                   key={link.name}
                   onClick={() => scrollToSection(link.href)}
-                  className="accent-gradient text-white hover:scale-105 transition-bounce"
+                  className="accent-gradient text-white hover:scale-105 transition-bounce text-[0.875rem] sm:text-[1rem] font-semibold"
                 >
                   {link.name}
                 </Button>

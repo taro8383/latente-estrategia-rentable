@@ -124,7 +124,7 @@ export const CTA = () => {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full accent-gradient text-white hover:scale-105 transition-bounce shadow-medium text-base sm:text-lg py-6 group"
+                className="w-full accent-gradient text-white hover:scale-105 transition-bounce shadow-medium text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] py-6 group font-semibold"
               >
                 <span className="block sm:hidden">Agendar</span>
                 <span className="hidden sm:inline">Agendar llamada estratégica</span>

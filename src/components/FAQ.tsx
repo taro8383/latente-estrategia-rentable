@@ -174,7 +174,7 @@ export const FAQ = () => {
                 <Button
                   onClick={() => document.getElementById('section-1')?.scrollIntoView({ behavior: 'smooth' })}
                   size="lg"
-                  className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong text-base sm:text-lg w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 group mobile-center-block"
+                  className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 group mobile-center-block font-semibold"
                 >
                   <span className="block sm:inline">Reclamar mi trono ahora</span>
                   <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />

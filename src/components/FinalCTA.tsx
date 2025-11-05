@@ -150,9 +150,9 @@ export const FinalCTA = () => {
           <Button
             onClick={scrollToContact}
             size="lg"
-            className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 whitespace-normal break-words text-center group mobile-center-block"
+            className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 whitespace-normal break-words text-center group mobile-center-block text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] font-semibold"
           >
-            <PersonalizedText as="span" className="text-sm sm:text-base">
+            <PersonalizedText as="span" className="text-[1rem] sm:text-[1.125rem] md:text-[1.25rem]">
               Responder "CORONA" y reclamar mi trono.
             </PersonalizedText>
             <Mail className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />

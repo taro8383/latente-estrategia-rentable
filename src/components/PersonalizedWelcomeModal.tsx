@@ -82,7 +82,7 @@ export const PersonalizedWelcomeModal = ({ isOpen, onClose }: PersonalizedWelcom
               <Button
                 onClick={onClose}
                 size="lg"
-                className="w-full accent-gradient text-white hover:scale-105 transition-all duration-300 shadow-strong text-sm sm:text-base px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 group touch-manipulation"
+                className="w-full accent-gradient text-white hover:scale-105 transition-all duration-300 shadow-strong text-[1rem] sm:text-[1.125rem] px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 group touch-manipulation font-semibold"
               >
                 <span className="text-center">Comenzar mi experiencia #1</span>
                 <ArrowRight className="ml-2 h-4 w-4 sm:h-5 sm:w-5 group-hover:translate-x-1 transition-transform duration-200" />

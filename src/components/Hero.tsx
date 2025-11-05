@@ -105,7 +105,7 @@ export const Hero = () => {
               <Button
                 size="default"
                 onClick={scrollToSection1}
-                className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 group mx-auto sm:mx-0 whitespace-normal break-words text-center"
+                className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-6 group mx-auto sm:mx-0 whitespace-normal break-words text-center text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] font-semibold"
               >
                 <span className="hidden sm:inline">Quiero construir mi legado como el #1</span>
                 <span className="sm:hidden">Construir mi legado #1</span>
