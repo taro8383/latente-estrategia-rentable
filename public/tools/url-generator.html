@@ -1476,6 +1476,7 @@
                 // Generate unique code using standalone function
                 const uniqueCode = generateUniqueCode();
                 const shortCode = GitHubActionsURLShortener.generateShortCode();
+                console.log('DEBUG: Generated shortCode:', shortCode);
 
                 // Get GitHub credentials and repo info (needed for workflow trigger)
                 let token = localStorage.getItem('github_token');
@@ -1508,8 +1509,10 @@
                 let logoId = null;
                 let fileExtension = null;
 
-                // Generate logo ID and get file extension if logo file exists
+                // DEBUG: Check if companyLogoFile exists
+                console.log('DEBUG: companyLogoFile exists:', !!companyLogoFile);
                 if (companyLogoFile) {
+                    console.log('DEBUG: companyLogoFile name:', companyLogoFile.name);
                     logoId = LogoStorage.generateLogoId();
                     fileExtension = companyLogoFile.name.split('.').pop().toLowerCase();
                     console.log('Logo file ready for GitHub Actions, logoId:', logoId, 'extension:', fileExtension);
