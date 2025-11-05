@@ -13,6 +13,7 @@ export const Header = () => {
     { name: "Cómo Funciona", href: "#como-funciona" },
     { name: "Modelo", href: "#modelo" },
     { name: "Socios Estratégicos", href: "#socios-estrategicos" },
+    { name: "Preguntas Frecuentes", href: "#preguntas-frecuentes" },
     { name: "#1", href: "#1", isButton: true },
   ];
 

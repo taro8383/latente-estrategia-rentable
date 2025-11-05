@@ -6,53 +6,53 @@ import { PersonalizedText } from "@/components/PersonalizedText";
 const faqData = [
   {
     id: "faq-1",
+    question: "¿Por qué solo 72 horas para decidir? Necesito tiempo para pensar una decisión tan importante.",
+    answer: "El límite de tiempo existe porque solo trabajamos con un negocio por sector en cada región para evitar conflictos de interés. Si no tomas la oportunidad, tu competidor podría hacerlo. Además, la velocidad de decisión es un indicador clave de si estás listo para el tipo de transformación agresiva que requiere llegar al #1. Los reyes no dudan - actúan."
+  },
+  {
+    id: "faq-2",
     question: "¿Cómo puede funcionar este modelo sin inversión inicial? ¿Cuál es la trampa?",
     answer: "No hay trampa. Nosotros invertimos más de 300 horas de trabajo antes de ver un peso porque confiamos en nuestros sistemas probados. Solo ganamos cuando generamos ganancias netas nuevas para tu negocio. Si no creamos valor real y medible, no cobramos. Es un modelo de riesgo 100% compartido donde nuestro éxito depende completamente del tuyo."
   },
   {
-    id: "faq-2",
+    id: "faq-3",
     question: "Ya contraté consultores antes y solo me dieron PDFs que nunca implementé. ¿En qué se diferencian ustedes?",
     answer: "La diferencia fundamental es que no somos consultores externos - somos socios operativos. Mientras los consultores tradicionales diagnostican desde afuera y se van, nosotros trabajamos desde adentro de tu negocio, implementando cada cambio junto a tu equipo. Nuestro dinero y reputación están en juego igual que los tuyos. No vendemos teoría, ejecutamos victorias reales."
   },
   {
-    id: "faq-3",
+    id: "faq-4",
     question: "¿Cómo pueden garantizar 20% en 90 días? Eso suena demasiado bueno para ser verdad.",
     answer: "Nuestra garantía se basa en datos reales: hemos implementado estos mismos sistemas en más de 47 empresas con resultados consistentes. Si no cumplimos, no solo no cobramos - personalmente volaremos a tu ciudad y te entregaremos un cheque por 20 millones de pesos junto con un análisis de por qué fallamos. Es una garantía respaldada por contrato, no una promesa vacía."
   },
   {
-    id: "faq-4",
+    id: "faq-5",
     question: "Mi negocio es muy diferente a otros. ¿Cómo sé que sus sistemas funcionarán en mi industria específica?",
     answer: "Los tres sistemas principales (Protocolo de Elección Obvia, Hidratación Rentable y Matriz de Ingresos Ocultos) son agnósticos a la industria. Ya los hemos aplicado exitosamente en joyería (+150% en ventas), salud (-35% en costos), manufactura y muchos otros en distintos paises inclusive. Los principios de dominio de mercado, optimización de flujo de caja y activación de ingresos ocultos aplican igual en cualquier negocio con operaciones complejas."
   },
   {
-    id: "faq-5",
+    id: "faq-6",
     question: "¿Qué significa exactamente \"participación en las ganancias\"? ¿Cuánto se llevan ustedes?",
     answer: "Compartimos únicamente las ganancias NUEVAS que generamos juntos - nunca tocamos tus ingresos actuales. El porcentaje específico se determina caso por caso según el potencial de crecimiento y la inversión de tiempo requerida, pero siempre es justo y transparente. Solo ganamos sobre el valor adicional que creamos, no sobre lo que ya tienes."
   },
   {
-    id: "faq-6",
+    id: "faq-7",
     question: "Soy el cuello de botella en mi negocio. ¿Cómo puedo involucrarme en esto si ya no tengo tiempo?",
     answer: "Precisamente por eso existe esta alianza. Nuestro primer objetivo es liberarte del día a día operativo. Implementamos sistemas que te permiten delegar estratégicamente, no solo operativamente. En las primeras semanas, necesitaremos algunas horas tuyas para entender tu negocio, pero rápidamente nos enfocamos en crear motores de crecimiento que funcionen sin tu intervención diaria."
   },
   {
-    id: "faq-7",
+    id: "faq-8",
     question: "¿Qué pasa si mi equipo se resiste a los cambios? Ya tengo suficientes problemas con el personal.",
     answer: "Tenemos protocolos específicos para manejar la resistencia al cambio porque lo hemos vivido desde adentro. No llegamos como 'consultores externos' imponiendo cambios - trabajamos junto a tu equipo, haciéndolos parte del proceso de transformación. Convertimos a los escépticos en campeones del cambio mostrándoles cómo estos sistemas también los benefician a ellos."
   },
   {
-    id: "faq-8",
+    id: "faq-9",
     question: "¿Cuánto tiempo real requiere la implementación? Necesito resultados rápidos.",
     answer: "Los primeros resultados tangibles se ven en la mayoria de los casos en 7-14 días. La implementación completa de los tres sistemas toma 12 meses, pero está diseñada para generar victorias rápidas desde el inicio. Cada sistema se implementa en fases que generan valor inmediato mientras construimos hacia el dominio total del mercado."
   },
   {
-    id: "faq-9",
+    id: "faq-10",
     question: "¿Qué tipo de acceso necesitan a mi negocio y mis números?",
     answer: "Necesitamos acceso completo a tus métricas financieras y operativas para identificar las oportunidades ocultas. Firmamos acuerdos de confidencialidad estrictos y trabajamos con la máxima discreción. Recuerda: tu información es nuestra información - si la comprometemos, nos comprometemos a nosotros mismos."
-  },
-  {
-    id: "faq-10",
-    question: "¿Por qué solo 72 horas para decidir? Necesito tiempo para pensar una decisión tan importante.",
-    answer: "El límite de tiempo existe porque solo trabajamos con un negocio por sector en cada región para evitar conflictos de interés. Si no tomas la oportunidad, tu competidor podría hacerlo. Además, la velocidad de decisión es un indicador clave de si estás listo para el tipo de transformación agresiva que requiere llegar al #1. Los reyes no dudan - actúan."
   }
 ];
 
