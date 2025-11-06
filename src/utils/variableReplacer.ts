@@ -228,12 +228,25 @@ export class VariableReplacer {
     return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   }
 
+  // Function to unescape text that was escaped for shell script compatibility
+  private unescapeText(text: string): string {
+    if (!text) return text;
+
+    return text
+      .replace(/\\"/g, '"')      // Unescape quotes
+      .replace(/\\n/g, '\n')     // Unescape newlines
+      .replace(/\\r/g, '\r')     // Unescape carriage returns
+      .replace(/\\t/g, '\t');    // Unescape tabs
+  }
+
   replace(text: string): string {
     if (!text) return text;
 
-    
+    // First, unescape text that may have been escaped for shell script compatibility
+    let processedText = this.unescapeText(text);
+
     // Apply gender replacements first
-    let processedText = this.applyGenderReplacements(text);
+    processedText = this.applyGenderReplacements(processedText);
     
     // Then apply existing variable replacements
     processedText = processedText.replace(/\[([^\]]+)\]/g, (match, variablePath) => {
@@ -267,7 +280,8 @@ export class VariableReplacer {
       }
 
       const finalValue = value || this.defaults[trimmedPath] || undefined;
-      return finalValue || `[${trimmedPath}]`;
+      const unescapedFinalValue = finalValue ? this.unescapeText(finalValue) : finalValue;
+      return unescapedFinalValue || `[${trimmedPath}]`;
     });
     
     return processedText;
@@ -312,7 +326,9 @@ export class VariableReplacer {
     }
     
     if (current !== undefined) {
-      return typeof current === 'string' ? current : String(current);
+      const value = typeof current === 'string' ? current : String(current);
+      // Unescape text that may have been escaped for shell script compatibility
+      return this.unescapeText(value);
     }
 
     // 2) Try matching against flattened available variables (normalizing keys)
@@ -325,7 +341,7 @@ export class VariableReplacer {
     const target = normalize(path);
  
     for (const [k, v] of Object.entries(vars)) {
-      if (normalize(k) === target) return v;
+      if (normalize(k) === target) return this.unescapeText(v);
     }
 
     // 3) Heuristic: "reader name" -> try readerInfo.name
