@@ -664,7 +664,7 @@
                                 Innovación
                             </label>
                             <input type="text" id="inovacion" placeholder="Concepto de innovación">
-                            <div class="field-preview">Ejemplo: "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando [tu innovación]… y ya tiene un prototipo en tu escritorio."</div>
+                            <div class="field-preview">Ejemplo: "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando cuero reciclado… y ya tiene un prototipo en tu escritorio."</div>
                         </div>
                         
                         <div class="field-group">
@@ -803,7 +803,7 @@
                     <div class="preview-section">
                         <h4>Problems Section Preview:</h4>
                         <p>En [ubicacion], [tu marca]...</p>
-                        <p>Usando [inovacion]...</p>
+                        <p>[inovacion]</p>
                     </div>
                     <div class="preview-section">
                         <h4>Solution Section Preview:</h4>
@@ -2025,7 +2025,7 @@
             const gender = formData.gender || 'male';
             const ubicacion = formData.ubicacion || '[ubicacion]';
             const brandName = formData.brandName || '[brand name]';
-            const inovacion = formData.inovacion || '[inovacion]';
+            const inovacion = formData.inovacion || 'Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando [tu innovación]… y ya tiene un prototipo en tu escritorio.';
             const malPosicionamiento = formData.malPosicionamiento || '[malPosicionamiento]';
             const rollsRoyce = formData.rollsRoyce || '[Rolls-Royce]';
             const fraseDescriptiva = formData.fraseDescriptiva || '[frase descriptiva]';
@@ -2037,7 +2037,7 @@
             // Bold the user inputs - ONLY when filled
             const boldUbicacion = ubicacion && ubicacion.trim() !== '' ? `<strong>${ubicacion}</strong>` : '[ubicacion]';
             const boldBrandName = brandName && brandName.trim() !== '' ? `<strong>${brandName}</strong>` : '[brand name]';
-            const boldInovacion = inovacion && inovacion.trim() !== '' ? `<strong>${inovacion}</strong>` : '[inovacion]';
+            const boldInovacion = inovacion && inovacion.trim() !== '' ? `<strong>${inovacion}</strong>` : 'Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando [tu innovación]… y ya tiene un prototipo en tu escritorio.';
             const boldMalPosicionamiento = malPosicionamiento && malPosicionamiento.trim() !== '' ? `<strong>${malPosicionamiento}</strong>` : '[malPosicionamiento]';
             const boldRollsRoyce = rollsRoyce && rollsRoyce.trim() !== '' ? `<strong>${rollsRoyce}</strong>` : '[Rolls-Royce]';
             const boldFraseDescriptiva = fraseDescriptiva && fraseDescriptiva.trim() !== '' ? `<strong>${fraseDescriptiva}</strong>` : '[frase descriptiva]';
@@ -2052,7 +2052,7 @@
                     "${boldMalPosicionamiento} ${losersText}. Sin un framework de posicionamiento radical, sos solo otro producto caro en un mar de similares."</p>
 
                     <p><strong>Problema de Innovación:</strong><br>
-                    "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando ${boldInovacion}… y ya tiene un prototipo en tu escritorio."</p>
+                    ${boldInovacion}</p>
 
                     <p><strong>Problema de Ubicación:</strong><br>
                     "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos disfrutas de tu exito en un café de ${boldUbicacion}."</p>

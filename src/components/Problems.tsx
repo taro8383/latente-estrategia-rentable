@@ -25,7 +25,7 @@ const allProblems = [
     icon: Users,
     title: "Tu equipo no está roto - está mal cableado",
     before: "Contrataste implementadores cuando necesitabas innovadores. El problema no es su capacidad, es tu sistema de gestión que premia el cumplimiento y castiga el riesgo. Sin recablear este sistema, seguirás teniendo empleados que obedecen en lugar de gente que cambia las reglas",
-    after: "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando [inovacion]… y ya tiene un prototipo en tu escritorio.",
+    after: "[inovacion]",
     result: "Ahora no tenés empleados. Tenés game-changers entrenados para ganar."
   },
   {
