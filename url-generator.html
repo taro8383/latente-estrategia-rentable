@@ -803,7 +803,7 @@
                     <div class="preview-section">
                         <h4>Problems Section Preview:</h4>
                         <p>En [ubicacion], [tu marca]...</p>
-                        <p>[historiaCompletaJefe]</p>
+                        <p>Usando [inovacion]...</p>
                     </div>
                     <div class="preview-section">
                         <h4>Solution Section Preview:</h4>
@@ -1149,85 +1149,15 @@
                     // Store the full URL in localStorage for cross-device use
                     localStorage.setItem(`full_url_${shortCode}`, longUrl);
 
-                    // 🛡️ BULLETPROOF: Comprehensive metadata sanitization for shell script safety
+                    // Clean up metadata to remove very long values that cause issues
                     const cleanMetadata = JSON.parse(JSON.stringify(metadata, (key, value) => {
-                        if (typeof value !== 'string') {
-                            return value;
-                        }
-
-                        // 📏 Length protection - prevent overflow attacks and excessive data
-                        if (value.length > 1000) {
+                        // Truncate very long strings to prevent issues
+                        if (typeof value === 'string' && value.length > 1000) {
                             console.log('🔧 Truncating long field:', key, 'from', value.length, 'to 1000 chars');
-                            value = value.substring(0, 1000) + '...[truncated]';
+                            return value.substring(0, 1000) + '...[truncated]';
                         }
-
-                        // 🚫 COMPREHENSIVE SHELL SCRIPT PROTECTION
-                        // Remove and escape ALL potentially dangerous characters
-                        return value
-                            // 1. Remove null bytes (prevents injection)
-                            .replace(/\0/g, '')
-                            // 2. Escape dangerous quotes and backslashes
-                            .replace(/\\/g, '\\\\')
-                            .replace(/"/g, '\\"')
-                            .replace(/'/g, "\\'")
-                            // 3. Escape newlines and whitespace characters
-                            .replace(/\n/g, '\\n')
-                            .replace(/\r/g, '\\r')
-                            .replace(/\t/g, '\\t')
-                            .replace(/\f/g, '\\f')
-                            .replace(/\v/g, '\\v')
-                            // 4. Escape shell special characters
-                            .replace(/;/g, '\\;')
-                            .replace(/&/g, '\\&')
-                            .replace(/\|/g, '\\|')
-                            .replace(/</g, '\\<')
-                            .replace(/>/g, '\\>')
-                            .replace(/\(/g, '\\(')
-                            .replace(/\)/g, '\\)')
-                            .replace(/\[/g, '\\[')
-                            .replace(/\]/g, '\\]')
-                            .replace(/\{/g, '\\{')
-                            .replace(/\}/g, '\\}')
-                            // 5. Remove dangerous Unicode characters
-                            .replace(/[\u0000-\u001F]/g, '')  // Control characters
-                            .replace(/[\u007F-\u009F]/g, '')  // DEL characters
-                            .replace(/[\u2000-\u20FF]/g, '')  // Unicode punctuation/spaces
-                            // 6. Escape other problematic shell characters
-                            .replace(/`/g, '\\`')
-                            .replace(/\$/g, '\\$')
-                            .replace(/@/g, '\\@')
-                            .replace(/#/g, '\\#')
-                            .replace(/\*/g, '\\*')
-                            .replace(/!/g, '\\!')
-                            .replace(/%/g, '\\%')
-                            .replace(/\^/g, '\\^')
-                            .replace(/~/g, '\\~')
-                            // 7. Prevent command substitution attacks
-                            .replace(/\$\(/g, '\\$(')
-                            .replace(/\$\{/g, '\\${')
-                            .replace(/\$[a-zA-Z_]/g, '\\$&')  // Variable expansion
-                            // 8. Prevent path traversal
-                            .replace(/\.\.\//g, '')
-                            .replace(/\.\./g, '')
-                            .replace(/\//g, '\\/')
-                            // 9. Remove or escape pipe operators and redirection
-                            .replace(/>>/g, '')
-                            .replace(/</g, '')
-                            .replace(/>/g, '')
-                            // 10. Clean up excessive whitespace
-                            .replace(/\s+/g, ' ')
-                            .trim();
+                        return value;
                     }));
-
-                    // 🛡️ BULLETPROOF VALIDATION: Final safety check
-                    const validationResult = this.validateShellSafety(cleanMetadata);
-                    if (!validationResult.safe) {
-                        console.error('🚨 SECURITY WARNING: Detected potentially dangerous content:', validationResult.issues);
-                        // Add safe fallback values for dangerous fields
-                        Object.keys(validationResult.issues).forEach(field => {
-                            cleanMetadata[field] = '[Sanitized - Dangerous Content]';
-                        });
-                    }
 
                     const metadataPayload = JSON.stringify(cleanMetadata);
                     console.log('📏 Clean metadata payload size:', metadataPayload.length, 'chars');
@@ -1295,55 +1225,6 @@
                     // CRITICAL: No localStorage fallback - this is server-side only for cross-device compatibility
                     throw new Error(`Failed to store URL mapping: ${error.message}. The URL was NOT created and will NOT work across devices. Please check your GitHub token and repository settings.`);
                 }
-            }
-
-            // 🛡️ BULLETPROOF: Shell script safety validation method
-            static validateShellSafety(data) {
-                const issues = {};
-                const dangerousPatterns = [
-                    // Command substitution patterns
-                    /\$\(/, /\$\{/, /\$[a-zA-Z_]/,
-                    // Shell operators
-                    /;/, /&&/, /\|\|/, />>/, />/, /</,
-                    // Control characters
-                    /[\x00-\x1F]/, /[\x7F-\x9F]/,
-                    // Dangerous commands
-                    /rm\s+/, /dd\s+/, /cat\s+/, /echo\s+/, /wget\s+/, /curl\s+/, /nc\s+/,
-                    // Path traversal
-                    /\.\.\//, /\.\./,
-                    // Script execution patterns
-                    /bash\s+/, /sh\s+/, /python\s+/, /node\s+/, /perl\s+/,
-                    // Network operations
-                    /nc\s+/, /telnet\s+/, /ssh\s+/,
-                    // System calls
-                    /system\s*\(/, /exec\s*\(/, /eval\s*\(/,
-                    // Variable assignment with commands
-                    /=.*\s*;/, /=.*\s*\$/,
-                ];
-
-                const checkObject = (obj, path = '') => {
-                    for (const [key, value] of Object.entries(obj)) {
-                        const currentPath = path ? `${path}.${key}` : key;
-
-                        if (typeof value === 'string') {
-                            dangerousPatterns.forEach((pattern, index) => {
-                                if (pattern.test(value)) {
-                                    issues[currentPath] = `Pattern ${index + 1}: Contains potentially dangerous shell command or character`;
-                                }
-                            });
-                        } else if (typeof value === 'object' && value !== null) {
-                            Object.assign(issues, checkObject(value, currentPath));
-                        }
-                    }
-                };
-
-                checkObject(data);
-
-                return {
-                    safe: Object.keys(issues).length === 0,
-                    issues: issues,
-                    warnings: Object.keys(issues).length > 0 ? 'Shell script safety validation detected potential issues' : null
-                };
             }
 
             // Upload logo file using Cloudflare Worker with FormData and retry logic
@@ -2137,7 +2018,6 @@
             const ubicacion = formData.ubicacion || '[ubicacion]';
             const brandName = formData.brandName || '[brand name]';
             const inovacion = formData.inovacion || '[inovacion]';
-            const historiaCompletaJefe = formData.historiaCompletaJefe || 'Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando [inovacion]… y ya tiene un prototipo en tu escritorio.';
             const malPosicionamiento = formData.malPosicionamiento || '[malPosicionamiento]';
             const rollsRoyce = formData.rollsRoyce || '[Rolls-Royce]';
             const fraseDescriptiva = formData.fraseDescriptiva || '[frase descriptiva]';
@@ -2150,7 +2030,6 @@
             const boldUbicacion = ubicacion && ubicacion.trim() !== '' ? `<strong>${ubicacion}</strong>` : '[ubicacion]';
             const boldBrandName = brandName && brandName.trim() !== '' ? `<strong>${brandName}</strong>` : '[brand name]';
             const boldInovacion = inovacion && inovacion.trim() !== '' ? `<strong>${inovacion}</strong>` : '[inovacion]';
-            const boldHistoriaCompletaJefe = historiaCompletaJefe && historiaCompletaJefe.trim() !== '' ? `<strong>${historiaCompletaJefe}</strong>` : 'Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando [inovacion]… y ya tiene un prototipo en tu escritorio.';
             const boldMalPosicionamiento = malPosicionamiento && malPosicionamiento.trim() !== '' ? `<strong>${malPosicionamiento}</strong>` : '[malPosicionamiento]';
             const boldRollsRoyce = rollsRoyce && rollsRoyce.trim() !== '' ? `<strong>${rollsRoyce}</strong>` : '[Rolls-Royce]';
             const boldFraseDescriptiva = fraseDescriptiva && fraseDescriptiva.trim() !== '' ? `<strong>${fraseDescriptiva}</strong>` : '[frase descriptiva]';
@@ -2165,7 +2044,7 @@
                     "${boldMalPosicionamiento} ${losersText}. Sin un framework de posicionamiento radical, sos solo otro producto caro en un mar de similares."</p>
 
                     <p><strong>Problema de Innovación:</strong><br>
-                    "${boldHistoriaCompletaJefe}"</p>
+                    "Tu jefe de producción entra a tu oficina con una idea que duplica el margen usando ${boldInovacion}… y ya tiene un prototipo en tu escritorio."</p>
 
                     <p><strong>Problema de Ubicación:</strong><br>
                     "Tus martes y jueves están libres, no porque delegaste, sino porque ya no hay incendios. Solo motores de crecimiento que giran solos mientras vos disfrutas de tu exito en un café de ${boldUbicacion}."</p>
