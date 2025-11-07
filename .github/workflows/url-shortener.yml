@@ -40,13 +40,15 @@ jobs:
 
     steps:
     - name: Debug - Show workflow inputs safely
+      env:
+        RAW_METADATA: "${{ github.event.inputs.metadata }}"
       run: |
         echo "DEBUG: Workflow Inputs"
         echo "Short Code: ${{ github.event.inputs.shortCode }}"
         echo "Long URL: ${{ github.event.inputs.longUrl }}"
         echo "Expiration Hours: ${{ github.event.inputs.expirationHours }}"
-        echo "Metadata (safely quoted):"
-        echo "'${{ github.event.inputs.metadata }}'"
+        echo "Metadata (safely quoted via environment variable):"
+        echo "'${RAW_METADATA}'"
         echo "Repository: ${{ github.repository }}"
         echo "Ref: ${{ github.ref }}"
         echo "Actor: ${{ github.actor }}"
