@@ -10,6 +10,7 @@ import { FinalCTA } from "@/components/FinalCTA";
 import { FAQ } from "@/components/FAQ";
 import { Footer } from "@/components/Footer";
 import { PersonalizedWelcomeModal } from "@/components/PersonalizedWelcomeModal";
+import { ScrollProgress } from "@/components/ScrollProgress";
 import { usePersonalization } from "@/context/PersonalizationProvider";
 import { useState, useEffect } from "react";
 
@@ -34,6 +35,7 @@ const Index = () => {
 
   return (
     <main className="min-h-screen">
+      <ScrollProgress />
       <Header />
       <Hero />
       <OfferBox />
