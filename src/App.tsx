@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import { ExpiredOffer } from "@/components/ExpiredOffer";
 import { RedirectHandler } from "@/components/RedirectHandler";
 import InvitationRequired from "@/components/InvitationRequired";
+import { ScrollProgress } from "@/components/ScrollProgress";
 
 const queryClient = new QueryClient();
 
@@ -46,6 +47,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <PersonalizationProvider>
+          <ScrollProgress />
           <Toaster />
           <Sonner />
           <HashRouter>

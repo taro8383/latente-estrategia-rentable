@@ -178,6 +178,9 @@ All colors MUST be HSL.
 
 @layer base {
   :root {
+    /* Ensure proper root font size for rem scaling */
+    font-size: 16px !important;
+
     --background: 0 0% 100%;
     --foreground: 220 15% 15%;
 
@@ -212,16 +215,16 @@ All colors MUST be HSL.
     --hero-gradient: linear-gradient(135deg, hsl(220 70% 12%) 0%, hsl(240 65% 20%) 100%);
     --accent-gradient: linear-gradient(135deg, hsl(25 95% 53%) 0%, hsl(15 90% 48%) 100%);
     --subtle-gradient: linear-gradient(180deg, hsl(220 18% 8%) 0%, hsl(220 20% 12%) 100%);
-    
+
     --shadow-soft: 0 2px 8px -2px hsl(220 15% 15% / 0.08);
     --shadow-medium: 0 8px 24px -4px hsl(220 15% 15% / 0.12);
     --shadow-strong: 0 16px 48px -8px hsl(220 15% 15% / 0.2);
-    
+
     --solution-bg: 220 16% 25%;
-    
+
     --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     --transition-bounce: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-    
+
     /* Custom animations for attention-grabbing effects */
     --glow-pulse: 0 0 20px hsl(25 95% 53% / 0.3);
     --glow-pulse-hover: 0 0 30px hsl(25 95% 53% / 0.5);
@@ -403,21 +406,36 @@ h3 {
     justify-content: center !important;
     align-items: center !important;
   }
-  
+
   .mobile-center-text {
     text-align: center !important;
   }
-  
+
   .mobile-center-flex {
     display: flex !important;
     justify-content: center !important;
     align-items: center !important;
   }
+
+  /* Ensure header stickiness works on mobile */
+  header {
+    position: -webkit-sticky !important;
+    position: sticky !important;
+    top: 0 !important;
+  }
+
+  /* Fix mobile viewport height issues */
+  html, body {
+    height: 100% !important;
+    min-height: 100vh !important;
+  }
   
   .mobile-center-block {
-    display: block !important;
+    display: flex !important;
     margin-left: auto !important;
     margin-right: auto !important;
+    align-items: center !important;
+    justify-content: center !important;
   }
   
   .mobile-stack {
@@ -441,23 +459,23 @@ h3 {
   
   /* Mobile-specific button font sizes using rem units */
   .mobile-button-sm {
-    font-size: 0.875rem !important; /* 14px */
-    line-height: 1.25rem !important;
+    font-size: 0.875rem; /* 14px */
+    line-height: 1.25rem;
   }
-  
+
   .mobile-button-md {
-    font-size: 1rem !important; /* 16px */
-    line-height: 1.5rem !important;
+    font-size: 1rem; /* 16px */
+    line-height: 1.5rem;
   }
-  
+
   .mobile-button-lg {
-    font-size: 1.125rem !important; /* 18px */
-    line-height: 1.75rem !important;
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.75rem;
   }
-  
+
   .mobile-button-xl {
-    font-size: 1.25rem !important; /* 20px */
-    line-height: 1.75rem !important;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.75rem;
   }
 
   /* Mobile button container fixes for long text */
@@ -473,46 +491,147 @@ h3 {
 /* Enhanced button sizing for better mobile readability */
 @media (max-width: 640px) {
   .enhanced-button-mobile {
-    font-size: 1rem !important; /* 16px */
-    line-height: 1.4rem !important;
-    padding-left: 0.75rem !important; /* 12px */
-    padding-right: 0.75rem !important; /* 12px */
-    min-height: 3rem !important; /* 48px minimum touch target */
+    font-size: 1rem; /* 16px */
+    line-height: 1.4rem;
+    padding-left: 0.75rem; /* 12px */
+    padding-right: 0.75rem; /* 12px */
+    min-height: 3rem; /* 48px minimum touch target */
+    width: 100%;
+    max-width: 100%;
+    word-wrap: break-word;
+    hyphens: auto;
+    white-space: normal;
+    text-align: center;
+  }
+
+  /* Button div container for flex layout */
+  .enhanced-button-mobile > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.5rem !important;
     width: 100% !important;
-    max-width: 100% !important;
-    word-wrap: break-word !important;
-    hyphens: auto !important;
-    white-space: normal !important;
     text-align: center !important;
   }
 
   /* Button span styling for proper text flow */
   .enhanced-button-mobile span {
     display: block !important;
-    width: 100% !important;
+    flex: 1 !important;
     text-align: center !important;
+    min-width: 0 !important; /* Allow text to shrink if needed */
+  }
+
+  /* Arrow icon styling for mobile */
+  .enhanced-button-mobile svg {
+    flex-shrink: 0 !important;
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+
+  /* Stack elements on very small screens if needed */
+  @media (max-width: 320px) {
+    .enhanced-button-mobile > div {
+      flex-direction: column !important;
+      gap: 0.25rem !important;
+    }
+
+    .enhanced-button-mobile span {
+      text-align: center !important;
+    }
+
+    .enhanced-button-mobile svg {
+      align-self: center !important;
+    }
   }
 }
 
 @media (min-width: 641px) and (max-width: 767px) {
   .enhanced-button-tablet {
-    font-size: 1.0625rem !important; /* 17px */
-    line-height: 1.4rem !important;
+    font-size: 1.0625rem; /* 17px */
+    line-height: 1.4rem;
+  }
+
+  /* Button div container for tablet */
+  .enhanced-button-tablet > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .enhanced-button-tablet span {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+
+  .enhanced-button-tablet svg {
+    flex-shrink: 0 !important;
   }
 }
 
 @media (min-width: 768px) {
   .enhanced-button-desktop {
-    font-size: 1.125rem !important; /* 18px */
-    line-height: 1.4rem !important;
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.4rem;
+  }
+
+  /* Button div container for desktop */
+  .enhanced-button-desktop > div {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+    width: 100% !important;
+  }
+
+  .enhanced-button-desktop span {
+    flex: 1 !important;
+    text-align: center !important;
+  }
+
+  .enhanced-button-desktop svg {
+    flex-shrink: 0 !important;
   }
 }
 
 @media (min-width: 1024px) {
   .enhanced-button-desktop {
-    font-size: 1.25rem !important; /* 20px */
-    line-height: 1.5rem !important;
+    font-size: 1.25rem; /* 20px */
+    line-height: 1.5rem;
   }
+}
+
+/* Welcome Modal text sizing with rem units and !important to override conflicting styles */
+[data-radix-dialog-content] .DialogTitle {
+  font-size: 1.125rem !important; /* 18px */
+}
+
+@media (min-width: 640px) {
+  [data-radix-dialog-content] .DialogTitle {
+    font-size: 1.25rem !important; /* 20px */
+  }
+}
+
+@media (min-width: 768px) {
+  [data-radix-dialog-content] .DialogTitle {
+    font-size: 1.5rem !important; /* 24px */
+  }
+}
+
+[data-radix-dialog-content] .welcome-message {
+  font-size: 0.875rem !important; /* 14px */
+}
+
+@media (min-width: 640px) {
+  [data-radix-dialog-content] .welcome-message {
+    font-size: 1rem !important; /* 16px */
+  }
+}
+
+[data-radix-dialog-content] .trust-indicators {
+  font-size: 0.75rem !important; /* 12px */
 }
 
 /* Force override Dialog component styles - Mobile First Approach */
@@ -552,4 +671,481 @@ h3 {
 [data-radix-dialog-overlay] {
   background-color: rgb(0 0 0 / 0.8) !important;
   backdrop-filter: blur(8px) !important;
+}
+
+/* Modal Text Scaling Fix - Use highest specificity to override all conflicting styles */
+html body [data-radix-dialog-content] .modal-title,
+html body [data-radix-dialog-content] .modal-title[data-radix-dialog-title],
+html body [data-radix-dialog-content] [data-radix-dialog-title].modal-title,
+[data-radix-dialog-content] [data-radix-dialog-title] {
+  font-size: clamp(1rem, 4vw, 1.125rem) !important; /* Mobile: 1rem (16px), Desktop: 1.125rem (18px) */
+}
+
+@media (min-width: 640px) {
+  html body [data-radix-dialog-content] .modal-title,
+  html body [data-radix-dialog-content] .modal-title[data-radix-dialog-title],
+  html body [data-radix-dialog-content] [data-radix-dialog-title].modal-title,
+  [data-radix-dialog-content] [data-radix-dialog-title] {
+    font-size: clamp(1.125rem, 4vw, 1.25rem) !important; /* Mobile: 1.125rem (18px), Desktop: 1.25rem (20px) */
+  }
+}
+
+@media (min-width: 768px) {
+  html body [data-radix-dialog-content] .modal-title,
+  html body [data-radix-dialog-content] .modal-title[data-radix-dialog-title],
+  html body [data-radix-dialog-content] [data-radix-dialog-title].modal-title,
+  [data-radix-dialog-content] [data-radix-dialog-title] {
+    font-size: 1.5rem !important; /* 24px - fixed for desktop */
+  }
+}
+
+html body [data-radix-dialog-content] .welcome-message {
+  font-size: clamp(0.8rem, 3.5vw, 0.875rem) !important; /* Mobile: ~13px, Desktop: 14px */
+}
+
+@media (min-width: 640px) {
+  html body [data-radix-dialog-content] .welcome-message {
+    font-size: 1rem !important; /* 16px */
+  }
+}
+
+html body [data-radix-dialog-content] .trust-indicators {
+  font-size: clamp(0.7rem, 3vw, 0.75rem) !important; /* Mobile: ~11px, Desktop: 12px */
+}
+
+/* Modal Dialog Title - Override ALL conflicting styles */
+.modal-dialog-title {
+  font-size: clamp(1rem, 4vw, 1.125rem) !important;
+  line-height: 1.2 !important;
+}
+
+@media (min-width: 640px) {
+  .modal-dialog-title {
+    font-size: clamp(1.125rem, 3.5vw, 1.25rem) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .modal-dialog-title {
+    font-size: clamp(1.25rem, 3vw, 1.5rem) !important;
+  }
+}
+
+/* Test class to verify rem scaling - add this for debugging */
+.rem-test {
+  font-size: 1rem !important; /* Should be 16px at default browser settings */
+  background: red !important;
+  color: white !important;
+  padding: 1rem !important;
+  position: fixed !important;
+  top: 10px !important;
+  right: 10px !important;
+  z-index: 9999 !important;
+}
+
+/* Smooth horizontal scrolling animation for carousel */
+@keyframes scrollX {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-scroll-x {
+  animation: scrollX 57.6s linear infinite;
+}
+
+/* Pause animation on hover */
+.animate-scroll-x:hover {
+  animation-play-state: paused;
+}
+
+/* Ensure smooth performance on mobile */
+@media (max-width: 640px) {
+  .animate-scroll-x {
+    animation: scrollX 28.8s linear infinite;
+  }
+
+  /* Slower scrolling on very small screens for better readability */
+  @media (max-width: 320px) {
+    .animate-scroll-x {
+      animation: scrollX 38.4s linear infinite;
+    }
+  }
+}
+
+/* Image format optimization for carousel */
+.carousel-logo {
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: crisp-edges;
+  image-rendering: pixelated;
+}
+
+.carousel-logo svg {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Better image loading and fallback handling */
+.carousel-logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.carousel-logo-container img {
+  transition: all 0.3s ease;
+  object-fit: contain;
+}
+
+/* Ensure SVGs scale properly in all containers */
+.carousel-logo-container svg {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+}
+
+/* Better mobile image handling */
+@media (max-width: 640px) {
+  .carousel-logo-container {
+    padding: 0.5rem !important;
+  }
+
+  .carousel-logo-container img {
+    max-width: 90% !important;
+    max-height: 90% !important;
+  }
+}
+
+/* Prevent layout shifts during image loading */
+.carousel-logo-container {
+  background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%),
+              linear-gradient(-45deg, #f8f9fa 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, #f8f9fa 75%),
+              linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+  background-size: 10px 10px;
+  background-position: 0 0, 0 5px, 5px -5px, -5px 0px;
+}
+
+/* Remove background for successfully loaded images */
+.carousel-logo-container img[src] {
+  background: white;
+}
+
+/* ====================================
+   SCROLL ANIMATIONS
+   ==================================== */
+
+/* Animation durations and easing */
+.animate-fade-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-down {
+  animation: fadeInDown 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-left {
+  animation: fadeInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-fade-right {
+  animation: fadeInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-scale-up {
+  animation: scaleUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+.animate-rotate-in {
+  animation: rotateIn 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.8s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-bounce-in {
+  animation: bounceIn 1s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+/* Keyframe animations */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeInRight {
+  from {
+    opacity: 0;
+    transform: translateX(-60px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleUp {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0deg) scale(1);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Staggered animation delays */
+.stagger-delay-1 { animation-delay: 100ms; }
+.stagger-delay-2 { animation-delay: 200ms; }
+.stagger-delay-3 { animation-delay: 300ms; }
+.stagger-delay-4 { animation-delay: 400ms; }
+.stagger-delay-5 { animation-delay: 500ms; }
+
+/* Initial states for scroll-triggered animations */
+.scroll-animate-hidden {
+  opacity: 0;
+  filter: blur(4px);
+  transform: translateY(40px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-animate-visible {
+  opacity: 1;
+  filter: blur(0px);
+  transform: translateY(0);
+}
+
+/* Specific animation classes */
+.scroll-fade-up {
+  opacity: 0;
+  transform: translateY(60px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-fade-up.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.scroll-fade-left {
+  opacity: 0;
+  transform: translateX(-60px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-fade-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-fade-right {
+  opacity: 0;
+  transform: translateX(60px);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-fade-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.scroll-scale-up {
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.scroll-scale-up.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Smooth reveal for text */
+.text-reveal {
+  position: relative;
+  overflow: hidden;
+}
+
+.text-reveal::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, #ffffff, transparent);
+  animation: shimmer 2s infinite;
+}
+
+@keyframes shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Glow effect on scroll */
+.scroll-glow {
+  transition: all 0.3s ease;
+}
+
+.scroll-glow.visible {
+  box-shadow: 0 0 40px hsl(25 95% 53% / 0.3);
+  border-color: hsl(25 95% 53% / 0.5);
+}
+
+/* Performance optimizations */
+.gpu-accelerated {
+  will-change: transform, opacity;
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+.smooth-transform {
+  transform: translateZ(0);
+}
+
+/* Section-specific animations */
+.hero-title-animate {
+  opacity: 0;
+  transform: translateY(50px) scale(0.95);
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.hero-title-animate.visible {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.card-animate {
+  opacity: 0;
+  transform: translateY(40px) rotateX(10deg);
+  transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+
+.card-animate.visible {
+  opacity: 1;
+  transform: translateY(0) rotateX(0);
+}
+
+/* Floating animation for special elements */
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-20px);
+  }
+}
+
+.floating {
+  animation: float 6s ease-in-out infinite;
+}
+
+.floating-delayed {
+  animation: float 6s ease-in-out infinite;
+  animation-delay: 2s;
+}
+
+/* Pulse animation for CTA elements */
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px hsl(25 95% 53% / 0.4);
+  }
+  50% {
+    box-shadow: 0 0 40px hsl(25 95% 53% / 0.8);
+  }
+}
+
+.pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
 }

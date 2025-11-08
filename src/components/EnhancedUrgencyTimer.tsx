@@ -1,5 +1,5 @@
-import { Clock } from "lucide-react";
 import { usePersonalization } from "@/context/PersonalizationProvider";
+import { Clock } from "lucide-react";
 
 export const EnhancedUrgencyTimer = () => {
   const { timeRemaining, isPersonalized, isVeryUrgent, getSecondsRemaining, data } = usePersonalization();
@@ -32,14 +32,16 @@ export const EnhancedUrgencyTimer = () => {
       }
     `}>
       <div className="flex items-center justify-center gap-3 mb-4">
-        <Clock className={`w-6 h-6 ${veryUrgent ? 'text-white animate-pulse' : isUrgent ? 'text-orange-300' : 'text-orange-400'}`} />
       </div>
       
       <div className="text-center mb-3">
         <p className={`
           font-bold leading-tight mb-2
-          ${veryUrgent ? 'text-white text-xl' : isUrgent ? 'text-orange-100 text-lg' : 'text-orange-100 text-base'}
-        `}>
+          ${veryUrgent ? 'text-white' : isUrgent ? 'text-orange-100' : 'text-orange-100'}
+        `}
+        style={{
+          fontSize: veryUrgent ? '1.25rem' : isUrgent ? '1.125rem' : '1rem'
+        }}>
           {veryUrgent ? '⚠️ ¡TIEMPO CRÍTICO! ' : isUrgent ? '⏳ Tiempo agotándose: ' : '⏳ '}
           <span className="block mt-2">
             {timeParts.map((part, index) => {
@@ -50,7 +52,7 @@ export const EnhancedUrgencyTimer = () => {
               return (
                 <span key={index} className="inline-block mx-1">
                   <span className={`
-                    text-xl font-semibold
+                    font-semibold
                     ${isSeconds
                       ? 'animate-pulse'
                       : ''
@@ -61,18 +63,20 @@ export const EnhancedUrgencyTimer = () => {
                       ? 'text-orange-200'
                       : 'text-orange-100'
                     }
-                  `}>
+                  `}
+                  style={{fontSize: '1.25rem'}}>
                     {value}
                   </span>
                   <span className={`
-                    text-sm font-medium ml-1
-                    ${veryUrgent 
-                      ? 'text-white/90' 
-                      : isUrgent 
-                      ? 'text-orange-300' 
+                    font-medium ml-1
+                    ${veryUrgent
+                      ? 'text-white/90'
+                      : isUrgent
+                      ? 'text-orange-300'
                       : 'text-orange-200'
                     }
-                  `}>
+                  `}
+                  style={{fontSize: '0.875rem'}}>
                     {unit}
                   </span>
                 </span>
@@ -83,14 +87,15 @@ export const EnhancedUrgencyTimer = () => {
       </div>
       
       <p className={`
-        text-center text-sm leading-relaxed
-        ${veryUrgent 
-          ? 'text-white/90 font-semibold' 
-          : isUrgent 
-          ? 'text-orange-200/90' 
+        text-center leading-relaxed
+        ${veryUrgent
+          ? 'text-white/90 font-semibold'
+          : isUrgent
+          ? 'text-orange-200/90'
           : 'text-orange-200/80'
         }
-      `}>
+      `}
+      style={{fontSize: '0.875rem'}}>
         {veryUrgent
           ? '¡SEGUNDOS para que tu oportunidad desaparezca para siempre!'
           : isUrgent
@@ -101,7 +106,7 @@ export const EnhancedUrgencyTimer = () => {
       
       {veryUrgent && (
         <div className="mt-4 pt-4 border-t border-white/30">
-          <p className="text-xs text-white/80 text-center italic font-medium">
+          <p className="text-white/80 text-center italic font-medium" style={{fontSize: '0.75rem'}}>
             "Los líderes no esperan. Los segundos deciden el destino."
           </p>
         </div>
@@ -109,7 +114,7 @@ export const EnhancedUrgencyTimer = () => {
       
       {isUrgent && !veryUrgent && (
         <div className="mt-3 pt-3 border-t border-orange-500/30">
-          <p className="text-xs text-orange-300/80 text-center italic">
+          <p className="text-orange-300/80 text-center italic" style={{fontSize: '0.75rem'}}>
             "El tiempo no perdona a quienes dudan."
           </p>
         </div>

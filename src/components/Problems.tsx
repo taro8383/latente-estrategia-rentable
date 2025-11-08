@@ -5,6 +5,7 @@ import problemsStress from "@/assets/problems-stress.jpg";
 import marketingPlan from "@/assets/Marketing-Plan.png";
 import { PersonalizedText } from "@/components/PersonalizedText";
 import { usePersonalization } from "@/context/PersonalizationProvider";
+import { AnimatedElement, StaggeredAnimation } from "@/components/ui/scroll-animations";
 
 const allProblems = [
   {
@@ -80,97 +81,105 @@ export const Problems = () => {
     <section id="problemas" className="py-24 md:py-32 bg-background">
       <div className="container mx-auto px-4">
         {/* Image Banner */}
-        <div className="max-w-5xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-strong">
-          <img 
-            src={problemsStress} 
-            alt="Empresario de cuero trabajando en su estrategia"
-            className="w-full h-64 md:h-96 object-cover"
-          />
-        </div>
+        <AnimatedElement animation="fade-down" delay={100}>
+          <div className="max-w-5xl mx-auto mb-16 rounded-3xl overflow-hidden shadow-strong">
+            <img
+              src={problemsStress}
+              alt="Empresario de cuero trabajando en su estrategia"
+              className="w-full h-64 md:h-96 object-cover"
+            />
+          </div>
+        </AnimatedElement>
 
         {/* Header Section */}
         <div className="max-w-4xl mx-auto text-center mb-16 mobile-center">
-          <div className="mb-8">
-            <div className="flex flex-wrap justify-center gap-4 mb-6 mobile-center-flex mobile-stack">
-              <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center">
-                <CheckCircle2 className="w-4 h-4 text-accent" />
-                <span className="text-accent font-semibold text-sm">Calidad del producto ✓</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center">
-                <CheckCircle2 className="w-4 h-4 text-accent" />
-                <span className="text-accent font-semibold text-sm">Posición en el mercado ✓</span>
-              </div>
-              <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center">
-                <CheckCircle2 className="w-4 h-4 text-accent" />
-                <span className="text-accent font-semibold text-sm">Operaciones que funcionan ✓</span>
+          <AnimatedElement animation="fade-up" delay={200}>
+            <div className="mb-8">
+              <div className="flex flex-wrap justify-center gap-4 mb-6 mobile-center-flex mobile-stack">
+                <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center">
+                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                  <span className="text-accent font-semibold" style={{fontSize: '0.875rem'}}>Calidad del producto ✓</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center">
+                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                  <span className="text-accent font-semibold" style={{fontSize: '0.875rem'}}>Posición en el mercado ✓</span>
+                </div>
+                <div className="flex items-center gap-2 px-3 py-1 bg-accent/10 rounded-full border border-accent/20 mobile-center">
+                  <CheckCircle2 className="w-4 h-4 text-accent" />
+                  <span className="text-accent font-semibold" style={{fontSize: '0.875rem'}}>Operaciones que funcionan ✓</span>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-        
-        <PersonalizedText as="h2" className="mb-6 mobile-center-text">
-          Entonces… ¿Por qué seguís atrapado en el{" "}
-          <span className="text-accent">segundo pelotón?</span>
-        </PersonalizedText>
-        <p className="text-xl text-muted-foreground mb-4 mobile-center-text">
-          No es suerte. Es que estás jugando con las reglas equivocadas.
-        </p>
-      </div>
+          </AnimatedElement>
 
-      {/* Problems Grid */}
-      <div className="max-w-6xl mx-auto space-y-6">
-        {visibleProblems.map((problem, index) => {
-          const Icon = problem.icon;
-          return (
-            <div
-                key={index}
-                className="group p-8 rounded-2xl border border-border bg-card hover:border-accent/50 transition-smooth shadow-soft hover:shadow-medium"
-              >
-                <div className="flex items-start gap-6 md:items-start mobile-stack mobile-center">
-                  <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-smooth mobile-center-block">
-                    <Icon className="w-8 h-8 text-accent" />
-                  </div>
-                  <div className="flex-1 space-y-4 mobile-center-text">
-                    <PersonalizedText as="h3" className="text-2xl font-bold text-foreground mobile-center-text">
-                      {problem.title}
-                    </PersonalizedText>
-                    
-                    <div className="grid md:grid-cols-3 gap-6 mobile-stack">
-                      <div className="space-y-2 mobile-center-text">
-                        <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mobile-center-text">Antes:</p>
-                        <PersonalizedText as="p" className="text-muted-foreground leading-relaxed mobile-center-text">
-                          {problem.before}
-                        </PersonalizedText>
-                      </div>
-                      
-                      <div className="space-y-2 mobile-center-text">
-                        <p className="text-sm font-semibold text-accent uppercase tracking-wider mobile-center-text">Después:</p>
-                        <PersonalizedText as="p" className="text-muted-foreground leading-relaxed mobile-center-text">
-                          {problem.after}
-                        </PersonalizedText>
-                      </div>
-                      
-                      <div className="space-y-2 mobile-center-text">
-                        <p className="text-sm font-semibold text-foreground uppercase tracking-wider mobile-center-text">Resultado:</p>
-                        <PersonalizedText className="text-foreground font-medium leading-relaxed mobile-center-text">
-                          {problem.result}
-                        </PersonalizedText>
+          <AnimatedElement animation="fade-up" delay={300}>
+            <PersonalizedText as="h2" className="mb-6 mobile-center-text">
+              Entonces… ¿Por qué seguís atrapado en el{" "}
+              <span className="text-accent">segundo pelotón?</span>
+            </PersonalizedText>
+            <p className="text-muted-foreground mb-4 mobile-center-text" style={{fontSize: '1.25rem'}}>
+              No es suerte. Es que estás jugando con las reglas equivocadas.
+            </p>
+          </AnimatedElement>
+        </div>
+
+        {/* Problems Grid */}
+        <div className="max-w-6xl mx-auto space-y-6">
+          <StaggeredAnimation staggerDelay={150} animation="fade-up">
+            {visibleProblems.map((problem, index) => {
+              const Icon = problem.icon;
+              return (
+                <div
+                  key={index}
+                  className="group p-8 rounded-2xl border border-border bg-card hover:border-accent/50 transition-smooth shadow-soft hover:shadow-medium scroll-glow"
+                >
+                  <div className="flex items-start gap-6 md:items-start mobile-stack mobile-center">
+                    <div className="flex-shrink-0 w-16 h-16 rounded-2xl bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-smooth mobile-center-block">
+                      <Icon className="w-8 h-8 text-accent" />
+                    </div>
+                    <div className="flex-1 space-y-4 mobile-center-text">
+                      <PersonalizedText as="h3" className="font-bold text-foreground mobile-center-text" style={{fontSize: '1.5rem'}}>
+                        {problem.title}
+                      </PersonalizedText>
+
+                      <div className="grid md:grid-cols-3 gap-6 mobile-stack">
+                        <div className="space-y-2 mobile-center-text">
+                          <p className="font-semibold text-muted-foreground uppercase tracking-wider mobile-center-text" style={{fontSize: '0.875rem'}}>Antes:</p>
+                          <PersonalizedText as="p" className="text-muted-foreground leading-relaxed mobile-center-text" style={{fontSize: '1rem'}}>
+                            {problem.before}
+                          </PersonalizedText>
+                        </div>
+
+                        <div className="space-y-2 mobile-center-text">
+                          <p className="font-semibold text-accent uppercase tracking-wider mobile-center-text" style={{fontSize: '0.875rem'}}>Después:</p>
+                          <PersonalizedText as="p" className="text-muted-foreground leading-relaxed mobile-center-text" style={{fontSize: '1rem'}}>
+                            {problem.after}
+                          </PersonalizedText>
+                        </div>
+
+                        <div className="space-y-2 mobile-center-text">
+                          <p className="font-semibold text-foreground uppercase tracking-wider mobile-center-text" style={{fontSize: '0.875rem'}}>Resultado:</p>
+                          <PersonalizedText className="text-foreground font-medium leading-relaxed mobile-center-text">
+                            {problem.result}
+                          </PersonalizedText>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            );
-        })}
-      </div>
+              );
+            })}
+          </StaggeredAnimation>
+        </div>
 
       {/* Expand/Collapse Button */}
-      <div className="text-center mt-12 mobile-center">
-        <Button
-          variant="outline"
-          onClick={() => setIsExpanded(!isExpanded)}
-          className={`
-            group
+      <AnimatedElement animation="fade-up" delay={600}>
+        <div className="text-center mt-12 mobile-center">
+          <Button
+            variant="outline"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className={`
+              group
               relative
               accent-gradient
               text-white
@@ -181,8 +190,8 @@ export const Problems = () => {
               hover:shadow-strong
               transition-all
               duration-300
-              px-10
-              py-5
+              px-4 sm:px-6 md:px-8
+              py-3 sm:py-4 md:py-5
               font-semibold
               glow-pulse
               button-attention
@@ -192,52 +201,60 @@ export const Problems = () => {
               md:min-w-[400px]
               mobile-center-block
               mobile-button-lg
+              enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop touch-manipulation
             `}
-        >
-          <span className="relative z-10">
-            {isExpanded ? "Mostrar menos problemas" : "¿Más problemas? Más soluciones"}
-          </span>
-          {isExpanded ? (
-            <ChevronUp className="ml-3 w-6 h-6 relative z-10 transition-transform duration-300 group-hover:-translate-y-1" />
-          ) : (
-            <ChevronDown className="ml-3 w-6 h-6 relative z-10 transition-transform duration-300 group-hover:translate-y-1" />
-          )}
-        </Button>
-      </div>
+            style={{minHeight: '3rem'}}
+          >
+            <div className="flex items-center justify-center w-full gap-2">
+              <span className="relative z-10 text-center flex-1">
+                {isExpanded ? "Mostrar menos problemas" : "¿Más problemas? Más soluciones"}
+              </span>
+              {isExpanded ? (
+                <ChevronUp className="flex-shrink-0 w-6 h-6 relative z-10 transition-transform duration-300 group-hover:-translate-y-1" />
+              ) : (
+                <ChevronDown className="flex-shrink-0 w-6 h-6 relative z-10 transition-transform duration-300 group-hover:translate-y-1" />
+              )}
+            </div>
+          </Button>
+        </div>
+      </AnimatedElement>
 
       {/* Final Section */}
-      <div className="max-w-4xl mx-auto mt-16 space-y-8 mobile-center">
-        <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-3xl p-8 md:p-12 border border-accent/30 mobile-center">
-          <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-6 text-center mobile-center-text">
-            La diferencia que se amplía
-          </h3>
-          
-          <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-accent/20 mb-6 mobile-center">
-            <p className="text-lg text-foreground leading-relaxed text-center mobile-center-text">
-              Mientras lees esto, tu competidor número uno no solo está ganando... está redefiniendo las reglas del juego para asegurarse de que tu marca quede permanentemente relegada a la categoría de 'una alternativa mas del monton'.
-            </p>
-            <div className="space-y-3 mt-4 mobile-center-text">
-              <p className="text-muted-foreground text-center">
-                Cada día que esperas, él está levantando la barrera de entrada al numero uno, usando una nueva técnica de marketing, o firmando un contrato de exclusividad con tu proveedor más confiable.
+      <AnimatedElement animation="scale-up" delay={700} duration={800}>
+        <div className="max-w-4xl mx-auto mt-16 space-y-8 mobile-center">
+          <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-3xl p-8 md:p-12 border border-accent/30 mobile-center scroll-glow">
+            <h3 className="font-bold text-foreground mb-6 text-center mobile-center-text" style={{fontSize: '2rem'}}>
+              La diferencia que se amplía
+            </h3>
+
+            <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-accent/20 mb-6 mobile-center">
+              <p className="text-foreground leading-relaxed text-center mobile-center-text" style={{fontSize: '1.125rem'}}>
+                Mientras lees esto, tu competidor número uno no solo está ganando... está redefiniendo las reglas del juego para asegurarse de que tu marca quede permanentemente relegada a la categoría de 'una alternativa mas del monton'.
               </p>
-              <p className="text-muted-foreground text-center">
-                No se trata solamente de ganar.
+              <div className="space-y-3 mt-4 mobile-center-text">
+                <p className="text-muted-foreground text-center" style={{fontSize: '1rem'}}>
+                  Cada día que esperas, él está levantando la barrera de entrada al numero uno, usando una nueva técnica de marketing, o firmando un contrato de exclusividad con tu proveedor más confiable.
+                </p>
+                <p className="text-muted-foreground text-center" style={{fontSize: '1rem'}}>
+                  No se trata solamente de ganar.
+                </p>
+                <p className="text-muted-foreground text-center" style={{fontSize: '1rem'}}>
+                  Se trata de no ser borrado del mapa.
+                </p>
+              </div>
+            </div>
+
+            <div className="text-center mobile-center">
+              <p className="text-foreground mb-4 mobile-center-text" style={{fontSize: '1.25rem'}}>
+                La diferencia no son los fundamentos.
               </p>
-              <p className="text-muted-foreground text-center">
-                Se trata de no ser borrado del mapa.
+              <p className="font-bold text-accent mobile-center-text" style={{fontSize: '1.5rem'}}>
+                Es el acceso a optimizaciones avanzadas que solo conocen quienes ya llegaron ahí.
               </p>
             </div>
           </div>
-          
-          <div className="text-center mobile-center">
-            <p className="text-xl text-foreground mb-4 mobile-center-text">
-              La diferencia no son los fundamentos.
-            </p>
-            <p className="text-2xl font-bold text-accent mobile-center-text">
-              Es el acceso a optimizaciones avanzadas que solo conocen quienes ya llegaron ahí.
-            </p>
-          </div>
         </div>
+      </AnimatedElement>
       </div>
     </section>
   );

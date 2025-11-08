@@ -1,19 +1,25 @@
 import { Clock, AlertTriangle, Mail } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import logo from "/LoDi-logo.svg";
 
 export const ExpiredOffer = () => {
   const handleContactSupport = () => {
-    window.location.href = 'mailto:contacto@latente.com?subject=Invitación Expirada - Solicitar Reconsideración';
-  };
-
-  const handleGoHome = () => {
-    window.location.href = '/';
+    window.location.href = 'mailto:invitacion@latente.net?subject=Invitación Expirada - Solicitar Reconsideración';
   };
 
   return (
-    <section className="min-h-screen hero-gradient text-primary-foreground flex items-center justify-center">
+    <section className="min-h-screen hero-gradient text-primary-foreground flex items-center justify-center pt-8">
       <div className="container mx-auto px-4">
         <div className="max-w-3xl mx-auto text-center">
+          {/* Logo - Full Width */}
+          <div className="mb-12 flex justify-center pt-8">
+            <img
+              src={logo}
+              alt="LoDi Logo"
+              className="h-16 md:h-20 w-auto"
+            />
+          </div>
+
           {/* Warning Icon */}
           <div className="mb-8">
             <div className="w-32 h-32 bg-destructive/20 rounded-full flex items-center justify-center mx-auto animate-pulse">
@@ -63,25 +69,20 @@ export const ExpiredOffer = () => {
               contacta directamente con nuestro equipo de estrategia.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            <div className="flex justify-center items-center">
               <Button
                 onClick={handleContactSupport}
                 size="lg"
-                className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong text-base sm:text-lg w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 group"
+                className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong text-base sm:text-lg w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 group enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop touch-manipulation"
+                style={{minHeight: '3rem'}}
               >
-                <Mail className="mr-0 sm:mr-2 mt-2 sm:mt-0 w-5 h-5 flex-shrink-0" />
-                <span className="block sm:hidden">Reconsiderar</span>
-                <span className="hidden sm:inline">Solicitar reconsideración</span>
-              </Button>
-
-              <Button
-                onClick={handleGoHome}
-                variant="outline"
-                size="lg"
-                className="border-accent/30 text-white hover:bg-accent/10 text-base sm:text-lg w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6"
-              >
-                <span className="block sm:hidden">Inicio</span>
-                <span className="hidden sm:inline">Ir al inicio</span>
+                <div className="flex items-center justify-center w-full gap-2">
+                  <Mail className="flex-shrink-0 w-5 h-5" />
+                  <span className="text-center flex-1">
+                    <span className="block sm:hidden">Reconsiderar</span>
+                    <span className="hidden sm:inline">Solicitar reconsideración</span>
+                  </span>
+                </div>
               </Button>
             </div>
 

@@ -75,16 +75,16 @@ export const FAQ = () => {
         {/* Header */}
         <div className="max-w-4xl mx-auto text-center mb-16 mobile-center">
           <div className="inline-block px-4 py-2 bg-accent/10 rounded-full border border-accent/20 mb-6 mobile-center-block">
-            <span className="text-accent font-semibold">RESOLUCIÓN DE DUDAS</span>
+            <span className="text-accent font-semibold" style={{fontSize: '1rem'}}>RESOLUCIÓN DE DUDAS</span>
           </div>
           
           <HelpCircle className="w-16 h-16 text-accent mx-auto mb-6 mobile-center-block" />
           
-          <h2 className="mb-6 mobile-center-text">
+          <h2 className="mb-6 mobile-center-text" style={{fontSize: '2rem'}}>
             Preguntas Frecuentes
           </h2>
           
-          <p className="text-xl text-muted-foreground mb-8 mobile-center-text">
+          <p className="text-muted-foreground mb-8 mobile-center-text" style={{fontSize: '1.25rem'}}>
             Las respuestas que necesitas para tomar la decisión más importante de tu carrera
           </p>
         </div>
@@ -117,12 +117,12 @@ export const FAQ = () => {
                   <div className="flex items-center justify-between mobile-stack mobile-center">
                     <div className="flex items-start gap-4 mobile-stack mobile-center">
                       <div className="flex-shrink-0 w-12 h-12 rounded-xl accent-gradient flex items-center justify-center shadow-medium mobile-center-block">
-                        <span className="text-white font-bold text-lg">{index + 1}</span>
+                        <span className="text-white font-bold" style={{fontSize: '1.125rem'}}>{index + 1}</span>
                       </div>
                       <h3 className={`
-                        text-lg md:text-xl font-bold leading-relaxed transition-all duration-300 mobile-center-text
+                        font-bold leading-relaxed transition-all duration-300 mobile-center-text
                         ${isExpanded ? 'text-foreground' : 'text-foreground hover:text-accent'}
-                      `}>
+                      `} style={{fontSize: '1.25rem'}}>
                         {item.question}
                       </h3>
                     </div>
@@ -140,7 +140,7 @@ export const FAQ = () => {
                 {isExpanded && (
                   <div className="px-6 pb-6 border-t border-border/50">
                     <div className="pt-6">
-                      <p className="text-lg text-muted-foreground leading-relaxed mobile-center-text">
+                      <p className="text-muted-foreground leading-relaxed mobile-center-text" style={{fontSize: '1.125rem'}}>
                         {item.answer}
                       </p>
                     </div>
@@ -155,16 +155,16 @@ export const FAQ = () => {
         <div className="max-w-4xl mx-auto mt-20 space-y-8 mobile-center">
           <div className="bg-gradient-to-r from-accent/10 to-accent/5 rounded-3xl p-8 md:p-12 border border-accent/30 mobile-center">
             <div className="text-center space-y-6 mobile-center">
-              <h3 className="text-2xl md:text-3xl font-bold text-foreground mb-6 mobile-center-text">
+              <h3 className="font-bold text-foreground mb-6 mobile-center-text" style={{fontSize: '2rem'}}>
                 ¿Todavía tienes dudas?
               </h3>
               
-              <PersonalizedText className="text-xl text-muted-foreground leading-relaxed mb-8 mobile-center-text">
+              <PersonalizedText className="text-muted-foreground leading-relaxed mb-8 mobile-center-text" style={{fontSize: '1.25rem'}}>
                 Los reyes no se paralizan por el análisis. Actúan con información suficiente y dominio.
               </PersonalizedText>
               
               <div className="bg-background/80 backdrop-blur-sm rounded-2xl p-6 border border-accent/20 mb-8 mobile-center">
-                <p className="text-lg text-foreground leading-relaxed text-center mobile-center-text">
+                <p className="text-foreground leading-relaxed text-center mobile-center-text" style={{fontSize: '1.125rem'}}>
                   Si llegaste hasta aquí, ya tienes toda la información que necesitas. 
                   La única pregunta real es: <span className="text-accent font-bold">¿vas a dejar que tu competidor tome el trono?</span>
                 </p>
@@ -174,10 +174,16 @@ export const FAQ = () => {
                 <Button
                   onClick={() => document.getElementById('section-1')?.scrollIntoView({ behavior: 'smooth' })}
                   size="lg"
-                  className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop w-full sm:w-auto px-4 sm:px-8 py-3 sm:py-6 group mobile-center-block font-semibold"
+                  className="accent-gradient text-white hover:scale-105 transition-bounce shadow-strong w-full sm:w-auto px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 whitespace-normal break-words text-center group font-semibold touch-manipulation pulse-glow"
+                  style={{minHeight: '3.5rem', fontSize: 'clamp(0.875rem, 3vw, 1rem)', lineHeight: '1.2'}}
                 >
-                  <span className="block sm:inline">Reclamar mi trono ahora</span>
-                  <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />
+                  <div className="flex items-center justify-center w-full gap-2" style={{minHeight: '2.5rem'}}>
+                    <span className="flex-1 text-center" style={{display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '2rem'}}>
+                      <span className="hidden sm:inline" style={{wordBreak: 'break-word', lineHeight: '1.2'}}>Reclamar mi trono ahora</span>
+                      <span className="sm:hidden" style={{wordBreak: 'break-word', lineHeight: '1.2'}}>Reclamar mi trono ahora</span>
+                    </span>
+                    <ArrowRight className="flex-shrink-0 group-hover:translate-x-1 transition-smooth w-4 h-4 sm:w-5 sm:h-5" />
+                  </div>
                 </Button>
               </div>
             </div>

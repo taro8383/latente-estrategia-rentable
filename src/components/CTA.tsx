@@ -51,10 +51,10 @@ export const CTA = () => {
             <h2 className="mb-6">
               ¿Listo para dejar de ser <span className="text-accent">el eterno segundo</span>?
             </h2>
-            <p className="text-xl text-muted-foreground mb-4">
+            <p className="text-muted-foreground mb-4" style={{fontSize: '1.25rem'}}>
               Agenda una llamada estratégica sin compromiso. Analizaremos tu situación y te diremos exactamente cómo podríamos ayudarte.
             </p>
-            <p className="text-lg font-semibold text-foreground">
+            <p className="font-semibold text-foreground" style={{fontSize: '1.125rem'}}>
               Si no vemos potencial para duplicar tus ganancias, te lo diremos de frente.
             </p>
           </div>
@@ -63,7 +63,7 @@ export const CTA = () => {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-2">
-                  <label htmlFor="name" className="text-sm font-semibold text-foreground">
+                  <label htmlFor="name" className="font-semibold text-foreground" style={{fontSize: '0.875rem'}}>
                     Nombre completo *
                   </label>
                   <Input
@@ -78,7 +78,7 @@ export const CTA = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <label htmlFor="email" className="text-sm font-semibold text-foreground">
+                  <label htmlFor="email" className="font-semibold text-foreground" style={{fontSize: '0.875rem'}}>
                     Email corporativo *
                   </label>
                   <Input
@@ -94,7 +94,7 @@ export const CTA = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="company" className="text-sm font-semibold text-foreground">
+                <label htmlFor="company" className="font-semibold text-foreground" style={{fontSize: '0.875rem'}}>
                   Empresa y sector *
                 </label>
                 <Input
@@ -109,7 +109,7 @@ export const CTA = () => {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="message" className="text-sm font-semibold text-foreground">
+                <label htmlFor="message" className="font-semibold text-foreground" style={{fontSize: '0.875rem'}}>
                   Cuéntanos tu situación (opcional)
                 </label>
                 <Textarea
@@ -124,14 +124,19 @@ export const CTA = () => {
               <Button
                 type="submit"
                 size="lg"
-                className="w-full accent-gradient text-white hover:scale-105 transition-bounce shadow-medium text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] py-6 group font-semibold"
+                className="w-full accent-gradient text-white hover:scale-105 transition-bounce shadow-medium text-[1rem] sm:text-[1.125rem] md:text-[1.25rem] py-3 sm:py-4 md:py-5 group font-semibold enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop touch-manipulation px-4 sm:px-6 md:px-8"
+                style={{minHeight: '3rem'}}
               >
-                <span className="block sm:hidden">Agendar</span>
-                <span className="hidden sm:inline">Agendar llamada estratégica</span>
-                <ArrowRight className="ml-0 sm:ml-2 mt-2 sm:mt-0 group-hover:translate-x-1 transition-smooth w-5 h-5 flex-shrink-0" />
+                <div className="flex items-center justify-center w-full gap-2">
+                  <span className="text-center flex-1">
+                    <span className="block sm:hidden">Agendar</span>
+                    <span className="hidden sm:inline">Agendar llamada estratégica</span>
+                  </span>
+                  <ArrowRight className="flex-shrink-0 group-hover:translate-x-1 transition-smooth w-5 h-5" />
+                </div>
               </Button>
 
-              <p className="text-sm text-muted-foreground text-center">
+              <p className="text-muted-foreground text-center" style={{fontSize: '0.875rem'}}>
                 No spam. No ventas agresivas. Solo una conversación honesta sobre si podemos ayudarte.
               </p>
             </form>
@@ -139,16 +144,16 @@ export const CTA = () => {
 
           <div className="mt-12 grid md:grid-cols-3 gap-6 text-center">
             <div className="p-6">
-              <p className="text-3xl font-bold text-accent mb-2">2-4x</p>
-              <p className="text-sm text-muted-foreground">Incremento promedio primer año</p>
+              <p className="font-bold text-accent mb-2" style={{fontSize: '1.875rem'}}>2-4x</p>
+              <p className="text-muted-foreground" style={{fontSize: '0.875rem'}}>Incremento promedio primer año</p>
             </div>
             <div className="p-6">
-              <p className="text-3xl font-bold text-accent mb-2">0% riesgo</p>
-              <p className="text-sm text-muted-foreground">Solo pagas por resultados</p>
+              <p className="font-bold text-accent mb-2" style={{fontSize: '1.875rem'}}>0% riesgo</p>
+              <p className="text-muted-foreground" style={{fontSize: '0.875rem'}}>Solo pagas por resultados</p>
             </div>
             <div className="p-6">
-              <p className="text-3xl font-bold text-accent mb-2">100% tuyo</p>
-              <p className="text-sm text-muted-foreground">Tu negocio actual intacto</p>
+              <p className="font-bold text-accent mb-2" style={{fontSize: '1.875rem'}}>100% tuyo</p>
+              <p className="text-muted-foreground" style={{fontSize: '0.875rem'}}>Tu negocio actual intacto</p>
             </div>
           </div>
         </div>

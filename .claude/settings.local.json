@@ -30,7 +30,9 @@
       "mcp__context7__get-library-docs",
       "Bash(wrangler --help:*)",
       "Bash(wrangler pages --help:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(npm install:*)",
+      "Bash(npm run dev:*)"
     ],
     "deny": [],
     "ask": []

@@ -95,12 +95,14 @@ export const LocalTimeCountdown = () => {
       </div>
       
       <p className={`
-        text-xl md:text-2xl font-bold mb-2
-        ${isCritical 
-          ? 'text-white animate-pulse' 
+        font-bold mb-2
+        ${isCritical
+          ? 'text-white animate-pulse'
           : 'text-white'
         }
-      `}>
+      `}
+      style={{fontSize: 'clamp(1.25rem, 2vw, 1.5rem)'}}
+      >
         ⏳ La ventana cierra el {dayName} {dayNumber} de {monthName}
       </p>
       
@@ -116,7 +118,7 @@ export const LocalTimeCountdown = () => {
       
       {isCritical && (
         <div className="mt-4 pt-4 border-t border-white/30">
-          <p className="text-xs text-white/80 text-center italic font-medium">
+          <p className="text-white/80 text-center italic font-medium" style={{fontSize: '0.75rem'}}>
             "Las decisiones históricas se toman en minutos. No esperes."
           </p>
         </div>

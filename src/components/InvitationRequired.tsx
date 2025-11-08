@@ -14,7 +14,7 @@ const InvitationRequired = () => {
     if (faviconLink) {
       faviconLink.href = '/favicon.svg';
     }
-    
+
     // Also set shortcut icon
     let shortcutIcon = document.querySelector("link[rel='shortcut icon']") as HTMLLinkElement;
     if (!shortcutIcon) {
@@ -24,10 +24,6 @@ const InvitationRequired = () => {
     }
     shortcutIcon.href = '/favicon.ico';
   }, []);
-
-  const handleGoBack = () => {
-    navigate(-1);
-  };
 
   return (
     <div className="min-h-screen hero-gradient text-primary-foreground flex items-center justify-center px-4">
@@ -79,7 +75,7 @@ const InvitationRequired = () => {
                   </div>
                   <p className="text-sm text-white/80">
                     <strong>Email:</strong><br />
-                    invitaciones@latente.net
+                    invitacion@latente.net
                   </p>
                 </div>
                 
@@ -118,22 +114,17 @@ const InvitationRequired = () => {
               </ul>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 pt-4">
+            {/* Action Button */}
+            <div className="flex justify-center pt-4">
               <Button
-                onClick={() => window.location.href = 'mailto:invitaciones@latente.net?subject=Solicitud%20de%20Invitación&body=Estoy%20interesado%20en%20recibir%20una%20invitación%20para%20acceder%20a%20la%20plataforma%20Latente.'}
-                className="flex-1 bg-accent hover:bg-accent/90 text-white"
+                onClick={() => window.location.href = 'mailto:invitacion@latente.net?subject=Solicitud%20de%20Invitación&body=Estoy%20interesado%20en%20recibir%20una%20invitación%20para%20acceder%20a%20la%20plataforma%20Latente.'}
+                className="w-full sm:w-auto bg-accent hover:bg-accent/90 text-white enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop touch-manipulation px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5"
+                style={{minHeight: '3rem'}}
               >
-                <Mail className="w-4 h-4 mr-2" />
-                Solicitar Invitación
-              </Button>
-              
-              <Button
-                variant="outline"
-                onClick={handleGoBack}
-                className="flex-1 border-white/20 text-white hover:bg-white/10"
-              >
-                Volver
+                <div className="flex items-center justify-center w-full gap-2">
+                  <Mail className="w-4 h-4 flex-shrink-0" />
+                  <span className="text-center flex-1">Solicitar Invitación</span>
+                </div>
               </Button>
             </div>
           </CardContent>

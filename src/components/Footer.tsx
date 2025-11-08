@@ -17,7 +17,7 @@ export const Footer = () => {
             </div>
 
             <div className="flex items-end mobile-center">
-              <p className="text-sm text-white/60 mobile-center-text">
+              <p className="text-white/60 mobile-center-text" style={{fontSize: '0.875rem'}}>
                 © {new Date().getFullYear()}. Latente, socios estratégicos en rentabilidad. Todos los derechos reservados.
               </p>
             </div>

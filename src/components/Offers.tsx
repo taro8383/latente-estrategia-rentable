@@ -215,13 +215,16 @@ export const Offers = () => {
                   <Button
                     onClick={scrollToContact}
                     size="lg"
-                    className={`w-full mobile-center-block ${
+                    className={`w-full mobile-center-block enhanced-button-mobile sm:enhanced-button-tablet md:enhanced-button-desktop touch-manipulation px-4 sm:px-6 md:px-8 py-3 sm:py-4 md:py-5 ${
                       tier.highlighted
                         ? 'accent-gradient text-white hover:scale-105 shadow-medium'
                         : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                     } transition-bounce mobile-button-md`}
+                    style={{minHeight: '3rem'}}
                   >
-                    {tier.cta}
+                    <div className="flex items-center justify-center w-full gap-2">
+                      <span className="text-center flex-1">{tier.cta}</span>
+                    </div>
                   </Button>
                 </div>
               </div>
