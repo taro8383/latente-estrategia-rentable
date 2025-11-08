@@ -26,8 +26,8 @@ Add the React Grab script tag directly to your HTML head section:
 **Complete modified section should look like:**
 ```html
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="https://lovable.dev/opengraph-image-p98pqg.png" />
+    <meta name="twitter:site" content="@latente" />
+    <meta name="twitter:image" content="/opengraph-image.png" />
 
     <!-- React Grab for development -->
     <script
