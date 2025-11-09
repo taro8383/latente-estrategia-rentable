@@ -605,9 +605,7 @@
                                 <option value="24">24 horas</option>
                                 <option value="48">48 horas</option>
                                 <option value="72" selected>72 horas</option>
-                                <option value="96">96 horas</option>
-                                <option value="120">120 horas</option>
-                                <option value="144">144 horas</option>
+                                <option value="84">84 horas</option>
                                 <option value="168">1 semana</option>
                             </select>
                         </div>
@@ -897,7 +895,7 @@
                 required: true,
                 min: 1,
                 max: 720,
-                values: [24, 48, 72, 96, 120, 144, 168],
+                values: [24, 48, 72, 168],
                 errorMessage: 'Vigencia inválida (seleccione una opción válida)'
             },
             {
@@ -1158,14 +1156,6 @@
                         if (typeof value === 'string' && value.length > 1000) {
                             console.log('🔧 Truncating long field:', key, 'from', value.length, 'to 1000 chars');
                             return value.substring(0, 1000) + '...[truncated]';
-                        }
-                        // Escape problematic characters for shell script compatibility
-                        if (typeof value === 'string') {
-                            return value
-                                .replace(/"/g, '\\"')  // Escape quotes
-                                .replace(/\n/g, '\\n') // Escape newlines
-                                .replace(/\r/g, '\\r') // Escape carriage returns
-                                .replace(/\t/g, '\\t'); // Escape tabs
                         }
                         return value;
                     }));
