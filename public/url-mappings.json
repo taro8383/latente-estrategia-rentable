@@ -224,15 +224,22 @@
       "createdAt": 1762734050021,
       "expiresAt": 1763036449962,
       "metadata": "{\"brandInfo\":{\"name\":\"GRIMOLDI\",\"industry\":\"calzados multimarca\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Alberto\",\"company\":\"GRIMOLDI\",\"position\":\"CEO\",\"location\":\"Puerto Madero\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"male\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"tienda de calzados multimarca\",\"historia\":\"Imagina esto: tu nieto, en 2050, revisa los archivos de moda de la Biblioteca del Congreso. Encuentra una foto icónica del zapato que definió una década. La leyenda no solo menciona la marca, sino la frase en negrita: 'El modelo fue introducido al continente por GRIMOLDI. Su elección validó la tendencia.' Alguien lo ve a su lado y dice, en voz baja: 'Mi abuela siempre me dijo: si no estaba en GRIMOLDI, no existía.' Eso no es una venta. Es una sentencia de estilo. Y esa sentencia, que dicta el futuro, se escribe ahora mismo.\",\"brandName\":\"GRIMOLDI\",\"tuMarca\":\"GRIMOLDI\",\"inovacion\":\"cuero reciclado\",\"malPosicionamiento\":\"calidad y artesanal\",\"rollsRoyce\":\"el Savile Row del calzado Argentino\",\"fraseDescriptiva\":\"calzados\",\"avatar\":\"Tu cliente ideal ya no es 'la mujer que sigue las tendencias de moda'. Es Camila, de Palermo, que no compra la última colección de una marca italiana. Compra la credibilidad estética que le da la tienda al elegir esa marca por ella. Compra el derecho a decir: 'Lo encontré en GRIMOLDI.' Que su círculo sepa: esta mujer no se viste. Es el canon\",\"propuestaPobre\":\"calidad y tendencia\",\"propuestaBuena\":\"Ellos venden zapatos. Nosotros vendemos el par que tu abuelo usó para forjar su camino... y tu nieto querrá para empezar el suyo\",\"automatizacion\":\"buscar los calzados que van a ser la próxima tendencia del mercado\",\"trabajoDeValor\":\"tu Director de Compras ya no cuenta pares de stock... entrena a jóvenes curadores de tendencias bajo tu sello.\",\"proveedor\":\"las lineas mas exclusivas\",\"infrautilizado\":\"Tu red de distribución infrautilizada no 'cuesta'... 'Genera $5,000,000/mes vendiendo servicios de logística de 'última milla' a startups de accesorios y moda que necesitan enviar pedidos a todo el país... sin montar su propia estructura.\",\"membresia\":\"Entran en tu Círculo de Legado: pagan una membresía anual y reciben piezas exclusivas\",\"metodo\":\"ese método tuyo para convertir una queja en una recompra inmediata? Lo vendes como 'Modelo de Recuperación de Valor' a centros comerciales y distribuidores en Uruguay y Ecuador... con tu logo en cada feedback que gestionen.'\"},\"expiration\":{\"createdAt\":\"2025-11-10T00:20:34.257Z\",\"expiresAt\":\"2025-11-13T12:20:34.257Z\",\"uniqueCode\":\"5w15k08pkdyfa1fkkdlgh6\",\"validHours\":84},\"companyLogo\":null,\"companyLogoId\":\"logo_1762734034257_pylfvhb\",\"companyLogoUrl\":\"https://taro8383.github.io/latente-estrategia-rentable/assets/logos/gwq811.jpg\",\"logoFileExtension\":\"jpg\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"calzados multimarca\",\"hasCustomContent\":true,\"company\":\"GRIMOLDI\",\"readerName\":\"Alberto\"}}"
+    },
+    "5bIRW9": {
+      "shortCode": "5bIRW9",
+      "longUrl": "https://latente.net/#/invite/1oe43xo7nz3sktv69jbzm",
+      "createdAt": 1762755570819,
+      "expiresAt": 1763014770761,
+      "metadata": "{\"brandInfo\":{\"name\":\"Reee\",\"industry\":\"Znnzjzjs\",\"productType\":\"leather goods\",\"targetAudience\":\"affluent professionals\"},\"readerInfo\":{\"name\":\"Juan\",\"company\":\"Luxury Holdings\",\"position\":\"CEO\",\"location\":\"Nueva York\"},\"industryKeywords\":[\"productos premium\",\"artesanía de calidad\",\"diseño exclusivo\"],\"genderInfo\":{\"gender\":\"male\",\"genderSpecificText\":{}},\"customMessages\":{\"calificador\":\"Gree\",\"historia\":\"Yree\",\"brandName\":\"Reee\",\"tuMarca\":\"Reee\",\"inovacion\":\"Dmksks\",\"malPosicionamiento\":\"Kdksks\",\"rollsRoyce\":\"Sjisiee\",\"fraseDescriptiva\":\"Jxjsks\",\"avatar\":\"Dnndsk\",\"propuestaPobre\":\"Kdksnsn\",\"propuestaBuena\":\"Isksksks\",\"automatizacion\":\"Jdksks\",\"trabajoDeValor\":\"Idisks\",\"proveedor\":\"XbnN\",\"infrautilizado\":\"Skkdifuuf\",\"membresia\":\"Djksks\",\"metodo\":\"Ucudjdje\"},\"expiration\":{\"createdAt\":\"2025-11-10T06:17:41.320Z\",\"expiresAt\":\"2025-11-13T06:17:41.320Z\",\"uniqueCode\":\"1oe43xo7nz3sktv69jbzm\",\"validHours\":72},\"companyLogo\":null,\"companyLogoId\":\"logo_1762755510702_k06tkkl\",\"companyLogoUrl\":\"https://your-username.github.io/your-repo/assets/logos/MTB5Qh.png\",\"logoFileExtension\":\"png\",\"metadata\":{\"generatorVersion\":\"2.1\",\"variableCount\":20,\"complexity\":17,\"industry\":\"Znnzjzjs\",\"hasCustomContent\":true,\"company\":\"Luxury Holdings\",\"readerName\":\"Juan\"}}"
     }
   },
-  "lastUpdated": 1762734050021,
+  "lastUpdated": 1762755570819,
   "version": "1.0",
   "statistics": {
-    "totalMappings": 31,
-    "activeMappings": 29,
+    "totalMappings": 32,
+    "activeMappings": 30,
     "expiredMappings": 2,
-    "lastCleanup": 1762734050020,
+    "lastCleanup": 1762755570818,
     "lastCleanupCount": 0
   }
 }
