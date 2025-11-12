@@ -32,7 +32,13 @@
       "Bash(wrangler pages --help:*)",
       "Bash(curl:*)",
       "Bash(npm install:*)",
-      "Bash(npm run dev:*)"
+      "Bash(npm run dev:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(rm:*)",
+      "Bash(for commit in:*)",
+      "Bash(do echo:*)",
+      "Bash(done)",
+      "Bash(public/url-mappings.json)"
     ],
     "deny": [],
     "ask": []
