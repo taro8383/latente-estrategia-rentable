@@ -1160,6 +1160,14 @@
                             console.log('🔧 Truncating long field:', key, 'from', value.length, 'to 1000 chars');
                             return value.substring(0, 1000) + '...[truncated]';
                         }
+                        // Escape problematic characters for shell script compatibility
+                        if (typeof value === 'string') {
+                            return value
+                                .replace(/"/g, '\\"')  // Escape quotes
+                                .replace(/\n/g, '\\n') // Escape newlines
+                                .replace(/\r/g, '\\r') // Escape carriage returns
+                                .replace(/\t/g, '\\t'); // Escape tabs
+                        }
                         return value;
                     }));
 
