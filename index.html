@@ -19,6 +19,9 @@
     <meta name="twitter:site" content="@latente" />
     <meta name="twitter:image" content="/opengraph-image.png" />
 
+    <!-- 100% privacy-first analytics -->
+    <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+
     <!-- Critical CSS (inlined to prevent FOUC and ensure immediate background/text visibility) -->
     <style>
       /* Minimal critical styles */
@@ -58,8 +61,7 @@
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
 
-    <!-- 100% privacy-first analytics -->
-    <script data-collect-dnt="true" async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
+    <!-- Simple Analytics noscript fallback -->
     <noscript><img src="https://queue.simpleanalyticscdn.com/noscript.gif?collect-dnt=true" alt="" referrerpolicy="no-referrer-when-downgrade"/></noscript>
   </body>
 </html>
