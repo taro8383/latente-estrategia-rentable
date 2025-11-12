@@ -78,9 +78,17 @@ export const RedirectHandler: React.FC = () => {
           try {
             if (!encodedData) {
               const url = new URL(urlToProcess);
-              const hashFragment = url.hash.substring(1); // Remove the # symbol
-              const urlParams = new URLSearchParams(hashFragment);
-              encodedData = urlParams.get('data');
+              if (url.hash && url.hash.includes('?data=')) {
+                // Handle multiple hash fragments by finding the LAST occurrence of ?data=
+                const lastDataIndex = url.hash.lastIndexOf('?data=');
+                if (lastDataIndex !== -1) {
+                  // Extract everything after the last ?data=
+                  const hashPart = url.hash.substring(lastDataIndex + 6); // +6 for '?data='
+                  // Remove any trailing hash fragments (#/something) that might come after the data
+                  const hashFragments = hashPart.split('#');
+                  encodedData = hashFragments[0]; // Take only the first part after ?data=
+                }
+              }
             }
 
             if (encodedData) {
