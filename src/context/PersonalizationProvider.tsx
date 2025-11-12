@@ -58,9 +58,14 @@ export const PersonalizationProvider: React.FC<PersonalizationProviderProps> = (
         // query. We attempt decoding from hash/search first, then fall back to that localStorage key.
         let usedIncomingPayload = false;
         if (window.location.hash && window.location.hash.includes('?data=')) {
-          const hashParams = window.location.hash.split('?data=');
-          if (hashParams.length > 1) {
-            encodedData = hashParams[1];
+          // Handle multiple hash fragments by finding the LAST occurrence of ?data=
+          const lastDataIndex = window.location.hash.lastIndexOf('?data=');
+          if (lastDataIndex !== -1) {
+            // Extract everything after the last ?data=
+            const hashPart = window.location.hash.substring(lastDataIndex + 6); // +6 for '?data='
+            // Remove any trailing hash fragments (#/something) that might come after the data
+            const hashFragments = hashPart.split('#');
+            encodedData = hashFragments[0]; // Take only the first part after ?data=
           }
         }
 
