@@ -1,4 +1,5 @@
 {
+  "_updated": "2025-11-12T18:00:00Z - Fixed JSON corruption",
   "mappings": {
     "rss1kV": {
       "shortCode": "rss1kV",
